@@ -270,9 +270,10 @@ def template_explanation(facts: dict[str, str]) -> str:
             "The purchase would have to be paid in cash."
         )
     else:
+        short = facts["Years short of age 95"]
         lines.append(
             f"The lease runs out when your youngest buyer is {facts['Youngest buyer is this old when lease ends']}, "
-            f"{facts['Years short of age 95']} years before age 95. CPF use is then pro-rated: "
+            f"{short} year{'' if short == '1' else 's'} before age 95. CPF use is then pro-rated: "
             f"(remaining lease - 20) / (95 - youngest age - 20), which allows {facts['CPF usable (% of Valuation Limit)']}% "
             "of the Valuation Limit. The rest must come from cash."
         )

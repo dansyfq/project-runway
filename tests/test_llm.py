@@ -183,3 +183,9 @@ def test_hourly_ai_budget_falls_back_to_passages(monkeypatch):
     over = bot.answer("What is the HDB loan limit?", [SOURCE])
     assert over.error == llm_mod.AI_BUSY and over.text == llm_mod.offline_answer([SOURCE])
     assert bot.explain(FACTS, [SOURCE]) == (template_explanation(FACTS), False)
+
+
+def test_template_says_1_year_not_1_years():
+    text = template_explanation({**FACTS, "Years short of age 95": "1"})
+    assert "1 year before age 95" in text and "1 years" not in text
+    assert "9 years before age 95" in template_explanation(FACTS)
