@@ -35,10 +35,13 @@ def verify_password(password: str, stored: str) -> bool:
     return hmac.compare_digest(actual, expected)
 
 
+DUMMY_HASH = hash_password("dummy")  # made once, so unknown usernames cost exactly one hash like known ones
+
+
 def check_login(username: str, password: str, users: dict[str, str]) -> bool:
     """Constant-ish time: always run one hash, even for unknown usernames."""
     stored = users.get(username.strip().lower())
     if stored is None:
-        verify_password(password, hash_password("dummy", iterations=ITERATIONS))
+        verify_password(password, DUMMY_HASH)
         return False
     return verify_password(password, stored)

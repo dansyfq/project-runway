@@ -82,3 +82,15 @@ def test_malformed_stored_hash_fails_closed():
     assert not verify_password("x", "pbkdf2_sha256$abc$!!$!!")
     assert not verify_password("x", "pbkdf2_sha256$1000$not base64$x")
 
+
+def test_unknown_user_costs_the_same_one_hash(monkeypatch):
+    """Unknown usernames must not take longer (or shorter) than known ones: one PBKDF2 each."""
+    import runway.auth as auth
+
+    users = {"demo": hash_password("Pw12345678")}
+    calls = []
+    real = auth.hashlib.pbkdf2_hmac
+    monkeypatch.setattr(auth.hashlib, "pbkdf2_hmac", lambda *a: calls.append(a[3]) or real(*a))
+    check_login("demo", "wrong", users)
+    check_login("ghost", "wrong", users)
+    assert calls == [auth.ITERATIONS, auth.ITERATIONS]
