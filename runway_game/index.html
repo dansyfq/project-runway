@@ -1121,19 +1121,11 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
 .lbar{position:relative;height:10px;background:rgba(255,255,255,.12);border-radius:5px;overflow:hidden}
 .lbar i{position:absolute;inset:0 auto 0 0;border-radius:5px;transition:width .6s cubic-bezier(.2,.7,.2,1),background .4s}
 .lbar b{position:absolute;top:-4px;bottom:-4px;width:2px;background:#fff}
-.lsrc{font:11.5px/1.5 var(--ui);color:rgba(255,255,255,.55);border-top:1px solid rgba(255,255,255,.12);padding-top:14px}
-.ltable .hd{display:grid;grid-template-columns:1fr auto;gap:12px;padding:0 0 12px;font:600 11.5px var(--ui);letter-spacing:.12em;text-transform:uppercase;color:#3A3A3A;border-bottom:1px solid #111}
-.ltable .tr{display:grid;grid-template-columns:minmax(110px,1fr) minmax(70px,2fr) auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid #D9D4CC}
-.ltable .tr:hover{background:#FBF9F6}
-.ltable .nm{font:600 17px var(--serif)} .ltable .pc{font:700 20px var(--serif);font-variant-numeric:tabular-nums;min-width:70px;text-align:right}
-.ltable .bar{height:8px;background:#F6F3EE;border-radius:4px;overflow:hidden} .ltable .bar i{display:block;height:100%;transform-origin:left;animation:rwLine 1.2s cubic-bezier(.2,.7,.2,1) both}
 .lask{background:#F6F3EE;border-top:1px solid #D9D4CC}
 .lchip{font:500 13.5px var(--ui);color:#1C1C1C;background:#fff;border:1px solid #D9D4CC;border-radius:999px;padding:10px 16px;cursor:pointer;transition:all .25s}
 .lchip:hover{border-color:#7A2E1D;color:#7A2E1D} .lchip.on{background:#7A2E1D;color:#fff;border-color:#7A2E1D}
 .lanswer{background:#fff;border:1px solid #D9D4CC;border-radius:8px;padding:clamp(24px,3vw,40px);display:flex;flex-direction:column;gap:18px;box-shadow:0 40px 80px -40px rgba(17,17,17,.25)}
 .lanswer .q{font:600 19px/1.35 var(--serif);color:#7A2E1D} .lanswer .a{margin:0;font:400 16.5px/1.6 var(--serif)}
-.lquote{background:#F6F3EE;border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
-.lquote small{font:600 11px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:#7A2E1D} .lquote span{font:italic 400 15px/1.5 var(--serif)}
 .lasky{display:flex;gap:8px}
 .lasky input{flex:1;min-width:0;font:400 15px var(--ui);border:1px solid #D9D4CC;border-radius:4px;padding:0 14px;height:48px;outline:none}
 .lasky input:focus{border-color:#7A2E1D;box-shadow:0 0 0 3px rgba(122,46,29,.12)}
@@ -1174,7 +1166,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
       <div class="lnav" id="lnav">
         <button type="button" class="lbrand" data-go="top" aria-label="Runway home"><svg viewBox="0 0 100 100" aria-hidden="true" class="lmark"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="var(--mk-bg,#fff)"/><path d="M31 52 38 48 38 73 31 66Z" fill="currentColor"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/><path d="M62 50 69 54 69 66 62 73Z" fill="currentColor"/></svg><span>Runway</span></button>
         <div class="llinks">
-          <a class="lk" href="#lidea">The idea</a><a class="lk" href="#lrule">The rule</a><a class="lk" href="#ltowns">By town</a><a class="lk" href="#lask">Ask Runway</a>
+          <a class="lk" href="#lask">Ask Runway</a>
           <button type="button" class="lk" data-go="about">About</button>
           <button type="button" class="lbtn sm login" data-login id="lLoginBtn">Log in</button>
           <button type="button" class="lbtn sm" data-go="map">Check a flat</button>
@@ -1188,12 +1180,11 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
         <div class="lwrap">
           <div class="leyebrow lrise"><i></i>For HDB resale buyers</div>
           <h1 class="lrise" style="animation-delay:.1s">How much lease you have left, <em>and what it buys you.</em></h1>
-          <p class="lead2 lrise" style="animation-delay:.22s">The years left on a flat's lease, combined with your age, decide how much CPF you can use. Runway shows you the rule, what a shorter lease costs in your town, and the source for both.</p>
+          <p class="lead2 lrise" style="animation-delay:.22s">The years left on a flat's lease, combined with your age, decide how much CPF you can use. Runway shows you the rule and what a shorter lease costs in your town.</p>
           <div class="lrow lrise" style="animation-delay:.34s"><button type="button" class="lbtn" data-go="map">Check a flat<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a class="lbtn ghost" href="#lask">Ask a question</a></div>
           <div class="lstats lrise" style="animation-delay:.46s">
             <div><b>986,090</b><span>resale records</span></div>
             <div><b>1990 – 2026</b><span>every HDB town</span></div>
-            <div><b>32 documents</b><span>CPF · HDB · MND</span></div>
           </div>
         </div>
       </div>
@@ -1223,7 +1214,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
       <div class="lsec lrule" id="lrule"><div class="lwrap lgrid" style="align-items:center">
         <div class="col reveal"><div class="leyebrow" style="color:#E8B4A5">02 · The age-95 rule</div>
           <h2>Try it with your own numbers.</h2>
-          <p class="body">Move the lease and the age. The verdict follows the rule in MND's Annex A and CPF Board's worked example. Nothing here is estimated by AI.</p>
+          <p class="body">Move the lease and the age.</p>
           <div class="lrow" style="gap:14px">
             <div style="display:flex;flex-direction:column;gap:8px"><span class="llbl">Lease left</span><span class="lstep"><button type="button" data-rule="lease" data-d="-1" aria-label="Less lease">−</button><output id="lLease"></output><button type="button" data-rule="lease" data-d="1" aria-label="More lease">+</button></span></div>
             <div style="display:flex;flex-direction:column;gap:8px"><span class="llbl">Youngest buyer</span><span class="lstep"><button type="button" data-rule="age" data-d="-1" aria-label="Younger">−</button><output id="lAge"></output><button type="button" data-rule="age" data-d="1" aria-label="Older">+</button></span></div>
@@ -1234,27 +1225,16 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
           <div class="lbar"><i id="lCover"></i><b id="lNeed"></b></div>
           <div style="display:flex;justify-content:space-between;font:500 12px var(--ui);color:rgba(255,255,255,.7)"><span id="lCovers"></span><span id="lNeeds"></span></div>
           <p style="margin:0;font:400 16px/1.55 var(--serif);color:rgba(255,255,255,.85)" id="lBody"></p>
-          <div class="lsrc">MND · Annex A, Updated Rules on CPF Usage and HDB Housing Loan · 9 May 2019. HDB loan limit from HDB, resale applications from 20 Aug 2024.</div>
         </div>
       </div></div>
 
-      <div class="lsec"><div class="lwrap lgrid" id="ltowns">
-        <div class="col reveal" style="position:sticky;top:96px"><div class="leyebrow">03 · Lease by town</div>
-          <h2>A shorter lease costs three times more in some towns.</h2>
-          <p class="body">Across Singapore, price per square metre barely moves with lease. That is an illusion, because long leases sit in new towns. Compare within a town and the pattern is clear.</p>
-          <div style="font:11.5px/1.5 var(--ui);color:#3A3A3A">Resale flats sold Jan 2024 – Sep 2026, compared within each town and flat type. A market pattern, not a guarantee.</div></div>
-        <div class="ltable reveal" style="transition-delay:.15s"><div class="hd"><span>Town</span><span>Per extra year of lease</span></div><div id="lTownRows"></div>
-          <div style="padding-top:18px;font:italic 400 16px/1.5 var(--serif)" id="lTownNote"></div></div>
-      </div></div>
-
       <div class="lsec lask" id="lask"><div class="lwrap lgrid" style="align-items:center">
-        <div class="col reveal"><div class="leyebrow">04 · Ask Runway</div>
+        <div class="col reveal"><div class="leyebrow">03 · Ask Runway</div>
           <h2>Follow-up questions, with the rule quoted each time.</h2>
           <p class="body">Ask why your CPF is cut, what changes if your partner is the younger buyer, or what the 20-year minimum means. Runway reads the CPF, HDB and MND documents and shows the passage it relied on. The numbers are always calculated the ordinary way. The AI only explains.</p>
           <div class="lrow" style="gap:8px" id="lSugg"></div></div>
         <div class="lanswer reveal" style="transition-delay:.15s">
           <div class="q" id="lAq"></div><p class="a" id="lAa"></p>
-          <div class="lquote"><small id="lAdoc"></small><span id="lAquote"></span></div>
           <div class="lasky"><input id="lAskIn" placeholder="Ask about your situation…" aria-label="Your question"><button type="button" id="lAskBtn">Ask</button></div>
         </div>
       </div></div>
@@ -1451,17 +1431,15 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
 /* ---------- landing page (works before the map data arrives) ---------- */
 (function(){
   const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
-  const L = {age: 28, lease: 58, answer: 'partner', hover: 'Clementi', notice: true};
+  const L = {age: 28, lease: 58, answer: 'partner', notice: true};
   // Same rule as runway/cpf_rules.py (tested): share of the Valuation Limit CPF can pay.
   function landingShare(age, lease){ if(lease <= 20) return 0; if(age + lease >= 95) return 1; return (lease - 20) / (95 - age - 20); }
   window.landingShare = landingShare;
   const ANSWERS = {
-    partner: {q: 'What if my partner is the younger buyer?', a: 'The rule looks only at the youngest owner. If your partner is younger than you, the lease has to last until they turn 95, so a younger partner makes the test harder, not easier.', doc: 'MND and MOM joint press release · 9 May 2019', quote: 'The rules will now focus on whether the remaining lease of the home can cover the youngest buyer until at least the age of 95.'},
-    cut: {q: 'How much is my CPF use cut by?', a: 'When the lease does not cover the youngest buyer to 95, the Valuation Limit is pro-rated. CPF Board\'s example: two 25-year-olds buying a $550,000 flat with 65 years left can use up to $495,000. The HDB loan limit, 75% today, is pro-rated the same way.', doc: 'MND · Annex A, 9 May 2019', quote: 'Valuation Limit pro-rated according to the extent that the remaining lease can cover the youngest buyer using CPF to the age of 95.'},
-    twenty: {q: 'What does the 20-year minimum lease mean?', a: 'The remaining lease at the point of purchase, which is the flat application date for HDB flats, must be more than 20 years, whatever your age. Below that, no CPF and no HDB loan.', doc: 'MND · Annex A, 9 May 2019', quote: 'Remaining lease at the point of purchase is more than 20 years. For HDB flats, the point of purchase refers to the flat application date.'}
-  };
-  const TOWNS = [['Yishun', .54], ['Hougang', .68], ['Choa Chu Kang', .79], ['Woodlands', .91], ['Tampines', .93], ['Bedok', 1.19], ['Queenstown', 1.40], ['Ang Mo Kio', 1.43], ['Toa Payoh', 1.52], ['Clementi', 1.55]];  // same figures as the map's town rows
-  function renderRule(){
+    partner: {q: 'What if my partner is the younger buyer?', a: 'The rule looks only at the youngest owner. If your partner is younger than you, the lease has to last until they turn 95, so a younger partner makes the test harder, not easier.'},
+    cut: {q: 'How much is my CPF use cut by?', a: 'When the lease does not cover the youngest buyer to 95, the Valuation Limit is pro-rated. CPF Board\'s example: two 25-year-olds buying a $550,000 flat with 65 years left can use up to $495,000. The HDB loan limit, 75% today, is pro-rated the same way.'},
+    twenty: {q: 'What does the 20-year minimum lease mean?', a: 'The remaining lease at the point of purchase, which is the flat application date for HDB flats, must be more than 20 years, whatever your age. Below that, no CPF and no HDB loan.'}
+  };  function renderRule(){
     const loanTxt = L.age >= 65 ? 'An HDB loan is not possible from age 65, because it must be repaid by then.' : '', need = 95 - L.age, gap = L.lease - need, ok = gap >= 0, share = landingShare(L.age, L.lease), span = Math.max(need, L.lease);
     $('#lLease').textContent = L.lease + ' yrs'; $('#lAge').textContent = L.age;
     const b = $('#lBadge'); b.textContent = L.lease <= 20 ? 'No CPF' : ok ? 'CPF up to Valuation Limit' : 'CPF pro-rated';
@@ -1479,19 +1457,13 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
     if(btn.dataset.rule === 'lease') L.lease = Math.max(21, Math.min(99, L.lease + d)); else L.age = Math.max(21, Math.min(70, L.age + d));
     renderRule();
   });
-  function renderTowns(){
-    $('#lTownRows').innerHTML = TOWNS.map(([n, v]) => { const on = n === L.hover; return `<div class="tr" data-town="${n}"><span class="nm" style="color:${on ? '#7A2E1D' : '#111'}">${n}</span><span class="bar"><i style="width:${Math.round(v / TOWNS[TOWNS.length - 1][1] * 100)}%;background:${on ? '#7A2E1D' : '#D9D4CC'}"></i></span><span class="pc" style="color:${on ? '#7A2E1D' : '#111'}">${v.toFixed(2)}%</span></div>`; }).join('');
-    const t = TOWNS.find(x => x[0] === L.hover);
-    $('#lTownNote').textContent = `In ${t[0]}, a 58-year flat trades about ${Math.round((1 - Math.pow(1 + t[1] / 100, -12)) * 100)}% per sqm below a comparable 70-year one.`;
-    $$('#lTownRows .tr').forEach(r => r.onmouseenter = () => { if(L.hover !== r.dataset.town){ L.hover = r.dataset.town; renderTowns(); } });
-  }
   function renderAsk(){
     const a = ANSWERS[L.answer];
-    $('#lAq').textContent = a.q; $('#lAa').textContent = a.a; $('#lAdoc').textContent = a.doc; $('#lAquote').textContent = '“' + a.quote + '”';
+    $('#lAq').textContent = a.q; $('#lAa').textContent = a.a;
     $('#lSugg').innerHTML = Object.entries(ANSWERS).map(([k, v]) => `<button type="button" class="lchip ${k === L.answer ? 'on' : ''}" data-ans="${k}">${v.q}</button>`).join('');
     $$('[data-ans]').forEach(c => c.onclick = () => { L.answer = c.dataset.ans; renderAsk(); });
   }
-  const askTyped = () => { const q = $('#lAskIn').value.trim(); if(q){ $('#lAskIn').value = ''; RW.enter('ask', q); } };
+  const askTyped = () => { const q = $('#lAskIn').value.trim(); $('#lAskIn').value = ''; RW.enter('ask', q || null); };
   $('#lAskBtn').onclick = askTyped; $('#lAskIn').onkeydown = e => { if(e.key === 'Enter') askTyped(); };
   $('#lNoticeTog').onclick = () => { L.notice = !L.notice; $('#lNoticeTxt').hidden = !L.notice; $('#lNoticeLab').textContent = L.notice ? 'Collapse' : 'Read the notice'; $('#lNoticeTog').setAttribute('aria-expanded', L.notice); };
   const scr = $('#scrLanding');
@@ -1500,7 +1472,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
   $$('.reveal').forEach(el => io.observe(el));
   const img = $('#lheroImg'); img.onload = () => img.style.opacity = '1'; if(img.complete) img.style.opacity = '1';
   $$('[data-go]').forEach(b => b.onclick = () => { const g = b.dataset.go; if(g === 'top'){ scr.scrollTo({top: 0, behavior: 'smooth'}); return; } RW.enter(g === 'map' ? 'map' : 'more', g === 'map' ? null : g); });
-  renderRule(); renderTowns(); renderAsk();
+  renderRule(); renderAsk();
 })();
 </script>
 <script>
@@ -2030,7 +2002,7 @@ function renderMore(){
       <button data-sub="about"><span>About Us<small>What Runway is, notice, team</small></span>${ICON.chev}</button>
       <button data-sub="method"><span>How it works<small>Methodology and flowcharts</small></span>${ICON.chev}</button>
       <button data-sub="sources"><span>Sources and credits<small>Data, map, documents, photos</small></span>${ICON.chev}</button>
-      <button id="homeBtn"><span>Runway home page<small>The rule, lease by town, notice</small></span>${ICON.chev}</button>
+      <button id="homeBtn"><span>Runway home page<small>The rule, notice</small></span>${ICON.chev}</button>
     </div>
     ${S.user?'<button class="btn ghost" type="button" id="outBtn">Log out</button>':'<button class="btn" type="button" id="inBtn">Log in for the reviewer view</button>'}`;
   $$('[data-sub]').forEach(b=>b.onclick=()=>sub(b.dataset.sub));
@@ -2049,10 +2021,10 @@ function renderSub(){
       <p class="small">Average age decides how long your HDB loan can be.</p>
       <span class="label">CPF Ordinary Account</span>
       <div class="chips">${[50000,100000,150000,200000,300000].map(o=>`<button type="button" class="chip" data-o="${o}" aria-pressed="${S.oaSet&&S.oa===o}">${exact(o)}</button>`).join('')}<button type="button" class="chip" data-o="skip" aria-pressed="${!S.oaSet}">Not sure</button></div>`;
-    const upd=()=>{$('#dA').textContent=S.age;$('#dV').textContent=S.avg;};
+    const upd=()=>{$('#dA').textContent=S.age;$('#dV').textContent=S.avg;S.dirty=true;sideProf();};
     $('#dAm').onclick=()=>{S.age=Math.max(21,S.age-1);syncAvg();upd();}; $('#dAp').onclick=()=>{S.age=Math.min(85,S.age+1);syncAvg();upd();};
     $('#dVm').onclick=()=>{S.avgSet=S.avg=Math.max(S.age,S.avg-1);upd();}; $('#dVp').onclick=()=>{S.avgSet=S.avg=Math.min(85,S.avg+1);upd();};
-    $$('[data-o]').forEach(c=>c.onclick=()=>{if(c.dataset.o==='skip')S.oaSet=false;else{S.oaSet=true;S.oa=+c.dataset.o;}$$('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===c));});
+    $$('[data-o]').forEach(c=>c.onclick=()=>{if(c.dataset.o==='skip')S.oaSet=false;else{S.oaSet=true;S.oa=+c.dataset.o;}$$('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===c));S.dirty=true;sideProf();});
   } else if(s==='size'){
     const big=document.documentElement.classList.contains('big');
     b.innerHTML=`${backBtn()}<h1>Text size</h1><p>Pick the size that is easiest to read.</p><div class="row"><button class="btn ${big?'ghost':'primary'}" id="szN">Normal</button><button class="btn ${big?'primary':'ghost'}" id="szB" style="font-size:1.2rem">Large</button></div>`;
@@ -2182,7 +2154,7 @@ $('#noticeLink').onclick=()=>{tab('more');sub('about');requestAnimationFrame(()=
 S.user=ME.user; S.role=ME.role||'brief'; S.onb=1; S.onbDone=false;
 function go(target,arg){ if(target==='ask'){tab('ask'); if(arg) ask(arg);} else if(target==='more'){tab('more'); if(arg) sub(arg);} else tab('map'); }
 window.RWAPP={
-  enter(target,arg){ if(target==='more'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=1; show('scrOnb'); renderOnb(); },
+  enter(target,arg){ if(target==='more'||target==='ask'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=1; show('scrOnb'); renderOnb(); },
   setUser(user,role){ S.user=user; S.role=role||'brief'; if(!$('#scrSub').hidden) renderSub(); else if(!$('#scrMore').hidden) renderMore(); }
 };
 const brand=$('.tabs .brand'); if(brand){ brand.style.cursor='pointer'; brand.onclick=()=>show('scrLanding'); }
