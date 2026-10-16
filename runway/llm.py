@@ -46,7 +46,7 @@ INJECTION_PATTERNS = [
     r"developer mode",
     r"pretend (to be|you are)",
 ]
-OFF_TOPIC_PATTERNS = [r"\bwrite (me )?(a |an |some )?(python|code|program|script|poem|song|story|essay)\b"]
+OFF_TOPIC_PATTERNS = [r"\bwrite (me )?(a |an |some )?(python|code|program|script|poem|song|story|essay)\b", r"\bjokes?\b"]
 ADVICE_PATTERNS = [
     r"should (i|we) (buy|sell|get|choose|take)",
     r"\b(is|would) (it|this|that) (be )?(a )?(good|bad|wise|smart) (buy|investment|deal|idea)",

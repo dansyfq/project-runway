@@ -29,6 +29,7 @@ from runway.rag import Chunk
         ("What does the 20-year minimum mean?", None),
         ("How does pro-rating work?", None),
         ("Can my parents co-own?", None),
+        ("Tell me a joke about co-owners", "off_topic"),
         ("How much BSD do I pay?", None),
         ("Should we buy this flat?", "advice"),
         ("Is it wise to buy a flat with 50 years left?", "advice"),
