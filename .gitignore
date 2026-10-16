@@ -1,0 +1,17 @@
+# Secrets and demo credentials: never commit
+.streamlit/secrets.toml
+demo_accounts.local.toml
+*.local.toml
+.env
+.env.*
+
+# Raw downloads (the combined data/resale.parquet is committed instead)
+data/raw/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.DS_Store
