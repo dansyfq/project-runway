@@ -1066,7 +1066,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
           <div style="display:flex;flex-direction:column;gap:12px">
             <label class="field"><span>Username</span><input class="inp" id="u" autocomplete="username" autocapitalize="none" required></label>
             <label class="field"><span>Password</span><input class="inp" id="pw" type="password" autocomplete="current-password" required></label>
-            <p class="err" id="loginErr" hidden>That username and password don't match.</p>
+            <p class="err" id="loginErr" role="alert" hidden>That username and password don't match.</p>
             <button class="btn primary" type="submit" id="loginBtn">Sign in</button>
           </div>
         </form>
@@ -1396,7 +1396,8 @@ function drawMap(){
     const s=g[0], r=calc(s.price,s.lease), ok=g.some(fits); if(ok&&S.match)nMatch+=g.filter(fits).length;
     const icon=L.divIcon({className:'pinicon',iconSize:[60,52],iconAnchor:[30,17],html:`<div class="pinwrap ${ok?'':'dim'}" style="animation-delay:${Math.min(i*15,600)}ms">${diaSvg(r.status,r.ratio,g.length)}<b>${Math.floor(s.lease)} yrs</b></div>`});
     const mk=L.marker([s.la,s.ln],{icon,keyboard:true,zIndexOffset:ok?1000:0,title:`Block ${s.blk} ${s.st}: ${g.length} sale${g.length>1?'s':''}, ${Math.floor(s.lease)} years left`,riseOnHover:true});
-    mk.on('click',()=>g.length>1?openBlock(g):openEnc(s));
+    const go=()=>g.length>1?openBlock(g):openEnc(s);
+    mk.on('click',go).on('keypress',e=>{if(e.originalEvent.key==='Enter'||e.originalEvent.key===' ')go();}); // Leaflet 1.9 pins are tabbable but ignore Enter
     LY.sales.addLayer(mk);
   });
   const n=(SALES[S.town]||[]).length;
@@ -1416,12 +1417,14 @@ function bindAgeSheet(){const avg0=S.avg,set=a=>{S.age=Math.max(21,Math.min(85,a
 
 /* ---------- sheets ---------- */
 function openSheet(html,after){
+  if(!$('#sheetHost .sheet')) S.opener=document.activeElement;
   $('#sheetHost').innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="scrim" data-closesheet></div><div class="panel"><div class="grab"></div><button class="close" type="button" aria-label="Close" data-closesheet>${ICON.close}</button>${html}</div></div>`;
   $$('#sheetHost [data-closesheet]').forEach(b=>b.onclick=closeSheet);
   if(after) after();
   const f=$('#sheetHost .close'); if(f) f.focus({preventScroll:true});
 }
-function closeSheet(){ $('#sheetHost').innerHTML=''; sideProf(); if(S.dirty && S.tab==='map' && !$('#scrMap').hidden){S.dirty=false;drawMap();} }
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#sheetHost .sheet'))closeSheet();});
+function closeSheet(){ const had=$('#sheetHost .sheet'); $('#sheetHost').innerHTML=''; if(had&&S.opener&&S.opener.isConnected) S.opener.focus({preventScroll:true}); sideProf(); if(S.dirty && S.tab==='map' && !$('#scrMap').hidden){S.dirty=false;drawMap();} }
 
 /* ---------- encounter ---------- */
 function bldgSvg(f){
