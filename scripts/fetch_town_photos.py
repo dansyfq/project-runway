@@ -53,10 +53,12 @@ def find_photo(query: str) -> dict | None:
         licence = strip_tags(meta.get("LicenseShortName", {}).get("value", ""))
         if info.get("mime") != "image/jpeg" or not OK_LICENCE.match(licence):
             continue
+        artist = strip_tags(meta.get("Artist", {}).get("value", "Unknown author"))
+        named = re.search(r"taken by (.+?)\.(?:\s{2,}|\n|$)", artist)  # "This Photo was taken by <name>.  Feel free..."
         return {
             "thumb": info["thumburl"],
             "page": info["descriptionurl"],
-            "author": strip_tags(meta.get("Artist", {}).get("value", "Unknown author"))[:80],
+            "author": " ".join((named.group(1) if named else artist).split()),  # whole name, never cut
             "licence": licence,
             "title": page["title"].removeprefix("File:"),
         }
