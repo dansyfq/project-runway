@@ -121,3 +121,10 @@ def test_api_failure_falls_back_visibly():
     assert result.error.startswith("TimeoutError")
     assert result.sources == [SOURCE]
     assert broken_llm().explain(FACTS, [SOURCE]) == (template_explanation(FACTS), False)
+
+
+def test_summarise_offline_lists_questions(monkeypatch):
+    monkeypatch.setattr(llm_mod, "get_setting", lambda name, default=None: default)
+    history = [{"role": "user", "content": "Is my HDB loan cut too?"}, {"role": "assistant", "content": "Yes [1]."}]
+    assert LLM().summarise(history) == "You asked about:\n- Is my HDB loan cut too?"
+    assert LLM().summarise([]) == "Nothing to sum up yet."
