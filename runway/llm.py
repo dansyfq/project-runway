@@ -25,8 +25,8 @@ DECLINE_INJECTION = (
     "I can only answer questions about HDB resale rules, CPF usage and lease, using the official documents "
     "in my library. I can't change how I work."
 )
-DECLINE_PERSONAL = "Please remove your NRIC or phone number. Runway never needs them."
-PERSONAL_PATTERNS = [r"\b[stfgm]\d{7}[a-z]\b", r"\b[689]\d{3}\s?\d{4}\b"]
+DECLINE_PERSONAL = "Please remove your NRIC, phone number or email. Runway never needs them."
+PERSONAL_PATTERNS = [r"\b[stfgm]\d{7}[a-z]\b", r"\b[689]\d{3}\s?\d{4}\b", r"[\w.+-]+@[\w-]+\.[\w.]+"]
 DECLINE_OFF_TOPIC = (
     "I only cover buying an HDB resale flat: CPF usage, the lease-to-age-95 rule, HDB loans, grants and "
     "the resale process. Try asking about one of those."
