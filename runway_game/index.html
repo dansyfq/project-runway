@@ -1,0 +1,1874 @@
+<title>Runway Town Safari</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+</style>
+<style>
+/* Layout: phone-first game shell (map scene + bottom tabs). Desktop centres the phone with a notes panel. Single light theme by brand choice: Runway Brand Kit v1.0. */
+:root{
+  --rust:#7A2E1D; --rust-dark:#5C2215; --rust-soft:#F4E7E2;
+  --ink:#111111; --body:#1C1C1C; --slate:#3A3A3A; --stone:#666666; --sand:#D9D4CC; --paper:#F6F3EE; --white:#FFFFFF;
+  --ok:#2C6845; --ok-soft:#E2EFE6; --part:#8F5509; --part-soft:#F8EAD4; --no:#3A3A3A; --no-soft:#ECEAE6;
+  --land:#ECE6DB; --road:#FFFFFF; --road-edge:#DDD5C8; --park:#D6E2CC; --water:#D3E2E6; --foot:#E1D9CC;
+  --wordmark:"Anton",Impact,"Arial Narrow Bold",sans-serif;
+  --serif:"Source Serif 4","Source Serif Pro",Georgia,"Times New Roman",serif;
+  --ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{font-size:18px;height:100%}
+body{margin:0}
+html.big{font-size:21px}
+body{background:var(--paper);color:var(--body);font-family:var(--serif);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100%}
+h1,h2,h3{margin:0;text-wrap:balance;color:var(--ink);font-family:var(--serif);line-height:1.15}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--rust);outline-offset:2px}
+.ui{font-family:var(--ui)}
+.num{font-variant-numeric:tabular-nums}
+.label{font:600 .72rem var(--ui);text-transform:uppercase;letter-spacing:.12em;color:var(--slate)}
+[hidden]{display:none!important}
+
+/* top mockup bar */
+.chrome{background:var(--ink);color:#EEE;font:500 .72rem/1.3 var(--ui);padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap}
+.chrome b{font:400 .95rem var(--wordmark);letter-spacing:.04em}
+.chrome .desc{white-space:nowrap}
+.chrome .sp{flex:1}
+.chrome label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.chrome button{background:transparent;border:1px solid #555;border-radius:4px;color:#EEE;padding:2px 10px;font:500 .72rem var(--ui)}
+
+/* stage */
+.stage{display:block}
+.phone{width:100%;height:100dvh;min-height:520px;background:var(--white);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.chrome{height:36px;flex-wrap:nowrap;overflow:hidden}
+.seg{display:inline-flex;border:1px solid #555;border-radius:6px;overflow:hidden}
+.seg button{border:0;background:transparent;color:#EEE;padding:2px 10px;font:600 .72rem var(--ui)}
+.seg button[aria-pressed="true"]{background:var(--rust);color:#fff}
+@media (max-width:700px){.chrome .hide-sm{display:none}}
+@media (max-width:1023px){.chrome .desc{display:none}}
+.chrome label,.chrome .seg button{white-space:nowrap}
+@media (min-width:700px) and (max-width:1023px){.sheet{align-items:center}.sheet .panel{width:100%;max-width:640px}}
+
+/* streamlit tags */
+.show-st [data-st]{outline:1.5px dashed var(--rust);outline-offset:-2px}
+.show-st [data-st]::after{content:attr(data-st);position:absolute;z-index:60;top:2px;left:2px;font:500 10px/1.4 var(--mono);background:var(--ink);color:#F2C230;padding:0 5px;border-radius:2px;pointer-events:none;white-space:nowrap}
+[data-st]{position:relative}
+
+/* screens */
+.screen{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;position:relative}
+.pad{padding:20px 20px 28px;display:flex;flex-direction:column;gap:18px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--sand);background:var(--white);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs button{border:0;background:none;padding:8px 2px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;font:600 .74rem var(--ui);color:var(--stone);position:relative;min-height:62px}
+.tabs button svg{width:26px;height:26px}
+.tabs button[aria-current="page"]{color:var(--rust)}
+.tabs .count{position:absolute;top:4px;left:calc(50% + 6px);background:var(--rust);color:var(--white);font:700 .66rem var(--ui);border-radius:999px;min-width:20px;height:20px;padding:0 5px;display:grid;place-items:center}
+.tabs .count.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.5)}}
+
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;border-radius:12px;border:2px solid var(--rust);background:var(--white);color:var(--rust);font:600 1rem var(--ui);padding:10px 18px;text-align:center}
+.btn.primary{background:var(--rust);color:var(--white)}
+.btn.primary:active{background:var(--rust-dark)}
+.btn.ghost{border-color:var(--sand);color:var(--ink)}
+.btn.sm{min-height:44px;font-size:.85rem;padding:6px 14px;border-radius:10px}
+.btn svg{width:22px;height:22px;flex:none}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.back{align-self:flex-start;border:0;background:none;font:600 .95rem var(--ui);color:var(--rust);display:flex;align-items:center;gap:4px;min-height:44px;padding:0}
+
+/* login */
+.login{background:var(--rust);color:var(--white);flex:1;display:flex;flex-direction:column;justify-content:center;gap:26px;padding:28px 24px}
+.lockup{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.lockup svg{width:84px;height:84px}
+.lockup .wm{font:400 3rem/1 var(--wordmark);letter-spacing:.04em}
+.lockup .tg{font:400 .78rem var(--wordmark);letter-spacing:.16em}
+.login .card{background:var(--white);color:var(--body);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field>span{font:600 .9rem var(--ui);color:var(--ink)}
+.inp{border:2px solid var(--sand);border-radius:12px;padding:12px 14px;min-height:56px;background:var(--white);width:100%;font-family:var(--ui);font-size:1rem}
+.inp:focus{border-color:var(--rust);outline:none}
+.err{font:500 .9rem var(--ui);color:var(--rust)}
+.quick{display:flex;flex-direction:column;gap:8px}
+.quick p{font:500 .8rem var(--ui);color:var(--slate);text-align:center}
+
+/* onboarding */
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:28px;height:6px;border-radius:3px;background:var(--sand)}
+.dots i.on{background:var(--rust)}
+.onb h1{font-size:1.75rem}
+.onb .lead{font-size:1.05rem;color:var(--slate)}
+.stepper{display:grid;grid-template-columns:72px 1fr 72px;align-items:center;gap:10px}
+.stepper button{height:72px;border-radius:16px;border:2px solid var(--rust);background:var(--white);color:var(--rust);font:700 2rem var(--ui)}
+.stepper output{font:700 4rem/1 var(--serif);text-align:center;color:var(--ink);font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--sand);background:var(--white);border-radius:999px;padding:8px 16px;min-height:48px;font:600 .95rem var(--ui);color:var(--ink)}
+.chip[aria-pressed="true"]{border-color:var(--rust);background:var(--rust-soft);color:var(--rust)}
+.notice{background:var(--paper);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;font-size:.92rem}
+.notice p{color:var(--body)}
+
+/* town list */
+.region{display:flex;flex-direction:column;gap:6px}
+.townrow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;border:2px solid var(--sand);background:var(--white);border-radius:12px;padding:10px 14px;min-height:58px;text-align:left}
+.townrow:hover{border-color:var(--rust)}
+.townrow[aria-pressed="true"]{border-color:var(--rust);background:var(--rust-soft)}
+.townrow b{font:600 1rem var(--ui);color:var(--ink);display:block}
+.townrow small{font:500 .78rem var(--ui);color:var(--slate)}
+.meter{display:inline-flex;gap:3px}
+.meter i{width:12px;height:12px;transform:rotate(45deg);border:2px solid var(--rust);border-radius:2px}
+.meter i.f{background:var(--rust)}
+.stampmark{font:700 .7rem var(--ui);color:var(--ok);border:2px solid var(--ok);border-radius:999px;padding:1px 8px}
+
+/* map */
+.mapscr{flex:1;position:relative;overflow:hidden;background:var(--land)}
+#lmap{position:absolute;inset:0;z-index:0;background:var(--water);font-family:var(--ui)}
+#lmap .leaflet-control-attribution{font:500 9px/1.3 var(--ui);background:rgba(255,255,255,.85);max-width:70%}
+.pinicon{background:none;border:0}
+.pinwrap{display:flex;flex-direction:column;align-items:center;gap:1px;animation:drop .5s cubic-bezier(.3,1.5,.6,1) both;cursor:pointer}
+.pinwrap svg{width:30px;height:30px;filter:drop-shadow(0 2px 2px rgba(17,17,17,.25))}
+.pinwrap b{font:700 11px/1 var(--ui);background:#fff;border:1px solid var(--sand);border-radius:8px;padding:2px 5px;color:var(--ink);white-space:nowrap}
+.zoomed-out .pinwrap b{display:none}
+.zoomed-out .pinwrap svg{width:22px;height:22px}
+@keyframes drop{from{transform:translateY(-30px);opacity:0}to{transform:none;opacity:1}}
+.stn-label{background:#fff;border:1px solid var(--sand);border-radius:6px;font:600 11px var(--ui);color:var(--ink);padding:1px 6px;box-shadow:none}
+.stn-label::before{display:none}
+.mapctl{position:absolute;right:12px;top:calc(50% + 20px);transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;gap:8px}
+.mapctl button{width:52px;height:52px;border-radius:14px;border:0;background:var(--white);box-shadow:0 3px 10px rgba(17,17,17,.18);font:700 1.5rem var(--ui);color:var(--ink);display:grid;place-items:center}
+.mapctl button svg{width:24px;height:24px}
+.blocklist{display:flex;flex-direction:column;gap:8px}
+.salerow{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;border:2px solid var(--sand);border-radius:12px;padding:10px 14px;background:var(--white);text-align:left;min-height:64px}
+.salerow:hover{border-color:var(--rust)}
+.salerow b{font:600 .95rem var(--ui);color:var(--ink)}
+.salerow small{font:500 .78rem var(--ui);color:var(--slate);display:block}
+.salerow .pr{font:700 1.05rem var(--serif);color:var(--ink);text-align:right}
+.speakbtn{align-self:flex-start;display:inline-flex;gap:6px;align-items:center;border:2px solid var(--rust);background:var(--white);color:var(--rust);border-radius:999px;min-height:40px;padding:4px 14px;font:600 .82rem var(--ui)}
+.speakbtn svg{width:18px;height:18px}
+.speakbtn[aria-pressed="true"]{background:var(--rust);color:var(--white)}
+.mic{width:56px;flex:none;border-radius:14px;border:2px solid var(--rust);background:var(--white);color:var(--rust);display:grid;place-items:center}
+.mic svg{width:26px;height:26px}
+.mic.on{background:var(--rust);color:var(--white);animation:micpulse 1.2s ease-in-out infinite}
+@keyframes micpulse{50%{box-shadow:0 0 0 8px rgba(122,46,29,.18)}}
+.voicebar{display:flex;justify-content:space-between;align-items:center;gap:6px 10px;flex-wrap:wrap;background:var(--paper);border-radius:12px;padding:6px 12px;font:500 .78rem var(--ui);color:var(--slate)}
+.voicebar label{display:inline-flex;gap:8px;align-items:center;font-weight:600;color:var(--ink);min-height:40px;cursor:pointer}
+.voicebar input{width:22px;height:22px;accent-color:var(--rust)}
+.road-label{background:none;border:0}
+.road-label span{display:inline-block;transform:translate(-50%,-50%);font:600 11px/1.1 var(--ui);color:#5A5348;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;letter-spacing:.02em}
+.zoomed-out .road-label span{display:none}
+.amicon{background:none;border:0}
+.am{display:flex;flex-direction:column;align-items:center;gap:2px;transform:translateY(-4px)}
+.am i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:2px solid #fff;box-shadow:0 1px 3px rgba(17,17,17,.3)}
+.am i svg{width:15px;height:15px}
+.am b{font:600 10.5px/1.15 var(--ui);color:var(--ink);background:rgba(255,255,255,.92);border-radius:5px;padding:1px 4px;max-width:120px;text-align:center;white-space:normal}
+.far .am b{display:none}
+.layers{display:flex;flex-direction:column;gap:8px}
+.layer{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;border:2px solid var(--sand);border-radius:12px;padding:10px 14px;min-height:60px;background:var(--white);text-align:left;font:600 1rem var(--ui);color:var(--ink)}
+.layer[aria-pressed="true"]{border-color:var(--rust);background:var(--rust-soft)}
+.layer .sw{width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
+.layer .sw svg{width:17px;height:17px}
+.layer .tg{width:46px;height:28px;border-radius:14px;background:var(--sand);position:relative}
+.layer .tg::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+.layer[aria-pressed="true"] .tg{background:var(--rust)}
+.layer[aria-pressed="true"] .tg::after{left:21px}
+.matchchip{background:var(--rust)!important;color:var(--white)!important}
+.dim{opacity:.28}
+.upcard{border:2px dashed var(--rust);border-radius:14px;padding:14px;background:var(--rust-soft);display:flex;flex-direction:column;gap:10px}
+.upcard .row .btn{min-height:50px}
+.found{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.found label{display:flex;flex-direction:column;gap:4px;font:600 .78rem var(--ui);color:var(--slate)}
+.found .inp{min-height:48px;padding:8px 10px;font-size:.95rem}
+.rec{border:2px solid var(--sand);border-radius:14px;padding:12px;background:var(--white);display:flex;flex-direction:column;gap:6px}
+.rec .rh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.rec .rh b{font:700 1.15rem var(--serif);color:var(--ink)}
+.rec .rk{font:700 .72rem var(--ui);color:var(--rust);text-transform:uppercase;letter-spacing:.1em}
+.rec p{font:500 .85rem/1.45 var(--ui);color:var(--slate)}
+.rec .btn{min-height:44px}
+.redact{font:500 .74rem var(--ui);color:var(--ok);display:flex;gap:6px;align-items:center}
+.srclist{display:flex;flex-direction:column;gap:10px}
+.srcitem{border-left:4px solid var(--rust);background:var(--paper);border-radius:0 10px 10px 0;padding:10px 12px;font:500 .85rem/1.45 var(--ui);color:var(--body)}
+.srcitem b{display:block;color:var(--ink);font-weight:600}
+.srcitem a{color:var(--rust);word-break:break-all}
+.stampc{position:relative;overflow:hidden}
+.stampc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;filter:grayscale(1) opacity(.35)}
+.stampc.got img{filter:none}
+.stampc span{position:relative;z-index:1}
+.stampc.hasimg span{background:rgba(255,255,255,.88);border-radius:6px;padding:1px 4px}
+.maptop{position:absolute;top:12px;left:12px;right:12px;display:flex;flex-direction:column;gap:8px;z-index:5}
+.towncard{background:var(--white);border-radius:16px;box-shadow:0 6px 20px rgba(17,17,17,.14);padding:12px 14px;display:flex;align-items:center;gap:12px}
+.towncard .tn{flex:1;min-width:0}
+.towncard h2{font-size:1.45rem}
+.towncard p{font:500 .8rem/1.35 var(--ui);color:var(--slate)}
+.towncard .btn{min-height:46px;padding:6px 12px;font-size:.82rem;flex:none}
+.mapchips{display:flex;gap:8px;flex-wrap:wrap}
+.pchip{background:var(--white);border:0;border-radius:999px;box-shadow:0 3px 10px rgba(17,17,17,.12);padding:6px 12px;min-height:40px;font:600 .8rem var(--ui);color:var(--ink);display:inline-flex;gap:6px;align-items:center}
+.pchip svg{width:16px;height:16px}
+.mapbot{position:absolute;left:12px;right:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;z-index:5}
+.legend{align-self:flex-start;background:rgba(255,255,255,.94);border-radius:12px;padding:6px 10px;display:flex;gap:12px;font:600 .72rem var(--ui);color:var(--slate);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend svg{width:16px;height:16px}
+.hint{background:var(--ink);color:var(--white);font:600 .9rem var(--ui);border-radius:12px;padding:12px 14px;text-align:center}
+
+/* sheets */
+.sheet{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:flex-end}
+.sheet .scrim{position:absolute;inset:0;background:rgba(17,17,17,.4);animation:fade .25s both}
+.sheet .panel{position:relative;background:var(--white);border-radius:24px 24px 0 0;max-height:94%;overflow-y:auto;animation:up .35s cubic-bezier(.2,.9,.3,1) both;display:flex;flex-direction:column}
+.sheet .grab{width:44px;height:5px;border-radius:3px;background:var(--sand);margin:10px auto 0}
+.sheet .close{position:absolute;right:12px;top:12px;width:48px;height:48px;border-radius:50%;border:0;background:var(--paper);display:grid;place-items:center;z-index:2}
+.sheet .close svg{width:22px;height:22px}
+@keyframes up{from{transform:translateY(100%)}}
+@keyframes fade{from{opacity:0}}
+
+/* encounter */
+.enc-top{background:linear-gradient(180deg,var(--paper),var(--white));padding:22px 20px 6px;display:flex;gap:16px;align-items:flex-end}
+.bldg{width:116px;flex:none}
+.bldg svg{width:100%;height:auto;display:block}
+.bldg .rise{animation:rise .7s cubic-bezier(.2,.9,.3,1) both;transform-box:fill-box;transform-origin:center bottom}
+@keyframes rise{from{transform:scaleY(.05)}}
+.enc-id{display:flex;flex-direction:column;gap:4px;min-width:0;padding-bottom:6px}
+.plate{align-self:flex-start;background:var(--ink);color:#F2C230;font:400 1.35rem/1.2 var(--wordmark);letter-spacing:.06em;padding:3px 10px;border-radius:4px}
+.enc-id h2{font-size:1.25rem}
+.enc-id .sub{font:500 .85rem var(--ui);color:var(--slate)}
+.price{font:700 1.7rem var(--serif);color:var(--ink);font-variant-numeric:tabular-nums}
+.leasebar{display:flex;flex-direction:column;gap:6px}
+.leasebar .lh{display:flex;justify-content:space-between;align-items:baseline}
+.leasebar .lv{font:700 1.5rem var(--serif);color:var(--ink)}
+.hp{height:18px;border-radius:9px;background:var(--paper);border:2px solid var(--sand);overflow:hidden}
+.hp i{display:block;height:100%;background:var(--rust);border-radius:7px;transition:width .8s}
+.verdict{border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;border:2px solid}
+.verdict.full{background:var(--ok-soft);border-color:var(--ok)}
+.verdict.part{background:var(--part-soft);border-color:var(--part)}
+.verdict.none{background:var(--no-soft);border-color:var(--no)}
+.stamp{align-self:flex-start;font:700 1.25rem var(--ui);letter-spacing:.02em;border:3px solid currentColor;border-radius:10px;padding:4px 12px;animation:stamp .5s cubic-bezier(.2,1.6,.4,1) both;display:inline-flex;align-items:center;gap:8px}
+.stamp svg{width:24px;height:24px}
+.full .stamp{color:var(--ok)} .part .stamp{color:var(--part)} .none .stamp{color:var(--no)}
+@keyframes stamp{from{transform:scale(1.8) rotate(-10deg);opacity:0}to{transform:rotate(-2deg);opacity:1}}
+.verdict .vline{font-size:1.05rem;color:var(--ink)}
+.rw{position:relative;height:56px;margin-top:2px}
+.rw .strip{position:absolute;left:0;right:0;top:20px;height:18px;background:var(--ink);border-radius:4px;overflow:hidden}
+.rw .strip .dash{position:absolute;left:6px;right:6px;top:8px;height:2px;background:repeating-linear-gradient(90deg,#F2C230 0 12px,transparent 12px 22px)}
+.rw .gap{position:absolute;top:0;bottom:0;right:0;background:repeating-linear-gradient(135deg,var(--sand) 0 6px,var(--white) 6px 12px)}
+.rw .plane{position:absolute;top:8px;width:34px;height:34px;margin-left:-17px;transition:left 1.4s cubic-bezier(.4,.1,.2,1)}
+.rw .t{position:absolute;bottom:-4px;font:600 .72rem var(--ui);color:var(--slate);white-space:nowrap}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--white);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.tile .k{font:600 .78rem var(--ui);color:var(--slate)}
+.tile .v{font:700 1.4rem/1.15 var(--serif);color:var(--ink);font-variant-numeric:tabular-nums}
+.tile .s{font:500 .72rem var(--ui);color:var(--slate)}
+details.more{border-top:1px solid var(--sand);padding-top:6px}
+details.more summary{font:600 .9rem var(--ui);color:var(--rust);cursor:pointer;min-height:44px;display:flex;align-items:center}
+.kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font:500 .88rem var(--ui)}
+.kv dt{color:var(--slate)} .kv dd{margin:0;font-weight:700;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.small{font:500 .78rem/1.45 var(--ui);color:var(--slate)}
+
+/* toast */
+.toast{position:absolute;left:16px;right:16px;bottom:78px;z-index:40;background:var(--ink);color:var(--white);border-radius:14px;padding:12px 16px;font:600 .95rem var(--ui);display:flex;gap:12px;align-items:center;animation:up .3s both}
+.toast .st{width:42px;height:42px;flex:none}
+
+/* shortlist */
+.scr-h{display:flex;flex-direction:column;gap:4px}
+.scr-h h1{font-size:1.8rem}
+.scr-h p{color:var(--slate)}
+.flatlist{display:flex;flex-direction:column;gap:10px}
+.fcard{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;border:2px solid var(--sand);border-radius:14px;padding:10px 12px;background:var(--white);text-align:left;min-height:78px}
+.fcard:hover{border-color:var(--rust)}
+.fcard b{font:600 .98rem var(--ui);color:var(--ink);display:block}
+.fcard small{font:500 .8rem var(--ui);color:var(--slate)}
+.fcard .pr{font:700 1rem var(--serif);text-align:right;color:var(--ink)}
+.vpill{display:inline-block;font:700 .72rem var(--ui);border-radius:999px;padding:2px 9px;margin-top:3px}
+.vpill.full{background:var(--ok-soft);color:var(--ok)} .vpill.part{background:var(--part-soft);color:var(--part)} .vpill.none{background:var(--no-soft);color:var(--no)}
+.empty{border:2px dashed var(--sand);border-radius:14px;padding:22px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.stamps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stampc{aspect-ratio:1;max-width:100%;border-radius:50%;border:2px dashed var(--sand);display:grid;place-items:center;text-align:center;font:600 .74rem/1.15 var(--ui);color:var(--slate);padding:6px}
+.stampc.got{border:3px solid var(--rust);color:var(--rust);background:var(--rust-soft);transform:rotate(-6deg)}
+.prog{height:10px;background:var(--paper);border-radius:5px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--rust)}
+
+/* ask */
+.chat{display:flex;flex-direction:column;gap:14px}
+.msg{display:flex;flex-direction:column;gap:6px;max-width:92%}
+.msg.me{align-self:flex-end;background:var(--rust);color:var(--white);border-radius:18px 18px 4px 18px;padding:12px 16px;font-family:var(--ui);font-weight:500}
+.msg.bot{align-self:flex-start;background:var(--paper);border-radius:18px 18px 18px 4px;padding:14px 16px}
+.msg.bot .who{font:600 .72rem var(--ui);color:var(--rust);text-transform:uppercase;letter-spacing:.12em}
+.msg.bot ul{margin:0;padding-left:20px}
+.msg.warn{background:var(--part-soft)}
+.src{font-family:var(--ui)}
+.src summary{font:600 .85rem var(--ui);color:var(--rust);cursor:pointer;min-height:40px;display:flex;align-items:center}
+.src .s1{border-left:3px solid var(--rust);padding:6px 10px;background:var(--white);border-radius:0 8px 8px 0;font-size:.82rem;margin-top:6px}
+.src .s1 b{display:block;font-weight:600;color:var(--ink)}
+.composer{position:sticky;bottom:0;background:var(--white);padding:10px 16px 12px;border-top:1px solid var(--sand);display:flex;gap:8px}
+.composer .inp{flex:1;min-height:52px}
+.composer .btn{min-height:52px;flex:none}
+
+/* more + docs */
+.list{display:flex;flex-direction:column;border:2px solid var(--sand);border-radius:14px;overflow:hidden}
+.list button{border:0;border-bottom:1px solid var(--sand);background:var(--white);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;min-height:60px;font:600 1rem var(--ui);color:var(--ink);text-align:left}
+.list button:last-child{border-bottom:0}
+.list button small{display:block;font:500 .78rem var(--ui);color:var(--slate)}
+.list svg{width:20px;height:20px;color:var(--stone);flex:none}
+.tagrole{font:700 .7rem var(--ui);background:var(--ink);color:var(--white);border-radius:4px;padding:2px 6px}
+.doc{border:2px solid var(--sand);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.doc .dh{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.doc b{font:600 .9rem var(--ui);color:var(--ink);word-break:break-word}
+.drop{border:2px dashed var(--rust);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--rust-soft)}
+.progress{height:8px;background:var(--paper);border-radius:4px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--rust);transition:width .2s}
+
+/* doc pages (about / method) */
+.doctext{display:flex;flex-direction:column;gap:14px;font-size:.95rem}
+.doctext h2{font-size:1.25rem;margin-top:6px}
+.doctext ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.scroll{overflow-x:auto;margin-inline:-4px}
+table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
+.tbl th{text-align:left;font-weight:600;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--slate);border-bottom:2px solid var(--sand);padding:6px;white-space:nowrap}
+.tbl td{border-bottom:1px solid var(--sand);padding:6px;vertical-align:top}
+.tbl tr.hl td{background:var(--paper)}
+.ok{color:var(--ok);font-weight:700} .open{color:var(--rust);font-weight:700} .todo{color:var(--part);font-weight:700}
+.callout{background:var(--paper);border-left:4px solid var(--rust);border-radius:0 10px 10px 0;padding:10px 12px;font:500 .82rem var(--ui)}
+.flow{display:flex;flex-direction:column;font:500 .78rem/1.35 var(--ui)}
+.fn{border:2px solid var(--ink);border-radius:8px;padding:7px 10px;background:var(--white);text-align:center;color:var(--ink)}
+.fn.t{background:var(--rust);border-color:var(--rust);color:var(--white);border-radius:999px;font-weight:600}
+.fn.d{border-color:var(--part);background:var(--part-soft);font-weight:600}
+.fn.o{border-style:dashed}
+.fn em{display:block;font:400 .66rem var(--mono);color:var(--slate);font-style:normal}
+.fn.t em{color:#F4E7E2}
+.ar{height:18px;display:flex;justify-content:center;position:relative}
+.ar::before{content:"";width:2px;background:var(--slate)}
+.ar::after{content:"";position:absolute;bottom:0;border:5px solid transparent;border-top-color:var(--slate);border-bottom:0}
+.br{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.br>div{display:flex;flex-direction:column}
+.br .bl{font:700 .68rem var(--ui);color:var(--slate);text-align:center;padding:3px 0}
+
+/* ---- responsive: tablet and desktop ---- */
+.tabs .brand,.tabs .side-prof{display:none}
+@media (min-width:700px){
+  .pad{width:100%;max-width:820px;margin-inline:auto;padding:32px 32px 44px}
+  .composer{padding-inline:max(16px,calc((100% - 820px)/2 + 32px))}
+  .stamps{grid-template-columns:repeat(auto-fill,minmax(108px,1fr))}
+  .flatlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .maptop{right:auto;width:420px;left:20px;top:20px}
+  .mapbot{right:auto;width:460px;left:20px;bottom:20px}
+  .mapctl{right:20px}
+  .toast{left:auto;right:24px;bottom:24px;width:380px}
+  .login{align-items:center;padding:40px}
+  .login .card{width:100%;max-width:420px}
+}
+@media (min-width:1024px){
+  .login{flex-direction:row;justify-content:center;gap:clamp(40px,6vw,120px)}
+  .login .card{flex:0 1 420px}
+  .lockup svg{width:120px;height:120px}
+  .lockup .wm{font-size:4.2rem}
+  .onb{max-width:640px}
+}
+@media (min-width:1024px){
+  .phone{display:grid;grid-template-columns:260px minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+  .phone>.screen{grid-column:2;grid-row:1}
+  #scrLogin,#scrOnb{grid-column:1/-1}
+  #sheetHost,#toastHost{grid-column:2;grid-row:1;position:relative;pointer-events:none}
+  #sheetHost .sheet,#toastHost .toast{pointer-events:auto}
+  .tabs{grid-column:1;grid-row:1;display:flex;flex-direction:column;gap:4px;border-top:0;border-right:1px solid var(--sand);padding:22px 14px;background:var(--paper)}
+  .tabs .brand{display:flex;align-items:center;gap:10px;padding:0 6px 22px;color:var(--rust)}
+  .tabs .brand svg{width:48px;height:48px;flex:none}
+  .tabs .brand .wm{display:block;font:400 1.7rem/1 var(--wordmark);letter-spacing:.04em}
+  .tabs .brand .tg{display:block;font:400 .52rem var(--wordmark);letter-spacing:.16em;margin-top:4px;color:var(--ink)}
+  .tabs>button{flex-direction:row;justify-content:flex-start;gap:14px;min-height:58px;padding:0 16px;border-radius:12px;font-size:1rem;color:var(--slate)}
+  .tabs>button:hover{background:var(--white)}
+  .tabs>button[aria-current="page"]{background:var(--white);color:var(--rust);box-shadow:inset 4px 0 0 var(--rust)}
+  .tabs .count{position:static;margin-left:auto}
+  .tabs .side-prof{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-top:auto;border:2px solid var(--sand);border-radius:12px;background:var(--white);padding:12px 14px;text-align:left;font:500 .8rem var(--ui);color:var(--slate);min-height:auto}
+  .tabs .side-prof b{font:600 .95rem var(--ui);color:var(--ink)}
+  .sheet{position:absolute;inset:0;flex-direction:row;justify-content:flex-end}
+  .sheet .scrim{background:rgba(17,17,17,.16)}
+  .sheet .panel{width:min(480px,100%);height:100%;max-height:100%;border-radius:0;animation:side .32s cubic-bezier(.2,.9,.3,1) both;box-shadow:-16px 0 40px rgba(17,17,17,.14)}
+  .sheet .grab{display:none}
+  .toast{position:absolute;top:20px;bottom:auto}
+  .flatlist{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@keyframes side{from{transform:translateX(100%)}}
+.noticelink{align-self:flex-start;background:rgba(255,255,255,.92);border:1px solid var(--sand);border-radius:999px;font:600 .72rem var(--ui);color:var(--slate);padding:4px 12px;min-height:32px;pointer-events:auto}
+.stampc.hasimg:not(.got) img{filter:grayscale(1);opacity:.35}
+.stampc.got img{filter:none;opacity:1}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="stage">
+  <div class="phone" id="phone">
+
+    <!-- LOGIN -->
+    <section class="screen" id="scrLogin">
+      <div class="login">
+        <div class="lockup">
+          <svg viewBox="0 0 100 100" aria-hidden="true"><g fill="#fff"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="#7A2E1D"/><path d="M31 52 38 48 38 73 31 66Z"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z"/><path d="M62 50 69 54 69 66 62 73Z"/></g></svg>
+          <span class="wm">RUNWAY</span><span class="tg">HOW MUCH LEASE YOU HAVE LEFT</span>
+        </div>
+        <form class="card" id="loginForm" autocomplete="on">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <label class="field"><span>Username</span><input class="inp" id="u" autocomplete="username" autocapitalize="none" required></label>
+            <label class="field"><span>Password</span><input class="inp" id="pw" type="password" autocomplete="current-password" required></label>
+            <p class="err" id="loginErr" hidden>That username and password don't match.</p>
+            <button class="btn primary" type="submit" id="loginBtn">Sign in</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ONBOARDING -->
+    <section class="screen" id="scrOnb" hidden>
+      <div class="pad onb" id="onbBody"></div>
+    </section>
+
+    <!-- MAP -->
+    <section class="screen" id="scrMap" hidden>
+      <div class="mapscr" data-st="folium / pydeck + OneMap tiles">
+        <div id="lmap" role="application" aria-label="Map of recent resale flats in this town"></div>
+        <div class="mapctl">
+          <button type="button" id="zIn" aria-label="Zoom in">+</button>
+          <button type="button" id="zOut" aria-label="Zoom out">−</button>
+          <button type="button" id="zSrc" aria-label="Map sources" style="font:700 1.1rem var(--serif);font-style:italic">i</button>
+          <button type="button" id="zHome" aria-label="Show the whole town"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="7"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
+        </div>
+        <div class="maptop">
+          <div class="towncard">
+            <div class="tn"><h2 id="tName">Clementi</h2><p id="tLine"></p></div>
+            <button class="btn sm" id="chgTown" type="button">Change town</button>
+          </div>
+          <div class="mapchips">
+            <button class="pchip" id="ageChip" type="button" data-st="st.number_input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span></span></button>
+            <button class="pchip" id="layerChip" type="button" data-st="st.multiselect (map layers)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 8l10 5 10-5z"/><path d="M2 13l10 5 10-5"/></svg>What to show</button>
+            <button class="pchip matchchip" id="matchChip" type="button" hidden></button>
+          </div>
+        </div>
+        <div class="mapbot">
+          <div class="legend" aria-label="Legend">
+            <span><svg viewBox="0 0 20 20"><path d="M10 1 19 10 10 19 1 10Z" fill="var(--ok)"/></svg>Full CPF</span>
+            <span><svg viewBox="0 0 20 20"><defs><clipPath id="lgc"><rect x="0" y="10" width="20" height="10"/></clipPath></defs><path d="M10 1 19 10 10 19 1 10Z" fill="#fff" stroke="var(--part)" stroke-width="2"/><path d="M10 1 19 10 10 19 1 10Z" fill="var(--part)" clip-path="url(#lgc)"/></svg>Part CPF</span>
+            <span><svg viewBox="0 0 20 20"><path d="M10 2 18 10 10 18 2 10Z" fill="#fff" stroke="var(--no)" stroke-width="2"/></svg>No CPF</span>
+          </div>
+          <div class="hint" id="mapHint">Tap a flat to check it</div>
+          <button type="button" class="noticelink" id="noticeLink">Notice</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHORTLIST -->
+    <section class="screen" id="scrList" hidden><div class="pad" id="listBody"></div></section>
+
+    <!-- ASK -->
+    <section class="screen" id="scrAsk" hidden>
+      <div class="pad" style="flex:1">
+        <div class="scr-h"><h1>Ask Runway</h1><p class="ui" style="font-size:.9rem">Speak or type. Answers come from CPF, HDB and MND documents.</p></div>
+        <div class="voicebar" data-st="Azure Speech en-SG voice"><label><input type="checkbox" id="autoRead"> Read answers aloud</label><span id="voiceName">Checking voices…</span></div>
+        <div class="upcard" data-st="st.file_uploader → extract → recommend">
+          <b class="ui" style="font-size:1rem;color:var(--ink)">Have a document? I can suggest towns.</b>
+          <p class="small" style="color:var(--body)">Upload your notes, budget, or HFE letter (PDF or text). I read your age, budget, CPF and flat type, then rank towns using recent sales.</p>
+          <div class="row"><button type="button" class="btn primary" id="upBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 12.5 12.5 20a5 5 0 0 1-7-7L13 5.5a3.4 3.4 0 0 1 4.8 4.8L10.4 17.7a1.7 1.7 0 0 1-2.4-2.4l6.9-6.9"/></svg>Upload a file</button><button type="button" class="btn" id="sampleBtn">Try a sample</button></div>
+          <input type="file" id="upDoc" accept=".pdf,.txt,.md,.text" hidden>
+          <span class="redact"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Names, NRIC and phone numbers are removed before anything is read.</span>
+        </div>
+        <div class="chat" id="chat" data-st="st.chat_message"></div>
+        <div class="chips" id="sugg" data-st="st.pills"></div>
+      </div>
+      <form class="composer" id="askForm" data-st="st.audio_input + st.chat_input">
+        <button type="button" class="mic" id="micBtn" aria-label="Speak your question" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <input class="inp" id="askIn" placeholder="Type or tap the mic" aria-label="Your question">
+        <button class="btn primary" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+      </form>
+    </section>
+
+    <!-- MORE -->
+    <section class="screen" id="scrMore" hidden><div class="pad" id="moreBody"></div></section>
+
+    <!-- SUB PAGES -->
+    <section class="screen" id="scrSub" hidden><div class="pad" id="subBody"></div></section>
+
+    <!-- TABS -->
+    <nav class="tabs" id="tabs" hidden aria-label="Main">
+      <div class="brand"><svg viewBox="0 0 100 100" aria-hidden="true"><g fill="#7A2E1D"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="#7A2E1D" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="#F6F3EE"/><path d="M31 52 38 48 38 73 31 66Z"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z"/><path d="M62 50 69 54 69 66 62 73Z"/></g></svg><span><span class="wm">RUNWAY</span><span class="tg">HOW MUCH LEASE YOU HAVE LEFT</span></span></div>
+      <button data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Map</button>
+      <button data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 22 12 12 22 2 12Z"/><path d="M8 12l3 3 5-6"/></svg>Shortlist<span class="count" id="listCount" hidden>0</span></button>
+      <button data-tab="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4z"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.4"/></svg>Ask</button>
+      <button data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</button>
+      <button type="button" class="side-prof" id="sideProf" data-st="st.sidebar profile"></button>
+    </nav>
+
+    <div id="sheetHost"></div>
+    <div id="toastHost"></div>
+  </div>
+
+  
+</div>
+
+<script>
+/* Bridge to the Streamlit host (custom component protocol). Python checks sign-in, answers
+   questions and sends the map data; everything else runs here, like the approved mockup. */
+(function(){
+  const RW = window.RW = {booted:false, waiting:{}, seq:0, queue:[], busy:false};
+  const post = (type, extra) => window.parent.postMessage(Object.assign({isStreamlitMessage:true, type}, extra||{}), '*');
+  function setHeight(){ let h; try{ h = window.parent.innerHeight; }catch(e){ h = window.innerHeight; } post('streamlit:setFrameHeight', {height: h}); }
+  RW.send = (type, payload) => new Promise((resolve, reject) => {
+    RW.queue.push({id: Date.now().toString(36) + '-' + (++RW.seq), type, payload: payload || {}, resolve, reject}); pump();
+  });
+  function pump(){
+    if(RW.busy || !RW.queue.length) return;
+    const m = RW.queue[0]; RW.busy = true; RW.waiting[m.id] = m;
+    post('streamlit:setComponentValue', {value: {id: m.id, type: m.type, payload: m.payload}, dataType: 'json'});
+    m.timer = setTimeout(() => finish(m.id, null, new Error('timeout')), 90000);
+  }
+  function finish(id, value, err){
+    const m = RW.waiting[id]; if(!m) return;
+    clearTimeout(m.timer); delete RW.waiting[id]; RW.queue.shift(); RW.busy = false;
+    err ? m.reject(err) : m.resolve(value); pump();
+  }
+  window.addEventListener('message', ev => {
+    const d = ev.data; if(!d || d.type !== 'streamlit:render') return;
+    const a = d.args || {};
+    (a.replies || []).forEach(r => finish(r.id, r.value));
+    if(a.me && !RW.booted){
+      if(a.data){ RW.booted = true; startRunway(a.data.M, a.data.PHOTOS, a.data.F, a.me); RW.send('booted'); }
+      else if(!RW.asked){ RW.asked = true; RW.send('need_data'); }
+    }
+    if(!a.me && RW.booted) location.reload();
+    setHeight();
+  });
+  const form = document.getElementById('loginForm');
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = document.getElementById('loginErr'), btn = document.getElementById('loginBtn');
+    err.hidden = true; btn.disabled = true; btn.textContent = 'Signing in…';
+    try{
+      const r = await RW.send('login', {u: document.getElementById('u').value, p: document.getElementById('pw').value});
+      if(!r || !r.ok){ err.textContent = (r && r.error) || "That username and password don't match."; err.hidden = false; }
+      else { document.getElementById('pw').value = ''; btn.textContent = 'Loading your map…'; return; }
+    }catch(x){ err.textContent = 'Runway did not respond. Try again.'; err.hidden = false; }
+    btn.disabled = false; btn.textContent = 'Sign in';
+  });
+  RW.logout = () => RW.send('logout').finally(() => location.reload());
+  window.addEventListener('resize', setHeight);
+  post('streamlit:componentReady', {apiVersion: 1});
+  setHeight();
+})();
+</script>
+<script>
+function startRunway(M, PHOTOS, F, ME){
+const TOWNS = M.towns.slice().sort((a,b)=>a.name.localeCompare(b.name));
+const LANDMARK = {'ANG MO KIO':'Ang Mo Kio Town Garden','BEDOK':'Bedok Reservoir','BISHAN':'Bishan-Ang Mo Kio Park','BUKIT BATOK':'Little Guilin','BUKIT MERAH':'York Hill estate','BUKIT PANJANG':'Zhenghua Nature Park','BUKIT TIMAH':'Bukit Timah Hill','CENTRAL AREA':'Pinnacle@Duxton','CHOA CHU KANG':'Choa Chu Kang Park','CLEMENTI':'Clementi Woods Park','GEYLANG':'Geylang Serai Market','HOUGANG':'Punggol Park','JURONG EAST':'Jurong Lake Gardens','JURONG WEST':'Jurong Central Park','KALLANG/WHAMPOA':'Kallang Riverside','MARINE PARADE':'East Coast Park','PASIR RIS':'Pasir Ris Park','PUNGGOL':'Punggol Waterway','QUEENSTOWN':'SkyVille@Dawson','SEMBAWANG':'Sembawang Park','SENGKANG':'Sengkang Riverside Park','SERANGOON':'Serangoon Gardens','TAMPINES':'Our Tampines Hub','TOA PAYOH':'Dragon Playground','WOODLANDS':'Woodlands Avenue 4','YISHUN':'Lower Seletar Reservoir'};
+const TBY = Object.fromEntries(TOWNS.map(t=>[t.id,t]));
+const REGIONS = [
+  ['North',['WOODLANDS','SEMBAWANG','YISHUN']],
+  ['North-East',['ANG MO KIO','HOUGANG','PUNGGOL','SENGKANG','SERANGOON']],
+  ['East',['BEDOK','PASIR RIS','TAMPINES']],
+  ['West',['BUKIT BATOK','BUKIT PANJANG','CHOA CHU KANG','CLEMENTI','JURONG EAST','JURONG WEST']],
+  ['Central',['BISHAN','BUKIT MERAH','BUKIT TIMAH','CENTRAL AREA','GEYLANG','KALLANG/WHAMPOA','MARINE PARADE','QUEENSTOWN','TOA PAYOH']]
+];
+const WATER = new Set(['PUNGGOL','KALLANG/WHAMPOA','SENGKANG','BEDOK','MARINE PARADE','PASIR RIS','JURONG EAST','SEMBAWANG']);
+const $ = s=>document.querySelector(s), $$ = s=>Array.from(document.querySelectorAll(s));
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const money = n=>'$'+(Math.round(n/1000)*1000).toLocaleString('en-SG');
+const exact = n=>'$'+Math.round(n).toLocaleString('en-SG');
+const ICON={
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7"/></svg>',
+  back:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg>',
+  keep:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2 22 12 12 22 2 12Z"/><path d="M8 12l3 3 5-6"/></svg>',
+  q:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.4M12 16.5v.5"/></svg>',
+  next:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
+  ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  half:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17A8.5 8.5 0 0 1 12 3.5z" fill="currentColor"/></svg>',
+  no:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="8.5"/><path d="M6 18 18 6"/></svg>',
+  plane:'<svg viewBox="0 0 32 32"><path d="M30 16c0-1-1-1.6-2-1.6h-7.4L13.4 3h-3l3.6 11.4H7.4L5 11H2.5l1.8 5-1.8 5H5l2.4-3.4H14L10.4 29h3l7.2-11.4H28c1 0 2-.6 2-1.6z" fill="#F2C230" stroke="#111" stroke-width="1"/></svg>'
+};
+
+const S={layers:{sales:true,mrt:true,bus:true,hawker:true,clinic:true,mall:true,school:false,cc:false},match:null,role:null,onb:0,tab:'map',town:'CLEMENTI',age:30,avg:30,oa:120000,oaSet:true,pins:[],enc:null,checked:false,list:[],stamps:new Set(),chat:[],docs:[],sub:null};
+
+/* ---------- rule engine (rules.py) ---------- */
+function calc(price, lease){
+  const need = 95 - S.age, r = {need, lease, price, end: S.age + lease};
+  if(lease <= 20) return Object.assign(r,{status:'none',ratio:0,cap:0,ltv:0,loan:0,tenure:0,cashNow:price,cashLife:price,cpfNow:0,monthly:0});
+  const ratio = S.age + lease >= 95 ? 1 : (lease - 20) / (need - 20);
+  const cap = ratio*price, ltv = .75*ratio;
+  const tenure = Math.max(0, Math.min(25, 65 - S.avg, lease - 20));
+  const loan = tenure>0 ? ltv*price : 0, down = price - loan;
+  const cpfNow = S.oaSet ? Math.min(S.oa, cap, down) : 0;
+  const i=.026/12, n=tenure*12, monthly = loan>0 ? loan*i/(1-Math.pow(1+i,-n)) : 0;
+  return Object.assign(r,{status:ratio>=1?'full':'part',ratio,cap,ltv,loan,tenure,down,cpfNow,cashNow:down-cpfNow,cashLife:Math.max(0,price-cap),monthly});
+}
+const VTXT = {full:'CPF: full use', part:'CPF: part only', none:'CPF: not allowed'};
+const VICON = {full:ICON.ok, part:ICON.half, none:ICON.no};
+function vline(r){
+  const yrs = Math.floor(r.lease);
+  if(r.status==='full') return `This flat has ${yrs} years left. Your youngest buyer is ${S.age}, so the lease lasts past age 95.`;
+  if(r.status==='part') return `This flat has ${yrs} years left. Your youngest buyer is ${S.age}, so the lease runs out ${Math.round(95-r.end)} years before age 95 and your CPF use is reduced.`;
+  return `This flat has ${yrs} years left. CPF and HDB loans cannot be used when 20 years or less remain.`;
+}
+function meter(t){
+  if(t.low) return {n:0,txt:'Not enough sales here to say'};
+  const n = t.pct>=1.3?3:t.pct>=0.8?2:1;
+  const d = Math.round((1-Math.pow(1+t.pct/100,-10))*100);
+  return {n,txt:`10 fewer years of lease ≈ ${d}% lower price here`};
+}
+const meterHtml = n=>`<span class="meter" aria-hidden="true">${[1,2,3].map(i=>`<i class="${i<=n?'f':''}"></i>`).join('')}</span>`;
+
+/* ---------- navigation ---------- */
+const SCR=['scrLogin','scrOnb','scrMap','scrList','scrAsk','scrMore','scrSub'];
+function show(id){SCR.forEach(s=>$('#'+s).hidden = s!==id); $('#tabs').hidden = (id==='scrLogin'||id==='scrOnb');}
+function sideProf(){const b=$('#sideProf');if(!b)return;b.innerHTML=`<span class="label">Your details</span><b>Youngest buyer ${S.age}</b><span>Average age ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}</span>`;b.onclick=()=>{tab('more');sub('details');};}
+function tab(t){
+  S.tab=t; S.sub=null; closeSheet(); sideProf();
+  $$('.tabs [data-tab]').forEach(b=>b.setAttribute('aria-current', b.dataset.tab===t?'page':'false'));
+  if(t==='map'){show('scrMap'); drawMap();}
+  if(t==='list'){show('scrList'); renderList();}
+  if(t==='ask'){show('scrAsk'); renderChat();}
+  if(t==='more'){show('scrMore'); renderMore();}
+}
+$$('.tabs [data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+function sub(name){S.sub=name; show('scrSub'); renderSub(); $('#scrSub').scrollTop=0;}
+
+/* ---------- onboarding ---------- */
+const NOTICE = `<p><b>IMPORTANT NOTICE:</b> This web application is a prototype developed for <b>educational purposes only.</b> The information provided here is <b>NOT intended for real-world usage</b> and should not be relied upon for making any decisions, especially those related to financial, legal, or healthcare matters.</p><p><b>Furthermore, please be aware that the LLM may generate inaccurate or incorrect information. You assume full responsibility for how you use any generated output.</b></p><p>Always consult with qualified professionals for accurate and personalised advice.</p>`;
+function dots(i){return `<div class="dots" aria-label="Step ${i} of 3">${[1,2,3].map(k=>`<i class="${k<=i?'on':''}"></i>`).join('')}</div>`;}
+function renderOnb(){
+  const b=$('#onbBody'), i=S.onb;
+  if(i===1){
+    b.innerHTML = `${dots(1)}<h1>How old is the youngest buyer?</h1><p class="lead">This decides how much lease you need.</p>
+      <div class="stepper" data-st="st.number_input"><button type="button" id="aMinus" aria-label="Younger">−</button><output id="aOut">${S.age}</output><button type="button" id="aPlus" aria-label="Older">+</button></div>
+      <div class="chips">${[25,30,35,40,50,60].map(a=>`<button type="button" class="chip" data-a="${a}" aria-pressed="${a===S.age}">${a}</button>`).join('')}</div>
+      <p class="small" id="aNeed"></p><button class="btn primary" id="nx">Next</button>`;
+    const set=a=>{S.age=Math.max(21,Math.min(85,a));S.avg=Math.max(S.avg,S.age);$('#aOut').textContent=S.age;$$('[data-a]').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.a===S.age));$('#aNeed').textContent=`You need ${95-S.age} years of lease to use CPF fully.`;};
+    $('#aMinus').onclick=()=>set(S.age-1); $('#aPlus').onclick=()=>set(S.age+1);
+    $$('[data-a]').forEach(c=>c.onclick=()=>set(+c.dataset.a)); set(S.age); S.avg=S.age;
+  } else if(i===2){
+    const opts=[50000,100000,150000,200000,300000];
+    b.innerHTML = `${dots(2)}<h1>About how much CPF do you have?</h1><p class="lead">Ordinary Account, all buyers together. A rough number is fine.</p>
+      <div class="chips" data-st="st.pills">${opts.map(o=>`<button type="button" class="chip" data-o="${o}" aria-pressed="${S.oaSet&&S.oa===o}">${exact(o)}</button>`).join('')}<button type="button" class="chip" data-o="skip" aria-pressed="${!S.oaSet}">Not sure</button></div>
+      <button class="btn primary" id="nx">Next</button>`;
+    $$('[data-o]').forEach(c=>c.onclick=()=>{if(c.dataset.o==='skip'){S.oaSet=false;}else{S.oaSet=true;S.oa=+c.dataset.o;} $$('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===c));});
+  } else {
+    b.innerHTML = `${dots(3)}<h1>Which town first?</h1><p class="lead">You can change it any time.</p>${townListHtml()}`;
+    bindTownList(t=>{S.town=t; finishOnb();});
+    return;
+  }
+  $('#nx').onclick=()=>{S.onb++; renderOnb(); $('#scrOnb').scrollTop=0;};
+}
+function finishOnb(){ needFit=true; tab('map'); }
+function townListHtml(){
+  return REGIONS.map(([r,ids])=>`<div class="region"><span class="label">${r}</span>${ids.map(id=>{const t=TBY[id],m=meter(t);return `<button type="button" class="townrow" data-town="${id}" aria-pressed="${id===S.town}"><span><b>${esc(t.name)}</b><small>${t.low?'Lease effect: not enough data':`Lease matters: ${['','a little','quite a lot','a lot'][m.n]}`}</small></span><span style="display:flex;gap:8px;align-items:center">${S.stamps.has(id)?'<span class="stampmark">Visited</span>':''}${meterHtml(m.n)}</span></button>`;}).join('')}</div>`).join('');
+}
+function bindTownList(cb){$$('[data-town]').forEach(b=>b.onclick=()=>cb(b.dataset.town));}
+
+/* ---------- real map (Leaflet; live app: folium + OneMap tiles) ---------- */
+const SALES = {};
+M.recent.forEach(b=>{const town=M.towns[b.t].id; b.x.forEach(x=>{(SALES[town]=SALES[town]||[]).push({town,blk:b.b,st:b.s,pc:b.pc,lc:b.lc,m:x[0],ft:x[1],sr:x[2],sqm:x[3],price:x[4],lease:x[5],key:town+'|'+b.b+'|'+b.s+'|'+x[0]+'|'+x[4]+'|'+x[2],la:b.la,ln:b.ln});});});
+const TBOUNDS = {};
+M.blocks.forEach(([la,ln,ti])=>{const id=M.towns[ti].id;(TBOUNDS[id]=TBOUNDS[id]||[]).push([la,ln]);});
+function townBounds(id){const p=TBOUNDS[id];const las=p.map(x=>x[0]).sort((a,b)=>a-b),lns=p.map(x=>x[1]).sort((a,b)=>a-b);const q=(a,f)=>a[Math.floor(f*(a.length-1))];return L.latLngBounds([q(las,.02),q(lns,.02)],[q(las,.98),q(lns,.98)]);}
+let LM=null, needFit=true; const LY={};
+const LINECOL={orangered:'#D42E12',mediumseagreen:'#009645',darkmagenta:'#9900AA',orange:'#FA9E0D',darkslateblue:'#005EC4',saddlebrown:'#9D5B25',gray:'#748477'};
+const AMS={
+  hawker:{label:'Hawker centres',col:'#9A5B0C',svg:'<path d="M3 11h18a9 9 0 0 1-18 0z" fill="#fff"/><path d="M8 8c0-2 2-2 2-4M13 8c0-2 2-2 2-4" stroke="#fff" stroke-width="1.8" fill="none"/>'},
+  clinic:{label:'Polyclinics',col:'#B3261E',svg:'<path d="M9.5 4h5v5.5H20v5h-5.5V20h-5v-5.5H4v-5h5.5z" fill="#fff"/>'},
+  mall:{label:'Shopping malls',col:'#6B4C9A',svg:'<path d="M5 8h14l-1 12H6z" fill="#fff"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="#fff" stroke-width="1.8" fill="none"/>'},
+  school:{label:'Primary schools',col:'#2B5C8A',svg:'<path d="M12 4 2 9l10 5 10-5z" fill="#fff"/><path d="M6 11v5c3 2 9 2 12 0v-5" stroke="#fff" stroke-width="1.8" fill="none"/>'},
+  cc:{label:'Community clubs',col:'#2C6845',svg:'<circle cx="8" cy="8" r="3" fill="#fff"/><circle cx="16" cy="8" r="3" fill="#fff"/><path d="M2 20c0-4 3-6 6-6s6 2 6 6M10 20c0-4 3-6 6-6s6 2 6 6" fill="#fff"/>'}
+};
+const LAYERDEF=[['sales','Flats sold Jul–Sep 2026','#7A2E1D','<path d="M12 2 22 12 12 22 2 12Z" fill="#fff"/>'],['mrt','MRT and LRT','#111','<rect x="6" y="3" width="12" height="14" rx="3" fill="#fff"/><path d="M8 21l2-4M16 21l-2-4" stroke="#fff" stroke-width="2"/>'],['bus','Bus stops','#4B5563','<rect x="5" y="3" width="14" height="15" rx="3" fill="#fff"/><path d="M7 21v-3M17 21v-3" stroke="#fff" stroke-width="2"/>'],...Object.entries(AMS).map(([k,v])=>[k,v.label,v.col,v.svg])];
+function initMap(){
+  LM = L.map('lmap',{zoomControl:false,attributionControl:false,preferCanvas:true,minZoom:13,maxZoom:18.5,zoomSnap:.5});
+  ['roadsP','blocksP','stopsP'].forEach((p,i)=>{LM.createPane(p);LM.getPane(p).style.zIndex=405+i*3;});
+  L.geoJSON(M.land,{style:{fillColor:'#F1ECE3',fillOpacity:1,color:'#CFC7BA',weight:1},interactive:false}).addTo(LM);
+  L.geoJSON(M.pa,{style:{fill:false,color:'#B9B0A2',weight:1.2,dashArray:'4 4'},interactive:false}).addTo(LM);
+  const rr=L.canvas({pane:'roadsP'});
+  LY.roadCase=L.polyline(F.roads,{renderer:rr,color:'#D6CCBC',weight:9,lineCap:'round',lineJoin:'round',interactive:false}).addTo(LM);
+  LY.roadFill=L.polyline(F.roads,{renderer:rr,color:'#FFFFFF',weight:6.5,lineCap:'round',lineJoin:'round',interactive:false}).addTo(LM);
+  const br=L.canvas({pane:'blocksP'});
+  M.blocks.forEach(([la,ln])=>L.rectangle([[la-.00009,ln-.00012],[la+.00009,ln+.00012]],{renderer:br,stroke:true,color:'#A79C8B',weight:1,fillColor:'#CFC5B6',fillOpacity:1,interactive:false}).addTo(LM));
+  LY.mrtLines=L.geoJSON(M.lines,{style:f=>({color:LINECOL[f.properties.c]||'#748477',weight:f.properties.c==='gray'?3:5,opacity:.9}),interactive:false});
+  LY.mrt=L.layerGroup([LY.mrtLines]);
+  M.stations.forEach(([la,ln,n,code])=>{const m=L.circleMarker([la,ln],{radius:7,color:'#111',weight:3,fillColor:'#fff',fillOpacity:1});m.bindTooltip(`${n} ${code.replace(/-/g,' / ')}`,{permanent:true,direction:'right',offset:[9,0],className:'stn-label'});LY.mrt.addLayer(m);});
+  const sr=L.canvas({pane:'stopsP'});
+  LY.bus=L.layerGroup(F.stops.map(([la,ln,n,rd])=>L.circleMarker([la,ln],{renderer:sr,radius:5,color:'#fff',weight:2,fillColor:'#4B5563',fillOpacity:1}).bindPopup(`<b>${esc(n)}</b><br>Bus stop · ${esc(rd)}`,{closeButton:false})));
+  Object.entries(AMS).forEach(([k,v])=>{LY[k]=L.layerGroup(F.am[k].map(([la,ln,n])=>L.marker([la,ln],{icon:L.divIcon({className:'amicon',iconSize:[120,40],iconAnchor:[60,13],html:`<div class="am"><i style="background:${v.col}"><svg viewBox="0 0 24 24">${v.svg}</svg></i><b>${esc(n)}</b></div>`}),title:`${v.label.replace(/s$/,'')}: ${n}`,keyboard:false})));});
+  LY.sales=L.layerGroup(); LY.labels=L.layerGroup().addTo(LM);
+  LM.on('zoomend',zoomStyle);
+  $('#zIn').onclick=()=>LM.zoomIn(); $('#zOut').onclick=()=>LM.zoomOut(); $('#zHome').onclick=()=>fitTown(true);
+  $('#zSrc').onclick=()=>{tab('more');sub('sources');};
+  applyLayers();
+}
+function applyLayers(){LAYERDEF.forEach(([k])=>{const on=S.layers[k];if(k==='bus')return;if(on&&!LM.hasLayer(LY[k]))LY[k].addTo(LM);if(!on&&LM.hasLayer(LY[k]))LM.removeLayer(LY[k]);});zoomStyle();}
+function zoomStyle(){
+  const z=LM.getZoom(), el=$('#lmap');
+  el.classList.toggle('zoomed-out',z<16); el.classList.toggle('far',z<16.5);
+  const w=z>=17.5?[16,13]:z>=16.5?[12,9.5]:z>=15.5?[9,6.5]:[6,4];
+  LY.roadCase.setStyle({weight:w[0]}); LY.roadFill.setStyle({weight:w[1]});
+  const busOn=S.layers.bus&&z>=16.5; if(busOn&&!LM.hasLayer(LY.bus))LY.bus.addTo(LM); if(!busOn&&LM.hasLayer(LY.bus))LM.removeLayer(LY.bus);
+  if(S.layers.mrt){const stOn=z>=15; LY.mrt.eachLayer(l=>{if(l.getTooltip){const tt=l.getTooltip(); if(tt){if(stOn)l.openTooltip();else l.closeTooltip();}}});}
+}
+function roadLabels(){
+  LY.labels.clearLayers();
+  const b=townBounds(S.town).pad(.4), placed={};
+  F.stops.forEach(([la,ln,n,rd])=>{
+    if(!b.contains([la,ln])||!rd) return;
+    const arr=placed[rd]=placed[rd]||[];
+    if(arr.some(p=>Math.hypot((p[0]-la)*111000,(p[1]-ln)*111000)<450)) return;
+    arr.push([la,ln]);
+    LY.labels.addLayer(L.marker([la,ln],{icon:L.divIcon({className:'road-label',iconSize:[0,0],html:`<span>${esc(rd)}</span>`}),interactive:false,keyboard:false}));
+  });
+}
+function fitTown(whole){const b=townBounds(S.town);LM.setMaxBounds(b.pad(.6));if(whole){LM.fitBounds(b,{padding:[20,20]});}else{const s=SALES[S.town]||[];const med=a=>a.sort((x,y)=>x-y)[Math.floor(a.length/2)];const c=s.length?[med(s.map(x=>x.la)),med(s.map(x=>x.ln))]:b.getCenter();LM.setView(c,16,{animate:false});}zoomStyle();}
+function diaSvg(status,ratio,n){
+  const col=status==='full'?'#2C6845':status==='part'?'#8F5509':'#3A3A3A', h=status==='none'?0:32*ratio, id='p'+Math.random().toString(36).slice(2,8), d='M17 1 33 17 17 33 1 17Z';
+  return `<svg viewBox="0 0 34 34"><defs><clipPath id="${id}"><rect x="0" y="${33-h}" width="34" height="${h}"/></clipPath></defs><path d="${d}" fill="#fff" stroke="${col}" stroke-width="3"/><path d="${d}" fill="${col}" clip-path="url(#${id})"/>${status==='none'?`<path d="M11 11 23 23" stroke="${col}" stroke-width="3"/>`:''}${n>1?`<circle cx="28" cy="6" r="6" fill="#111"/><text x="28" y="9" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff" font-family="IBM Plex Sans,sans-serif">${n}</text>`:''}</svg>`;
+}
+function blocksInTown(){const by={};(SALES[S.town]||[]).forEach(s=>{const k=s.blk+'|'+s.st;(by[k]=by[k]||[]).push(s);});return Object.values(by);}
+const fits = s => !S.match || ((!S.match.ft||s.ft===S.match.ft) && s.price<=S.match.max);
+function drawMap(){
+  const t=TBY[S.town], m=meter(t);
+  $('#tName').textContent=t.name; $('#tLine').innerHTML=`${meterHtml(m.n)} ${m.txt}`;
+  $('#ageChip span').textContent=`Youngest buyer: ${S.age}`;
+  const mc=$('#matchChip'); mc.hidden=!S.match; if(S.match) mc.innerHTML=`${esc(S.match.ft||'Any flat')} up to ${money(S.match.max)} <span aria-hidden="true">✕</span>`;
+  if(!LM) initMap();
+  LM.invalidateSize();
+  if(needFit){fitTown();roadLabels();needFit=false;}
+  LY.sales.clearLayers();
+  const groups=blocksInTown(); let nMatch=0;
+  groups.forEach((g,i)=>{
+    const s=g[0], r=calc(s.price,s.lease), ok=g.some(fits); if(ok&&S.match)nMatch+=g.filter(fits).length;
+    const icon=L.divIcon({className:'pinicon',iconSize:[60,52],iconAnchor:[30,17],html:`<div class="pinwrap ${ok?'':'dim'}" style="animation-delay:${Math.min(i*15,600)}ms">${diaSvg(r.status,r.ratio,g.length)}<b>${Math.floor(s.lease)} yrs</b></div>`});
+    const mk=L.marker([s.la,s.ln],{icon,keyboard:true,zIndexOffset:ok?1000:0,title:`Block ${s.blk} ${s.st}: ${g.length} sale${g.length>1?'s':''}, ${Math.floor(s.lease)} years left`,riseOnHover:true});
+    mk.on('click',()=>g.length>1?openBlock(g):openEnc(s));
+    LY.sales.addLayer(mk);
+  });
+  const n=(SALES[S.town]||[]).length;
+  $('#mapHint').textContent = !n?'No sales here in Jul–Sep 2026. Try another town.' : S.match?`${nMatch} of ${n} recent sales match your document. Tap a bright diamond.`:`${n} sales here in Jul–Sep 2026. Drag to look around, tap a diamond.`;
+}
+$('#matchChip').onclick=()=>{S.match=null;drawMap();};
+$('#layerChip').onclick=()=>openSheet(`<div class="pad"><h1 style="font-size:1.6rem">What to show on the map</h1><p class="small">Roads, blocks and town lines are always shown. Bus stops appear when you zoom in.</p><div class="layers">${LAYERDEF.map(([k,l,c,svg])=>`<button type="button" class="layer" data-ly="${k}" aria-pressed="${!!S.layers[k]}"><span class="sw" style="background:${c}"><svg viewBox="0 0 24 24">${svg}</svg></span>${l}<span class="tg" aria-hidden="true"></span></button>`).join('')}</div><button class="btn primary" data-closesheet>Done</button></div>`,()=>$$('[data-ly]').forEach(b=>b.onclick=()=>{const k=b.dataset.ly;S.layers[k]=!S.layers[k];b.setAttribute('aria-pressed',S.layers[k]);applyLayers();}));
+function openBlock(g){
+  const s=g[0];
+  openSheet(`<div class="pad"><span class="plate" style="align-self:flex-start">BLK ${esc(s.blk)}</span><h1 style="font-size:1.5rem">${esc(s.st)}</h1><p class="small">Singapore ${esc(s.pc)} · ${g.length} sales in Jul–Sep 2026 · ${Math.floor(s.lease)} years of lease left</p>
+    <div class="blocklist">${g.map((x,i)=>`<button type="button" class="salerow" data-si="${i}"><span><b>${esc(x.ft)} · storey ${esc(x.sr)}</b><small>${x.sqm} sqm · sold ${x.m}</small></span><span class="pr">${exact(x.price)}</span></button>`).join('')}</div></div>`,()=>$$('[data-si]').forEach(b=>b.onclick=()=>openEnc(g[+b.dataset.si])));
+}
+$('#chgTown').onclick=()=>openSheet(`<div class="pad"><h1 style="font-size:1.6rem">Choose a town</h1><p class="small">Diamonds show how much lease length changes prices in each town.</p>${townListHtml()}</div>`,()=>bindTownList(t=>{S.town=t;needFit=true;closeSheet();drawMap();}));
+$('#ageChip').onclick=()=>openSheet(ageSheetHtml(),bindAgeSheet);
+function ageSheetHtml(){return `<div class="pad"><h1 style="font-size:1.6rem">Youngest buyer's age</h1><div class="stepper"><button type="button" id="sMinus" aria-label="Younger">−</button><output id="sOut">${S.age}</output><button type="button" id="sPlus" aria-label="Older">+</button></div><p class="small" id="sNeed"></p><button class="btn primary" data-closesheet>Done</button></div>`;}
+function bindAgeSheet(){const set=a=>{S.age=Math.max(21,Math.min(85,a));S.avg=Math.max(S.avg,S.age);$('#sOut').textContent=S.age;$('#sNeed').textContent=`Needs ${95-S.age} years of lease for full CPF.`;S.dirty=true;};$('#sMinus').onclick=()=>set(S.age-1);$('#sPlus').onclick=()=>set(S.age+1);set(S.age);}
+
+/* ---------- sheets ---------- */
+function openSheet(html,after){
+  $('#sheetHost').innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="scrim" data-closesheet></div><div class="panel"><div class="grab"></div><button class="close" type="button" aria-label="Close" data-closesheet>${ICON.close}</button>${html}</div></div>`;
+  $$('#sheetHost [data-closesheet]').forEach(b=>b.onclick=closeSheet);
+  if(after) after();
+  const f=$('#sheetHost .close'); if(f) f.focus({preventScroll:true});
+}
+function closeSheet(){ $('#sheetHost').innerHTML=''; sideProf(); if(S.dirty && S.tab==='map' && !$('#scrMap').hidden){S.dirty=false;drawMap();} }
+
+/* ---------- encounter ---------- */
+function bldgSvg(f){
+  const top = parseInt(String(f.sr||'1–3').split('–')[1]||'12',10), floors=Math.max(4,Math.min(16,Math.round((top+6)/2))), W=96, fh=9, H=floors*fh+18;
+  let win=''; for(let r=0;r<floors;r++) for(let c=0;c<5;c++) win+=`<rect x="${14+c*15}" y="${14+r*fh}" width="9" height="5" rx="1" fill="${(r*5+c)%7===0?'#F2C230':'#C9C2B6'}"/>`;
+  return `<svg viewBox="0 0 120 ${H+20}" aria-hidden="true"><ellipse cx="60" cy="${H+12}" rx="54" ry="6" fill="rgba(17,17,17,.1)"/><g class="rise"><rect x="12" y="10" width="${W}" height="${H}" rx="3" fill="#fff" stroke="#111" stroke-width="2"/><rect x="8" y="4" width="${W+8}" height="8" rx="2" fill="#7A2E1D"/>${win}<rect x="50" y="${H-4}" width="20" height="14" fill="#111"/></g></svg>`;
+}
+function openEnc(f){
+  S.enc=f; S.checked=false;
+  const lpct=Math.min(100,f.lease/99*100);
+  openSheet(`
+    <div class="enc-top">
+      <div class="bldg">${bldgSvg(f)}</div>
+      <div class="enc-id"><span class="plate">BLK ${esc(f.blk)}</span><h2>${esc(f.st)}</h2><span class="sub">${esc(f.ft)} · storey ${esc(f.sr)} · ${f.sqm} sqm</span><span class="sub">Singapore ${esc(f.pc)} · ${esc(TBY[f.town].name)}</span></div>
+    </div>
+    <div class="pad" style="padding-top:12px" data-st="st.dialog">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span class="price">${exact(f.price)}</span><span class="small">sold ${f.m}</span></div>
+      <div class="leasebar"><div class="lh"><span class="label">Lease left</span><span class="lv">${f.lease.toFixed(0)} years</span></div><div class="hp" role="img" aria-label="${f.lease.toFixed(0)} of 99 years"><i style="width:0" data-w="${lpct}"></i></div><span class="small">Started ${f.lc}. Leases are 99 years.</span></div>
+      <div id="encResult"><button class="btn primary" id="checkBtn" data-st="st.button → rules.py" style="width:100%">Check for age ${S.age}</button></div>
+    </div>`, ()=>{
+      requestAnimationFrame(()=>{const i=$('.hp i'); if(i) i.style.width=i.dataset.w+'%';});
+      $('#checkBtn').onclick=showResult;
+    });
+}
+function showResult(){
+  const f=S.enc, r=calc(f.price,f.lease); S.checked=true;
+  const span=Math.max(95,r.end)-S.age, pos=a=>Math.max(0,Math.min(100,(a-S.age)/span*100));
+  const kept=S.list.some(x=>x.key===f.key);
+  $('#encResult').innerHTML = `
+    <div class="verdict ${r.status}" data-st="st.metric">
+      <span class="stamp">${VICON[r.status]}${VTXT[r.status]}</span>
+      <p class="vline">${vline(r)}</p>
+      <div class="rw" aria-hidden="true">
+        <div class="strip"><div class="dash"></div>${r.end<95?`<div class="gap" style="left:${pos(r.end)}%"></div>`:''}</div>
+        <div class="plane" id="plane" style="left:0">${ICON.plane}</div>
+        <span class="t" style="left:0">Now ${S.age}</span>
+        <span class="t" style="right:0">${r.end<95?'95':Math.floor(r.end)}</span>
+      </div>
+      <div class="tiles">
+        <div class="tile"><span class="k">CPF you can use</span><span class="v">${r.status==='none'?'$0':'up to '+money(r.cap)}</span><span class="s">${r.status==='full'?'full amount':r.status==='part'?Math.round(r.ratio*100)+'% of the price':'not allowed'}</span></div>
+        <div class="tile"><span class="k">Cash you need</span><span class="v">${r.cashLife>0?'at least '+money(r.cashLife):'$0 extra'}</span><span class="s">${r.cashLife>0?'on top of CPF':'CPF is not cut'}</span></div>
+      </div>
+      <details class="more"><summary>More numbers</summary>
+        <dl class="kv">
+          <dt>HDB loan, up to</dt><dd>${r.loan?exact(r.loan):'not available'}</dd>
+          ${r.loan?`<dt>Loan length</dt><dd>${Math.floor(r.tenure)} years</dd><dt>Monthly, about</dt><dd>${exact(r.monthly)}</dd>`:''}
+          ${S.oaSet?`<dt>Cash at the start</dt><dd>${exact(r.cashNow)}</dd>`:''}
+        </dl>
+        <p class="small" style="margin-top:8px">Simplified. Assumes the price equals the valuation, a 2.6% HDB rate, and no grants. Check with CPF's housing calculator.</p>
+      </details>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+      <button class="btn primary" id="keepBtn" ${kept?'disabled':''} data-st="st.button → session_state.shortlist">${ICON.keep}${kept?'In your shortlist':'Keep in shortlist'}</button>
+      <div class="row"><button class="btn" id="whyBtn">${ICON.q}Why?</button><button class="btn ghost" id="nextBtn">${ICON.next}Next flat</button></div>
+    </div>`;
+  requestAnimationFrame(()=>setTimeout(()=>{const p=$('#plane'); if(p) p.style.left=`calc(${pos(Math.min(r.end,Math.max(95,r.end)))}% - ${r.end>=95?17:0}px)`;},250));
+  $('#keepBtn').onclick=keep;
+  $('#whyBtn').onclick=()=>{const q=`Why is my CPF ${r.status==='full'?'not cut':'cut'} for Blk ${f.blk} ${f.st}?`; tab('ask'); ask(q,{f,r});};
+  $('#nextBtn').onclick=()=>{const L2=SALES[f.town]||[f];const i=L2.findIndex(p=>p.key===f.key);const nx=L2[(i+1)%L2.length];openEnc(nx);if(LM)LM.panTo([nx.la,nx.ln]);};
+}
+function keep(){
+  const f=S.enc; if(S.list.some(x=>x.key===f.key)) return;
+  S.list.unshift(f);
+  const newStamp=!S.stamps.has(f.town); S.stamps.add(f.town);
+  const c=$('#listCount'); c.hidden=false; c.textContent=S.list.length; c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
+  $('#keepBtn').disabled=true; $('#keepBtn').innerHTML=ICON.keep+'In your shortlist';
+  toast(newStamp?`New town stamp: ${TBY[f.town].name}`:'Kept in your shortlist', newStamp);
+}
+function toast(msg,stamp){
+  $('#toastHost').innerHTML=`<div class="toast" role="status">${stamp?`<svg class="st" viewBox="0 0 42 42"><circle cx="21" cy="21" r="18" fill="#F4E7E2" stroke="#7A2E1D" stroke-width="3" stroke-dasharray="4 3"/><path d="M21 9 33 21 21 33 9 21Z" fill="#7A2E1D"/></svg>`:''}<span>${esc(msg)}</span></div>`;
+  clearTimeout(toast.t); toast.t=setTimeout(()=>$('#toastHost').innerHTML='',2600);
+}
+
+/* ---------- shortlist ---------- */
+function miniDia(r){const col=r.status==='full'?'var(--ok)':r.status==='part'?'var(--part)':'var(--no)';const h=r.status==='none'?0:40*r.ratio;return `<svg viewBox="0 0 52 52" width="52" height="52" aria-hidden="true"><defs><clipPath id="m${Math.random().toString(36).slice(2,7)}x"><rect/></clipPath></defs><path d="M26 6 46 26 26 46 6 26Z" fill="#fff" stroke="${col}" stroke-width="3"/><clipPath id="cl"></clipPath><path d="M26 6 46 26 26 46 6 26Z" fill="${col}" style="clip-path:inset(${(40-h)/52*100+ (6/52*100)}% 0 0 0)"/></svg>`;}
+function renderList(){
+  const n=S.stamps.size;
+  const items = S.list.map((f,i)=>{const r=calc(f.price,f.lease);return `<button class="fcard" type="button" data-li="${i}">${miniDia(r)}<span><b>Blk ${esc(f.blk)} ${esc(f.st)}</b><small>${esc(TBY[f.town].name)} · ${Math.floor(f.lease)} yrs left</small><br><span class="vpill ${r.status}">${VTXT[r.status]}</span></span><span class="pr">${money(f.price)}<br><small class="small">${r.cashLife>0?'+'+money(r.cashLife)+' cash':'no extra cash'}</small></span></button>`;}).join('');
+  $('#listBody').innerHTML = `
+    <div class="scr-h"><h1>Your shortlist</h1><p class="ui" style="font-size:.9rem">Worked out for a youngest buyer aged ${S.age}.</p></div>
+    ${S.list.length?`<div class="flatlist" data-st="st.dataframe">${items}</div><button class="btn ghost sm" type="button" id="expBtn" data-st="st.download_button">Save shortlist as a file</button>`
+      :`<div class="empty"><svg viewBox="0 0 52 52" width="52" height="52"><path d="M26 6 46 26 26 46 6 26Z" fill="none" stroke="var(--sand)" stroke-width="3" stroke-dasharray="5 4"/></svg><b class="ui">Nothing here yet</b><p class="small">Check a flat on the map, then tap Keep in shortlist.</p><button class="btn primary" type="button" data-gomap>Go to the map</button></div>`}
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="font-size:1.3rem">Town stamps</h2><span class="label">${n} of ${TOWNS.length}</span></div>
+      <div class="prog"><i style="width:${n/TOWNS.length*100}%"></i></div>
+      <div class="stamps">${TOWNS.map(t=>{const p=PHOTOS[t.id];return `<div class="stampc ${S.stamps.has(t.id)?'got':''} ${p?'hasimg':''}" title="${esc(LANDMARK[t.id])}">${p?`<img src="${p.img}" alt="">`:''}<span>${esc(t.name).replace('/','/&#8203;')}</span></div>`;}).join('')}</div><p class="small">Keep a flat in a town to earn its stamp. Photos: Wikimedia Commons (credits in More → Sources).</p>
+    </div>`;
+  $$('[data-li]').forEach(b=>b.onclick=()=>{const f=S.list[+b.dataset.li];if(S.town!==f.town){S.town=f.town;needFit=true;}tab('map');openEnc(f);showResult();});
+  const gm=$('[data-gomap]'); if(gm) gm.onclick=()=>tab('map');
+  const ex=$('#expBtn'); if(ex) ex.onclick=()=>{
+    const head=['Block','Street','Town','Flat type','Storey','Price','Lease left (years)','Sold','CPF verdict','CPF you can use','Cash on top of CPF'];
+    const rows=S.list.map(f=>{const r=calc(f.price,f.lease);return [f.blk,f.st,TBY[f.town].name,f.ft,f.sr,Math.round(f.price),f.lease.toFixed(1),f.m,VTXT[r.status],Math.round(r.cap),Math.round(r.cashLife)];});
+    const csv=[head].concat(rows).map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='runway_shortlist.csv'; document.body.appendChild(a); a.click(); a.remove();
+  };
+}
+
+/* ---------- Ask Runway ---------- */
+const SUGG=['Can I still use CPF for an old flat?','Is my HDB loan cut too?','How long can my loan be?','Why did Clementi cut my CPF more than Yishun?'];
+function srcHtml(src, open){
+  if(!src || !src.length) return '';
+  return `<details class="src"${open?' open':''}><summary>Where this comes from (${src.length})</summary>${src.map((s,i)=>`<div class="s1"><b>[${i+1}] ${esc(s.publisher)} · ${esc(s.title)}</b>${s.heading?esc(s.heading)+'. ':''}${esc(s.text)}${s.url?` <a href="${esc(s.url)}" target="_blank" rel="noopener">Open</a>`:''}</div>`).join('')}</details>`;
+}
+function md(text){
+  const lines = esc(text||'').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').split(/\n/);
+  let out = '', list = false;
+  for(const raw of lines){
+    const l = raw.trim();
+    if(/^[-*•]\s+/.test(l)){ if(!list){out+='<ul>';list=true;} out += `<li>${l.replace(/^[-*•]\s+/,'')}</li>`; continue; }
+    if(list){out+='</ul>';list=false;}
+    if(l) out += `<p>${l}</p>`;
+  }
+  return out + (list?'</ul>':'');
+}
+function flatFacts({f, r}){
+  const t = TBY[f.town], facts = {
+    'Youngest buyer age': String(S.age), 'Remaining lease (years)': String(Math.floor(f.lease)),
+    'Youngest buyer is this old when lease ends': String(Math.floor(r.end)),
+    'Lease covers youngest buyer to age 95': r.status==='full'?'yes':'no',
+    'Years short of age 95': String(Math.max(0, Math.round(95 - r.end))),
+    'CPF can be used': r.status==='none'?'no':'yes',
+    'CPF usable (% of Valuation Limit)': (r.ratio*100).toFixed(1),
+    'HDB loan limit (% of price or value)': (r.ltv*100).toFixed(1), 'Full HDB loan limit (%)': '75'};
+  if(!t.low) facts['Lease premium by town'] = `${t.name} ${t.pct.toFixed(2)}% per year`;
+  return facts;
+}
+const history = () => S.chat.filter(m=>!m.typing).slice(-7).map(m=>({role:m.me?'user':'assistant', content:plain(m.html)}));
+async function ask(q, ctx){
+  const prior = history();
+  S.chat.push({me:true, html:esc(q)});
+  if(/\b[stfgm]\d{7}[a-z]\b/i.test(q) || /\b[689]\d{7}\b/.test(q)){ pushBot({warn:true, html:'<p>Please remove your NRIC or phone number. Runway never needs them.</p>'}); return; }
+  const typing = {typing:true, html:'<p class="small">Checking the official documents…</p>'};
+  S.chat.push(typing); renderChat();
+  let b;
+  try{
+    const r = await RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior});
+    b = {html: md(r.text) + (r.note ? `<p class="small">${esc(r.note)}</p>` : ''), src: r.sources, open: !!r.offline, warn: r.blocked === 'personal'};
+  }catch(e){ b = {warn:true, html:'<p>Runway could not reach its documents just now. Try again in a moment.</p>'}; }
+  S.chat.splice(S.chat.indexOf(typing), 1);
+  pushBot(b);
+}
+const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+const INTRO='<p>Hello. Ask me about using CPF, HDB loans, or lease. You can speak or type. I answer from official documents.</p>';
+function renderChat(){
+  const all=[{bot:true,html:INTRO}].concat(S.chat);
+  $('#chat').innerHTML = all.map((m,i)=>m.me?`<div class="msg me">${m.html}</div>`:`<div class="msg bot ${m.warn?'warn':''}"><span class="who">Runway</span>${m.html}${m.src?srcHtml(m.src,m.open):''}<button type="button" class="speakbtn" data-say="${i}" aria-pressed="false">${SPK}Listen</button></div>`).join('');
+  $$('[data-say]').forEach(b=>b.onclick=()=>{const m=all[+b.dataset.say];if(b.getAttribute('aria-pressed')==='true'){stopSpeak();return;}speak(plain(m.html),b);});
+  const hasSum=S.chat.some(m=>m.me);
+  $('#sugg').innerHTML = SUGG.map(s=>`<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('') + (hasSum?`<button class="chip" type="button" id="sumBtn" data-st="summarise chain">Sum up this chat</button>`:'');
+  $$('#sugg [data-q]').forEach(c=>c.onclick=()=>ask(c.dataset.q));
+  const sb=$('#sumBtn'); if(sb) sb.onclick=async()=>{sb.disabled=true; try{const r=await RW.send('summary',{history:history()}); pushBot({html:'<p><b>In short:</b></p>'+md(r.text)});}catch(e){sb.disabled=false;}};
+  const sc=$('#scrAsk'); requestAnimationFrame(()=>sc.scrollTop=sc.scrollHeight);
+}
+function pushBot(b){S.chat.push(b);renderChat();if($('#autoRead').checked){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1]);}}
+function plain(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.small').forEach(x=>x.remove());return d.textContent.replace(/\s+/g,' ').trim();}
+
+/* ---------- document upload → profile → town recommendations ---------- */
+const SAMPLE_DOC = `Sample buyer notes (example)
+Name: Tan Ah Kow   NRIC: S1234567D   Phone: 91234567
+We are a couple buying a resale flat.
+Youngest buyer is 34. Average age of buyers is 36.
+Budget: about $620,000 for a 4-room flat.
+Combined CPF Ordinary Account: $150,000.
+We prefer to stay near my parents in Bedok or Tampines, close to an MRT and a hawker centre.`;
+function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s);});}
+async function pdfText(buf){
+  const V='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+  if(!window.pdfjsLib){await loadScript(V+'pdf.worker.min.js');await loadScript(V+'pdf.min.js');pdfjsLib.GlobalWorkerOptions.workerSrc=V+'pdf.worker.min.js';}
+  const doc=await pdfjsLib.getDocument({data:buf}).promise; let out='';
+  for(let i=1;i<=Math.min(doc.numPages,10);i++){const p=await doc.getPage(i);const c=await p.getTextContent();out+=c.items.map(x=>x.str).join(' ')+'\n';}
+  return out;
+}
+function redact(txt){
+  let n=0; const r=(re)=>{txt=txt.replace(re,()=>{n++;return '[removed]';});};
+  r(/\b[STFGM]\d{7}[A-Z]\b/gi); r(/\b[689]\d{3}\s?\d{4}\b/g); r(/[\w.+-]+@[\w-]+\.[\w.]+/g);
+  txt=txt.replace(/(name\s*[:：]\s*)([^\n]+?)(?=\s{2,}|\s+nric|\s+phone|\n|$)/gi,(m,a)=>{n++;return a+'[removed]';});
+  return {txt,n};
+}
+function money2(s,suf){let v=parseFloat(String(s).replace(/,/g,''));if(/k/i.test(suf||''))v*=1e3;if(/m/i.test(suf||''))v*=1e6;return isFinite(v)?Math.round(v):null;}
+function extract(txt){
+  const g=(re,i=1)=>{const m=txt.match(re);return m?m[i]:null;};
+  const f={};
+  f.age=+(g(/youngest[^0-9\n]{0,40}(\d{2})/i)||g(/\bage[sd]?\b[^0-9\n]{0,12}(\d{2})/i)||0)||null;
+  f.avg=+(g(/average age[^0-9\n]{0,20}(\d{2})/i)||0)||null;
+  let m=txt.match(/budget[^0-9$\n]{0,30}\$?\s*([\d,.]+)\s*(k|m|mil|million)?/i); f.budget=m?money2(m[1],m[2]):null;
+  m=txt.match(/(ordinary account|\bOA\b)[^0-9$\n]{0,30}\$?\s*([\d,.]+)\s*(k)?/i)||txt.match(/CPF[^0-9$\n]{0,40}\$\s*([\d,.]+)\s*(k)?/i);
+  f.oa=m?money2(m[m.length===4?2:1],m[m.length===4?3:2]):null;
+  m=txt.match(/(hdb (housing )?loan|loan amount|loan of up to)[^0-9$\n]{0,30}\$?\s*([\d,.]+)\s*(k|m)?/i); const loan=m?money2(m[3],m[4]):null;
+  if(!f.budget&&loan) f.budget=loan+(f.oa||0);
+  m=txt.match(/\b([2-5])[- ]?room/i); f.ft=m?m[1]+'-room':(/executive/i.test(txt)?'Executive':null);
+  f.towns=TOWNS.filter(t=>new RegExp('\\b'+t.name.split('/')[0].replace(/ /g,'\\s+')+'\\b','i').test(txt)).map(t=>t.id);
+  return f;
+}
+async function handleDoc(name,getText){
+  S.chat.push({me:true,html:`Uploaded <b>${esc(name)}</b>`}); renderChat();
+  let raw;
+  try{raw=await getText();}catch(e){pushBot({warn:true,html:'<p>I could not read this file. Try a PDF with selectable text, a .txt file, or tap Try a sample.</p>'});return;}
+  const {txt,n}=redact(raw||''); const f=extract(txt);
+  const D={age:f.age||S.age,avg:f.avg||f.age||S.avg,budget:f.budget||600000,oa:f.oa??(S.oaSet?S.oa:100000),ft:f.ft||'4-room',towns:f.towns};
+  const idn=S.chat.length;
+  const fts=['2-room','3-room','4-room','5-room','Executive'];
+  pushBot({doc:D,html:`<p><b>Here is what I found.</b> Please check and fix anything wrong.</p>
+    ${n?`<span class="redact">${n} personal detail${n>1?'s':''} removed (name, NRIC, phone).</span>`:''}
+    <div class="found" data-f="${idn}">
+      <label>Youngest buyer<input class="inp" type="number" data-k="age" value="${D.age}"></label>
+      <label>Average age<input class="inp" type="number" data-k="avg" value="${D.avg}"></label>
+      <label>Budget ($)<input class="inp" type="number" step="10000" data-k="budget" value="${D.budget}"></label>
+      <label>CPF OA ($)<input class="inp" type="number" step="5000" data-k="oa" value="${D.oa}"></label>
+      <label style="grid-column:1/-1">Flat type<select class="inp" data-k="ft">${fts.map(x=>`<option ${x===D.ft?'selected':''}>${x}</option>`).join('')}</select></label>
+    </div>
+    ${D.towns.length?`<p class="small">Towns you mentioned: ${D.towns.map(id=>esc(TBY[id].name)).join(', ')}</p>`:''}
+    ${!f.age||!f.budget?`<p class="small">Some details were not in the document, so I used your current details. Change them above if needed.</p>`:''}
+    <button type="button" class="btn primary" data-act="find" data-n="${idn}">Find towns for me</button>`,s:'Read your document and found your age, budget, CPF and flat type.'});
+}
+const median=a=>{const b=a.slice().sort((x,y)=>x-y);return b.length?b[Math.floor(b.length/2)]:0;};
+function recommend(p){
+  const need=95-p.age, out=[];
+  TOWNS.forEach(t=>{
+    const all=(SALES[t.id]||[]).filter(s=>s.ft===p.ft); if(all.length<3) return;
+    const afford=all.filter(s=>s.price<=p.budget), good=afford.filter(s=>s.lease>=need);
+    const pref=p.towns.includes(t.id);
+    out.push({t,n:all.length,afford:afford.length,good:good.length,medP:median(all.map(s=>s.price)),medL:median(all.map(s=>s.lease)),pref,score:good.length/all.length*60+afford.length/all.length*30+(pref?15:0)});
+  });
+  return out.sort((a,b)=>b.score-a.score);
+}
+function findTowns(n){
+  const box=$(`[data-f="${n}"]`); const v=k=>box.querySelector(`[data-k="${k}"]`).value;
+  const p={age:Math.max(21,Math.min(85,+v('age')||S.age)),avg:+v('avg')||+v('age'),budget:+v('budget')||600000,oa:+v('oa')||0,ft:v('ft'),towns:(S.chat[n]&&S.chat[n].doc?S.chat[n].doc.towns:[])};
+  S.age=p.age; S.avg=Math.max(p.avg,p.age); S.oa=p.oa; S.oaSet=true; S.dirty=true;
+  const r=recommend(p), top=r.slice(0,3);
+  if(!top.length||top[0].afford===0){pushBot({html:`<p>None of the recent ${esc(p.ft)} sales were within ${money(p.budget)}. Try a smaller flat type or a higher budget.</p>`});return;}
+  S.lastRec={p,top};
+  pushBot({html:`<p><b>Towns to look at first</b> for a ${esc(p.ft)} up to ${money(p.budget)}, youngest buyer ${p.age}:</p>
+    ${top.map((x,i)=>`<div class="rec"><div class="rh"><b>${i+1}. ${esc(x.t.name)}</b>${x.pref?'<span class="rk">You mentioned it</span>':''}</div>
+      <p><b style="color:var(--ink)">${x.good} of ${x.n}</b> recent ${esc(p.ft)} sales fit your budget <b style="color:var(--ink)">and</b> keep full CPF. Typical price ${money(x.medP)}, typical lease ${Math.round(x.medL)} years.</p>
+      <button type="button" class="btn sm" data-act="map" data-town="${x.t.id}">See these flats on the map</button></div>`).join('')}
+    <p class="small">Ranked by Runway's calculator from Jul–Sep 2026 sales, not by the AI. Your details now apply across the app.</p>`,
+    s:`Best towns for a ${p.ft} up to ${money(p.budget)}: ${top.map(x=>x.t.name).join(', ')}.`});
+}
+$('#chat').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  if(b.dataset.act==='find') findTowns(+b.dataset.n);
+  if(b.dataset.act==='map'){const p=S.lastRec.p;S.town=b.dataset.town;S.match={ft:p.ft,max:p.budget};needFit=true;tab('map');}
+});
+$('#upBtn').onclick=()=>$('#upDoc').click();
+$('#upDoc').onchange=e=>{const f=e.target.files[0]; if(!f) return; e.target.value='';
+  handleDoc(f.name,()=> /\.pdf$/i.test(f.name)||f.type==='application/pdf' ? f.arrayBuffer().then(pdfText) : f.text());};
+$('#sampleBtn').onclick=()=>handleDoc('sample-buyer-notes.txt',async()=>SAMPLE_DOC);
+
+/* ---------- voice: text to speech (prefers a Singapore English voice) ---------- */
+const TTS = 'speechSynthesis' in window ? window.speechSynthesis : null;
+let VOICE=null;
+function pickVoice(){
+  if(!TTS){$('#voiceName').textContent='Read-aloud is not supported on this device.';return;}
+  const vs=TTS.getVoices();
+  VOICE = vs.find(v=>/en[-_]SG/i.test(v.lang)) || vs.find(v=>/singapore/i.test(v.name)) || vs.find(v=>/en[-_]GB/i.test(v.lang)) || vs.find(v=>/^en/i.test(v.lang)) || null;
+  const sg = VOICE && (/en[-_]SG/i.test(VOICE.lang)||/singapore/i.test(VOICE.name));
+  $('#voiceName').textContent = !vs.length ? 'Voice: device default' : sg ? `Voice: ${VOICE.name.replace(/\s*\(.*\)/,'')} (Singapore English)` : `No Singapore voice on this device. Using ${VOICE?VOICE.name.replace(/\s*\(.*\)/,''):'the default'}.`;
+}
+if(TTS){pickVoice(); TTS.onvoiceschanged=pickVoice;} else pickVoice();
+let speakingBtn=null;
+function stopSpeak(){if(TTS)TTS.cancel();if(speakingBtn){speakingBtn.setAttribute('aria-pressed','false');speakingBtn.lastChild.textContent='Listen';}speakingBtn=null;}
+function speak(text,btn){
+  if(!TTS) return;
+  stopSpeak();
+  const u=new SpeechSynthesisUtterance(text.replace(/\$/g,' dollars ').replace(/ dollars ([\d,]+)/g,' $1 dollars'));
+  if(VOICE){u.voice=VOICE;u.lang=VOICE.lang;} else u.lang='en-SG';
+  u.rate=.92;
+  if(btn){speakingBtn=btn;btn.setAttribute('aria-pressed','true');btn.lastChild.textContent='Stop';}
+  u.onend=u.onerror=()=>{if(speakingBtn===btn)stopSpeak();};
+  TTS.speak(u);
+}
+
+/* ---------- voice: speech to text (en-SG) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let REC=null;
+$('#micBtn').onclick=()=>{
+  if(REC){REC.stop();return;}
+  if(!SR){pushBot({warn:true,html:'<p>Voice input is not available in this browser. You can type your question instead.</p>'});return;}
+  REC=new SR(); REC.lang='en-SG'; REC.interimResults=true; REC.maxAlternatives=1;
+  const mb=$('#micBtn'); mb.classList.add('on'); mb.setAttribute('aria-pressed','true'); $('#askIn').placeholder='Listening…';
+  let finalText='';
+  REC.onresult=e=>{let s='';for(const r of e.results){s+=r[0].transcript;if(r.isFinal)finalText=s;}$('#askIn').value=s;};
+  REC.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'||e.error==='audio-capture')pushBot({warn:true,html:'<p>The microphone is blocked, so I could not hear you. Allow the microphone and tap the mic again, or type your question.</p>'});};
+  REC.onend=()=>{mb.classList.remove('on');mb.setAttribute('aria-pressed','false');$('#askIn').placeholder='Type or tap the mic';REC=null;const v=($('#askIn').value||finalText).trim();if(v){$('#askIn').value='';ask(v);}};
+  try{REC.start();setTimeout(()=>{if(REC)REC.stop();},10000);}catch(err){REC.onend();}
+};
+$('#askForm').addEventListener('submit',e=>{e.preventDefault();const v=$('#askIn').value.trim();if(!v)return;$('#askIn').value='';ask(v);});
+
+/* ---------- more ---------- */
+function renderMore(){
+  $('#moreBody').innerHTML=`
+    <div class="scr-h"><h1>More</h1><p class="ui" style="font-size:.9rem">Signed in as ${esc(S.user)}</p></div>
+    <div class="list">
+      <button data-sub="details"><span>Your details<small>Youngest ${S.age} · average ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}</small></span>${ICON.chev}</button>
+      <button data-sub="size"><span>Text size<small>${document.documentElement.classList.contains('big')?'Large':'Normal'}</small></span>${ICON.chev}</button>
+    </div>
+    <div class="list">
+      <button data-sub="about"><span>About Us<small>What Runway is, notice, team</small></span>${ICON.chev}</button>
+      <button data-sub="method"><span>How it works<small>Methodology and flowcharts</small></span>${ICON.chev}</button>
+      <button data-sub="sources"><span>Sources and credits<small>Data, map, documents, photos</small></span>${ICON.chev}</button>
+    </div>
+    <button class="btn ghost" type="button" id="outBtn">Sign out</button>`;
+  $$('[data-sub]').forEach(b=>b.onclick=()=>sub(b.dataset.sub));
+  $('#outBtn').onclick=signOut;
+}
+function signOut(){closeSheet();RW.logout();}
+function backBtn(){return `<button class="back" type="button" id="backBtn">${ICON.back}More</button>`;}
+function renderSub(){
+  const b=$('#subBody'), s=S.sub;
+  if(s==='details'){
+    b.innerHTML=`${backBtn()}<h1>Your details</h1>
+      <span class="label">Youngest buyer</span><div class="stepper"><button type="button" id="dA-" aria-label="Younger">−</button><output id="dA">${S.age}</output><button type="button" id="dA+" aria-label="Older">+</button></div>
+      <span class="label">Average age of all buyers</span><div class="stepper"><button type="button" id="dV-" aria-label="Younger">−</button><output id="dV">${S.avg}</output><button type="button" id="dV+" aria-label="Older">+</button></div>
+      <p class="small">Average age decides how long your HDB loan can be.</p>
+      <span class="label">CPF Ordinary Account</span>
+      <div class="chips">${[50000,100000,150000,200000,300000].map(o=>`<button type="button" class="chip" data-o="${o}" aria-pressed="${S.oaSet&&S.oa===o}">${exact(o)}</button>`).join('')}<button type="button" class="chip" data-o="skip" aria-pressed="${!S.oaSet}">Not sure</button></div>`;
+    const upd=()=>{$('#dA').textContent=S.age;$('#dV').textContent=S.avg;};
+    $('#dA-').onclick=()=>{S.age=Math.max(21,S.age-1);upd();}; $('#dA+').onclick=()=>{S.age=Math.min(85,S.age+1);S.avg=Math.max(S.avg,S.age);upd();};
+    $('#dV-').onclick=()=>{S.avg=Math.max(S.age,S.avg-1);upd();}; $('#dV+').onclick=()=>{S.avg=Math.min(85,S.avg+1);upd();};
+    $$('[data-o]').forEach(c=>c.onclick=()=>{if(c.dataset.o==='skip')S.oaSet=false;else{S.oaSet=true;S.oa=+c.dataset.o;}$$('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===c));});
+  } else if(s==='size'){
+    const big=document.documentElement.classList.contains('big');
+    b.innerHTML=`${backBtn()}<h1>Text size</h1><p>Pick the size that is easiest to read.</p><div class="row"><button class="btn ${big?'ghost':'primary'}" id="szN">Normal</button><button class="btn ${big?'primary':'ghost'}" id="szB" style="font-size:1.2rem">Large</button></div>`;
+    $('#szN').onclick=()=>{setSize(false);renderSub();}; $('#szB').onclick=()=>{setSize(true);renderSub();};
+  } else if(s==='sources'){ b.innerHTML=backBtn()+sourcesHtml(); }
+  else if(s==='about'){ b.innerHTML=backBtn()+aboutHtml(); }
+  else if(s==='method'){ b.innerHTML=backBtn()+methodHtml(); }
+  $('#backBtn').onclick=()=>tab('more');
+}
+function setSize(big){document.documentElement.classList.toggle('big',big);$$('[data-size]').forEach(x=>x.setAttribute('aria-pressed',(x.dataset.size==='b')===big));}
+$$('[data-size]').forEach(x=>x.onclick=()=>setSize(x.dataset.size==='b'));
+
+const SRCI=(t,d,u)=>`<div class="srcitem"><b>${t}</b>${d}${u?`<br><a href="${u}" target="_blank" rel="noopener">${u.replace(/^https:\/\//,'')}</a>`:''}</div>`;
+const FULL = () => S.role === 'full';
+function sourcesHtml(){
+  const credits = TOWNS.filter(x=>PHOTOS[x.id]).map(x=>`${esc(x.name)}: ${esc(PHOTOS[x.id].credit)}`).join('<br>');
+  return `<div class="doctext"><h1>Sources and credits</h1>
+<p>Every number comes from the public data below. The AI only explains.</p>
+<h2>Rules and answers</h2><div class="srclist">
+${SRCI('32 official documents','CPF Board, HDB, MND and MOM, IRAS and CEA pages on CPF use, the age-95 rule, HDB loans, grants and the resale process. Ask Runway searches these and shows the passage it used.','')}
+${SRCI('MND · Annex A: Updated rules on CPF usage and HDB housing loan','The age-95 rule, CPF pro-rating, HDB loan limit and loan length.','https://www.mnd.gov.sg')}
+${SRCI('CPF Board · Lease not covering the youngest buyer to 95','The 20-year floor and CPF\'s worked example.','https://www.cpf.gov.sg')}</div>
+<h2>Flat prices</h2><div class="srclist">
+${SRCI('HDB · Resale flat prices (data.gov.sg)','986,090 sales from 1990 to Sep 2026. The map shows the sales from Jul to Sep 2026.','https://data.gov.sg')}</div>
+<h2>Map</h2><div class="srclist">
+${SRCI('Block addresses and coordinates','OneMap (Singapore Land Authority), via the open singapore-postal-codes list.','https://www.onemap.gov.sg')}
+${SRCI('Roads and bus stops','LTA DataMall, via the open sgbusdata project.','https://github.com/cheeaun/sgbusdata')}
+${SRCI('MRT and LRT lines and stations','© OpenStreetMap contributors, via sgraildata.','https://www.openstreetmap.org/copyright')}
+${SRCI('Town outlines and coastline','URA Master Plan 2014 planning areas.','https://github.com/yinshanyang/singapore')}</div>
+<h2>Town photos</h2><div class="srclist">${SRCI('Wikimedia Commons','Each photo keeps its licence and author credit:<br>'+credits,'https://commons.wikimedia.org')}</div>
+<h2>Voice</h2><div class="srclist">${SRCI('Read aloud and speak','Uses your device\'s speech features, with a Singapore English voice when it has one.','')}</div>
+<h2>Brand</h2><div class="srclist">${SRCI('Runway Brand Kit v1.0','Team Runway, AI Bootcamp 2026.','')}</div>
+</div>`;
+}
+const NOTICE_BLOCK = () => `<h2 id="notice">Notice</h2><div class="notice">${NOTICE}</div><p class="small">Runway is a learning project, not financial advice. Confirm your position with CPF Board and your HDB eligibility letter.</p>`;
+function aboutHtml(){
+  if(!FULL()) return `<div class="doctext">
+  <h1>About Us</h1>
+  <p>Runway shows how a flat's lease and your youngest buyer's age decide how much CPF and HDB loan you can use, and what a shorter lease costs in each town.</p>
+  <ul><li><b>Map:</b> check real flats sold in Jul–Sep 2026.</li><li><b>Ask:</b> plain answers from official documents.</li></ul>
+  ${NOTICE_BLOCK()}
+  <h2>Team Runway</h2><p>Lynn Koh · Leong Soon Poh · Danish Syafiq · Max How</p></div>`;
+  return `<div class="doctext">
+  <h1>About Us</h1>
+  <p>A runway is how far you can go before you run out of ground. For an HDB buyer, the lease is the runway.</p>
+  <h2>Scope</h2><p>Buying an HDB flat in the resale market: how the lease left and the youngest buyer's age decide how much CPF and HDB loan you can use, and what a shorter lease costs in each town.</p>
+  <h2>Objectives</h2><ul><li>Bring together the rules from CPF Board, HDB and the Ministry of National Development.</li><li>Personalise with generic details only: ages, a rough CPF figure and a town. No names or NRIC.</li><li>Explain, not just calculate, with the source shown.</li><li>Present it as a map, verdict cards, a shortlist, a file and a chat.</li></ul>
+  <h2>Features</h2><ul><li><b>Map (Town Safari)</b>: every HDB block, MRT lines and the flats sold in Jul–Sep 2026 at their real addresses. Check each one for your age, keep the ones you like and collect town stamps.</li><li><b>Ask Runway</b>: questions answered from 32 official documents with sources, "Why?" for any flat, a chat summary, read-aloud, and document upload that suggests towns.</li><li><b>Safeguards</b>: numbers come from Runway's calculator, never the AI. An AI explanation with a number the calculator didn't produce is replaced by a plain one. NRIC and phone numbers are blocked or removed.</li></ul>
+  <h2>Data sources</h2>
+  <div class="scroll"><table class="tbl"><thead><tr><th>Source</th><th>Used for</th></tr></thead><tbody>
+    <tr><td>HDB resale flat prices, 1990 – Sep 2026 (986,090 sales, data.gov.sg)</td><td>Flats on the map, town lease effect</td></tr>
+    <tr><td>MND Annex A and CPF Board guidance on the age-95 rule</td><td>Rule engine, Ask Runway</td></tr>
+    <tr><td>32 official CPF, HDB, MND/MOM, IRAS and CEA documents</td><td>Ask Runway</td></tr>
+    <tr><td>OneMap (SLA) addresses, URA Master Plan 2014, LTA bus data, OpenStreetMap</td><td>Map</td></tr>
+    <tr><td>Wikimedia Commons (CC licences)</td><td>Town stamps</td></tr></tbody></table></div>
+  ${NOTICE_BLOCK()}
+  <h2>Team Runway</h2><p>Lynn Koh · Leong Soon Poh · Danish Syafiq · Max How</p>
+</div>`;
+}
+const FLOW_MAP = `<h2>Flowchart · Use case 1: Map</h2>
+  <div class="flow">
+    <div class="fn t">Sign in</div><div class="ar"></div>
+    <div class="fn">Youngest age, rough CPF, first town</div><div class="ar"></div>
+    <div class="fn">Town map: blocks, MRT, Jul–Sep 2026 sales</div><div class="ar"></div>
+    <div class="fn">Tap a diamond, pick a sale</div><div class="ar"></div>
+    <div class="fn d">Lease left more than 20 years?</div>
+    <div class="br"><div><div class="bl">No</div><div class="fn o">CPF: not allowed</div></div><div><div class="bl">Yes</div><div class="fn d">Lease reaches age 95?</div>
+      <div class="br" style="margin-top:4px"><div><div class="bl">Yes</div><div class="fn o">CPF: full use</div></div><div><div class="bl">No</div><div class="fn o">CPF: part only</div></div></div></div></div>
+    <div class="ar"></div>
+    <div class="fn">Verdict, runway, CPF and cash numbers</div><div class="ar"></div>
+    <div class="fn d">What next?</div>
+    <div class="br"><div><div class="bl">Keep</div><div class="fn t">Shortlist + town stamp</div></div><div><div class="bl">Why?</div><div class="fn t">Ask Runway explains this flat</div></div></div>
+  </div>`;
+const FLOW_ASK = `<h2>Flowchart · Use case 2: Ask Runway</h2>
+  <div class="flow">
+    <div class="fn t">Type, speak, tap a question, or upload a document</div><div class="ar"></div>
+    <div class="fn d">Document uploaded?</div>
+    <div class="br"><div><div class="bl">Yes</div><div class="fn">Remove personal data, read age, budget, CPF, flat type</div><div class="ar"></div><div class="fn t">Rank towns from recent sales</div></div><div><div class="bl">No</div><div class="fn o">Question</div></div></div><div class="ar"></div>
+    <div class="fn d">NRIC, phone, advice or off-topic?</div>
+    <div class="br"><div><div class="bl">Yes</div><div class="fn o">Polite decline</div></div><div><div class="bl">No</div><div class="fn">Search 32 official documents</div></div></div>
+    <div class="ar"></div>
+    <div class="fn">AI answers only from the passages, with numbered sources</div><div class="ar"></div>
+    <div class="fn t">Answer + "Where this comes from" + Listen</div>
+  </div>`;
+function methodHtml(){
+  if(!FULL()) return `<div class="doctext">
+  <h1>How it works</h1>
+  <p>Runway's calculator does the numbers from HDB's sales records and the official rules. The AI only explains.</p>
+  <div class="scroll"><table class="tbl"><tbody>
+    <tr><td>Lease reaches age 95</td><td>Full CPF</td></tr>
+    <tr><td>Lease ends earlier</td><td>CPF share = (lease − 20) ÷ (95 − age − 20)</td></tr>
+    <tr><td>20 years or less left</td><td>No CPF, no HDB loan</td></tr></tbody></table></div>
+  ${FLOW_MAP}${FLOW_ASK}</div>`;
+  const t1=(()=>{const a=S.age,v=S.avg;S.age=25;S.avg=25;const r=calc(550000,65);S.age=a;S.avg=v;return r;})();
+  const req=[['Information from several official sources','32 documents + HDB sales data + OneMap'],['Personalised with non-identifying inputs','Ages, rough CPF, town; NRIC and phone blocked'],['Explanations and follow-up questions','Ask Runway, Why?, chat summary'],['Text, tables, charts and forms','Map, verdict card, runway bar, shortlist, file export'],['At least two use cases','Map (Town Safari) and Ask Runway'],['About Us and Methodology pages','More → About Us, How it works'],['One flowchart per use case','Below'],['Deployed with a password','Streamlit Community Cloud, hashed passwords in secrets'],['Required disclaimer','About Us → Notice, linked from the map']];
+  return `<div class="doctext">
+  <h1>How it works</h1>
+  <p>Every number comes from plain arithmetic on HDB's transaction records and the published rules. The AI only explains. It never calculates.</p>
+  <h2>Requirements checklist</h2>
+  <div class="scroll"><table class="tbl"><thead><tr><th>Requirement</th><th>Where</th></tr></thead><tbody>${req.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</tbody></table></div>
+  <h2>Data flow</h2>
+  <ul><li><b>Offline:</b> pandas combines HDB's 5 resale files (986,090 sales), works out each town's lease effect from Jan 2024 – Sep 2026 sales, and geocodes every block with OneMap addresses.</li><li><b>Map:</b> town outlines, roads, MRT and the Jul–Sep 2026 sales are drawn with Leaflet. The calculator runs in the app for your age.</li><li><b>Ask:</b> 32 official documents are split into 349 passages. Keyword (BM25) and OpenAI embedding search are merged, the top 5 passages go to the AI with strict rules, and the answer shows its sources.</li></ul>
+  <h2>The rule</h2>
+  <div class="scroll"><table class="tbl"><tbody>
+    <tr><td>Lease needed</td><td>95 − youngest buyer's age</td></tr>
+    <tr><td>20-year floor</td><td>20 years or less left: no CPF, no HDB loan</td></tr>
+    <tr><td>CPF share</td><td>100% if the lease reaches 95; otherwise (lease − 20) ÷ (95 − age − 20)</td></tr>
+    <tr><td>CPF you can use</td><td>share × price (price used as valuation)</td></tr>
+    <tr><td>HDB loan limit</td><td>75% × share × price (resale applications from 20 Aug 2024)</td></tr>
+    <tr><td>Loan length</td><td>shortest of 25, 65 − average age, lease − 20</td></tr></tbody></table></div>
+  <h2>Town lease effect</h2>
+  <p>Within each town, flats of the same type sold in the same month are compared to measure how price per square metre changes with each extra year of lease. Towns with too few sales or too little lease variety show "not enough data". It is a market pattern, not a guarantee.</p>
+  <h2>Test cases</h2>
+  <div class="scroll"><table class="tbl"><thead><tr><th>Case</th><th>Expected</th><th>Result</th></tr></thead><tbody>
+    <tr><td>Age 25, 65 yrs, $550,000 (CPF Board example)</td><td>$495,000 CPF</td><td class="ok">${exact(t1.cap)}</td></tr>
+    <tr><td>Age 25 with 55 / 65 / 75 yrs (MND Annex B)</td><td>70% / 90% / 100%</td><td class="ok">Pass</td></tr>
+    <tr><td>Lease 20 yrs</td><td>No CPF, no loan</td><td class="ok">Pass</td></tr>
+    <tr><td>Average age 50, 80 yrs</td><td>15-year loan</td><td class="ok">Pass</td></tr>
+    <tr><td>Chat with an NRIC, advice or prompt injection</td><td>Declined</td><td class="ok">Pass</td></tr>
+    <tr><td>AI explanation with an invented figure</td><td>Replaced by template</td><td class="ok">Pass</td></tr></tbody></table></div>
+  <p class="small">Automated tests and 28 evaluation questions run on every change.</p>
+  ${FLOW_MAP}${FLOW_ASK}
+</div>`;
+}
+window.addEventListener('resize',()=>{if(LM)LM.invalidateSize();});
+$('#noticeLink').onclick=()=>{tab('more');sub('about');requestAnimationFrame(()=>{const n=$('#notice');if(n)n.scrollIntoView();});};
+S.user=ME.user; S.role=ME.role; S.onb=1;
+show('scrOnb'); renderOnb();
+}
+</script>
