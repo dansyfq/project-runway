@@ -16,14 +16,14 @@ The interface in `runway_game/index.html` is the approved design hand-off, runni
 
 | Screen | What it does |
 |---|---|
-| **Sign in** | Username and password, checked in Python against hashed passwords in Streamlit secrets. |
+| **Home page** | Landing page: the idea, an age-95 rule widget, lease by town, an Ask preview and the required notice. **Check a flat** opens the map; **Log in** (top right) opens the reviewer login over the page. |
 | **Setup** | Youngest buyer's age, rough CPF, first town. No names or NRIC. |
 | **Map** (use case 1) | Town Safari: every HDB block, MRT lines and the flats sold in Jul–Sep 2026. Tap a diamond for the verdict, runway bar, CPF you can use and cash you need. Keep, Why?, Next flat. |
 | **Shortlist** | Kept flats recalculated for your details, CSV download, and 26 town stamps with Wikimedia Commons photos. |
 | **Ask** (use case 2) | Answers from 32 official documents with sources, "Why?" for a flat, chat summary, read-aloud, and document upload that suggests towns. |
-| **More** | Your details, text size, About Us (with the required notice), How it works (flowcharts), Sources and credits. The `demo` account sees short versions; `reviewer` and `lecturer` see the full ones. |
+| **More** | Your details, text size, About Us (with the required notice), How it works (flowcharts), Sources and credits. Visitors browse as guests and see short versions; logging in as `reviewer` shows the full ones. |
 
-Python (`runway/bridge.py`) handles sign-in, sends the map data only after sign-in, and answers questions
+Python (`runway/bridge.py`) checks the reviewer login, sends the map data after the home page loads, and answers questions
 (`runway/rag.py` + `runway/llm.py`). The map's calculator runs in the browser and is tested against
 `runway/cpf_rules.py` so both give the same numbers. The AI never calculates; an explanation with a number
 the calculator didn't produce is replaced by a plain template.
@@ -43,14 +43,15 @@ Runway shows the matching official passages instead of an AI answer.
 
 ## Logins
 
-No usernames or passwords are stored in this repository. `scripts/seed_users.py` creates accounts from, in order:
+Anyone can use Runway without an account. One `reviewer` login unlocks the full About Us and How it works.
+No passwords are stored in this repository. `scripts/seed_users.py` creates the account from, in order:
 
-1. the `RUNWAY_DEMO_USERS` environment variable (`name:password,name2:password2`), or
+1. the `RUNWAY_DEMO_USERS` environment variable (`name:password`), or
 2. `demo_accounts.local.toml` (gitignored), or
-3. three generated accounts with random passwords, saved to `demo_accounts.local.toml`.
+3. a generated `reviewer` account with a random password, saved to `demo_accounts.local.toml`.
 
-It writes only salted PBKDF2 hashes to `.streamlit/secrets.toml` (also gitignored). For a deployed app, paste that
-file's contents into **Streamlit Community Cloud > App settings > Secrets**. Use `--rotate` to issue new passwords.
+It writes only a salted PBKDF2 hash to `.streamlit/secrets.toml` (also gitignored). For a deployed app, paste that
+file's contents into **Streamlit Community Cloud > App settings > Secrets**. Use `--rotate` for a new password.
 
 ## Deploy (Streamlit Community Cloud)
 
