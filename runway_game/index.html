@@ -1733,14 +1733,14 @@ function renderSub(){
   const b=$('#subBody'), s=S.sub;
   if(s==='details'){
     b.innerHTML=`${backBtn()}<h1>Your details</h1>
-      <span class="label">Youngest buyer</span><div class="stepper"><button type="button" id="dA-" aria-label="Younger">−</button><output id="dA">${S.age}</output><button type="button" id="dA+" aria-label="Older">+</button></div>
-      <span class="label">Average age of all buyers</span><div class="stepper"><button type="button" id="dV-" aria-label="Younger">−</button><output id="dV">${S.avg}</output><button type="button" id="dV+" aria-label="Older">+</button></div>
+      <span class="label">Youngest buyer</span><div class="stepper"><button type="button" id="dAm" aria-label="Youngest buyer younger">−</button><output id="dA">${S.age}</output><button type="button" id="dAp" aria-label="Youngest buyer older">+</button></div>
+      <span class="label">Average age of all buyers</span><div class="stepper"><button type="button" id="dVm" aria-label="Average age younger">−</button><output id="dV">${S.avg}</output><button type="button" id="dVp" aria-label="Average age older">+</button></div>
       <p class="small">Average age decides how long your HDB loan can be.</p>
       <span class="label">CPF Ordinary Account</span>
       <div class="chips">${[50000,100000,150000,200000,300000].map(o=>`<button type="button" class="chip" data-o="${o}" aria-pressed="${S.oaSet&&S.oa===o}">${exact(o)}</button>`).join('')}<button type="button" class="chip" data-o="skip" aria-pressed="${!S.oaSet}">Not sure</button></div>`;
     const upd=()=>{$('#dA').textContent=S.age;$('#dV').textContent=S.avg;};
-    $('#dA-').onclick=()=>{S.age=Math.max(21,S.age-1);upd();}; $('#dA+').onclick=()=>{S.age=Math.min(85,S.age+1);S.avg=Math.max(S.avg,S.age);upd();};
-    $('#dV-').onclick=()=>{S.avg=Math.max(S.age,S.avg-1);upd();}; $('#dV+').onclick=()=>{S.avg=Math.min(85,S.avg+1);upd();};
+    $('#dAm').onclick=()=>{S.age=Math.max(21,S.age-1);upd();}; $('#dAp').onclick=()=>{S.age=Math.min(85,S.age+1);S.avg=Math.max(S.avg,S.age);upd();};
+    $('#dVm').onclick=()=>{S.avg=Math.max(S.age,S.avg-1);upd();}; $('#dVp').onclick=()=>{S.avg=Math.min(85,S.avg+1);upd();};
     $$('[data-o]').forEach(c=>c.onclick=()=>{if(c.dataset.o==='skip')S.oaSet=false;else{S.oaSet=true;S.oa=+c.dataset.o;}$$('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===c));});
   } else if(s==='size'){
     const big=document.documentElement.classList.contains('big');
