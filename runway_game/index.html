@@ -1372,6 +1372,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
     </div>
     <div id="sheetHost"></div>
     <div id="toastHost" role="status"></div>
+    <div id="rwLoading" role="status" hidden style="position:fixed;left:16px;right:16px;bottom:24px;z-index:90;max-width:420px;margin:0 auto;background:#111;color:#fff;border-radius:14px;padding:14px 18px;font:600 15px/1.4 var(--ui);text-align:center">Loading the map and recent sales…</div>
   </div>
 
   
@@ -1399,15 +1400,20 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
     err ? m.reject(err) : m.resolve(value); pump();
   }
   RW.me = {user: null, role: 'brief'};
-  RW.enter = (target, arg) => { if(window.RWAPP) RWAPP.enter(target, arg); else RW.pendingEnter = {target, arg}; };
+  // The map data (~3 MB) is fetched on the first click into the app, not for landing-page readers.
+  RW.enter = (target, arg) => {
+    if(window.RWAPP) return RWAPP.enter(target, arg);
+    RW.pendingEnter = {target, arg};
+    const box = document.getElementById('rwLoading'); box.textContent = 'Loading the map and recent sales…'; box.hidden = false;
+    if(!RW.asked){ RW.asked = true; RW.send('need_data').catch(() => { RW.asked = false; box.textContent = 'Runway did not respond. Tap again to retry.'; }); }
+  };
   window.addEventListener('message', ev => {
     const d = ev.data; if(!d || d.type !== 'streamlit:render') return;
     const a = d.args || {};
     (a.replies || []).forEach(r => finish(r.id, r.value));
     if(a.me) RW.me = a.me;
     if(!RW.booted){
-      if(a.data){ RW.booted = true; startRunway(a.data.M, a.data.PHOTOS, a.data.F, RW.me); RW.send('booted'); loginButtons(); }
-      else if(!RW.asked){ RW.asked = true; RW.send('need_data'); }
+      if(a.data){ RW.booted = true; document.getElementById('rwLoading').hidden = true; startRunway(a.data.M, a.data.PHOTOS, a.data.F, RW.me); RW.send('booted'); loginButtons(); }
     }
     setHeight();
   });
