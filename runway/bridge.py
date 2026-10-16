@@ -68,6 +68,7 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
     if kind == "logout":
         for key in ("user", "role", "data_sent"):
             state.pop(key, None)
+        state.get("replies", []).clear()  # in place: the host appends this reply to the same list
         return {"ok": True}
 
     if not state.get("user"):  # everything below needs a signed-in user

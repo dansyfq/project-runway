@@ -145,3 +145,12 @@ def test_declined_turns_in_history_never_reach_the_ai(bot, index, monkeypatch):
     send("ask", {"user": "demo"}, bot, index, q="And for CPF?", history=history)
     send("summary", {"user": "demo"}, bot, index, history=history)
     assert seen == [[history[2]], [history[2]]]
+
+
+def test_logout_forgets_previous_answers(bot, index):
+    """Sign-out only reloads the iframe, so the Streamlit session (and its replies list) lives on and the
+    host would keep sending the last user's answers. The list is cleared in place: app.py appends to it."""
+    replies = [{"id": "a", "value": {"text": "an answer for the last user"}}]
+    state = {"user": "demo", "role": "brief", "replies": replies}
+    send("logout", state, bot, index)
+    assert state["replies"] is replies and replies == []
