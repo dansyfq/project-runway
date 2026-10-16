@@ -5,12 +5,12 @@ import pandas as pd
 import streamlit as st
 
 from runway.config import DEFAULT_CHAT_MODEL, DEFAULT_EMBED_MODEL
-from runway.ui import disclaimer, footer
+from runway.lease_data import premium_table
+from runway.ui import town_premiums
 
 EVAL_FILE = Path(__file__).resolve().parent.parent / "data" / "eval_results.json"
 
-st.title("Methodology")
-disclaimer()
+st.title("How it works")
 
 st.markdown(
     """
@@ -27,30 +27,27 @@ digraph {
   pq [label="resale.parquet\\n986,090 rows", fillcolor="#e3eef1"];
   web [label="32 official pages\\nCPF, HDB, MND, IRAS"]; corpus [label="data/corpus/*.md\\nwith source URL"];
   chunks [label="349 passages\\nBM25 + embeddings", fillcolor="#e3eef1"];
-  le [label="Lease Explorer", fillcolor="#fdf1df"]; ask [label="Ask Runway", fillcolor="#fdf1df"];
+  le [label="Map", fillcolor="#fdf1df"]; ask [label="Ask Runway", fillcolor="#fdf1df"];
   csv -> build -> pq -> le; web -> corpus -> chunks -> ask; chunks -> le [label="rule passages"];
 }
 """
 )
 
-st.markdown("### Use case 1: Lease Explorer")
+st.markdown("### Use case 1: Map (Town Safari)")
 st.graphviz_chart(
     """
 digraph {
-  node [shape=box, style="rounded,filled", fillcolor="#f3f6f8", color="#9aa5ad", fontname="Helvetica"];
-  in [label="User inputs\\ntowns, flat type, buyer ages,\\nremaining lease, price", shape=parallelogram, fillcolor="#fdf1df"];
-  rule [label="cpf_rules.py\\nlease + age >= 95?"]; full [label="CPF up to 100% of\\nValuation Limit"];
-  pro [label="Pro-rate:\\n(lease - 20) / (95 - age - 20)"]; none [label="Lease <= 20 years:\\nno CPF"];
-  ltv [label="HDB loan limit = 75% x share\\nTenure = min(25, 65 - avg age, lease - 20)"];
-  fit [label="lease_data.py\\nper town: log($/sqm) ~ lease\\n(OLS, 95% range)"];
-  charts [label="Verdict, metrics,\\nbar chart, scatter, CSV"];
-  facts [label="Facts dictionary\\n(only computed numbers)"];
-  ret [label="Retrieve rule passages"]; gpt [label="LLM explains\\n(temperature 0)"];
-  guard [label="Number guard:\\nany figure not in facts?", shape=diamond];
-  out [label="Explanation\\nwith citations", fillcolor="#e3eef1"]; tmpl [label="Template explanation\\nfrom facts only", fillcolor="#e3eef1"];
-  in -> rule; rule -> full [label="yes"]; rule -> pro [label="no, lease > 20"]; rule -> none [label="lease <= 20"];
-  full -> ltv; pro -> ltv; none -> charts; ltv -> charts; in -> fit -> charts;
-  ltv -> facts; fit -> facts; facts -> gpt; ret -> gpt; gpt -> guard;
+  node [shape=box, style="rounded,filled", fillcolor="#F6F3EE", color="#D9D4CC", fontname="Helvetica"];
+  in [label="Your details\\nyoungest age, other buyer,\\nrough CPF, town", shape=parallelogram, fillcolor="#F4E7E2"];
+  sales [label="Sales Jul-Sep 2026\\ngeocoded with OneMap"]; town [label="Sales in your town,\\ngrouped by block"];
+  rule [label="cpf_rules.py\\nlease + age >= 95?"]; marker [label="Diamond per block\\ngreen full / brown part / grey none,\\nfilled by CPF share"];
+  tap [label="Tap a diamond", shape=parallelogram, fillcolor="#F4E7E2"];
+  money [label="CPF you can use = price x share\\nCash you need = price - CPF\\nHDB loan = 75% x share x price\\nTenure = min(25, 65 - avg age, lease - 20)"];
+  card [label="Verdict card,\\nrunway bar, more numbers"]; keep [label="Keep: shortlist,\\ntown stamp, CSV file"];
+  why [label="Why?", shape=parallelogram, fillcolor="#F4E7E2"]; gpt [label="Retrieve rule passages,\\nLLM explains (temperature 0)"];
+  guard [label="Number guard:\\nany figure Runway\\ndidn't compute?", shape=diamond];
+  out [label="Explanation\\nwith sources", fillcolor="#E2EFE6"]; tmpl [label="Plain template\\nfrom the numbers", fillcolor="#E2EFE6"];
+  in -> town; sales -> town -> rule -> marker -> tap -> money -> card -> keep; card -> why -> gpt -> guard;
   guard -> out [label="no"]; guard -> tmpl [label="yes"];
 }
 """
@@ -61,7 +58,7 @@ st.graphviz_chart(
     """
 digraph {
   node [shape=box, style="rounded,filled", fillcolor="#f3f6f8", color="#9aa5ad", fontname="Helvetica"];
-  q [label="User question\\n(+ optional Lease Explorer facts)", shape=parallelogram, fillcolor="#fdf1df"];
+  q [label="User question\\n(+ optional: the flat you're looking at)", shape=parallelogram, fillcolor="#fdf1df"];
   screen [label="Screen question", shape=diamond];
   dec [label="Polite decline + where\\nto get help (CPF / HDB)", fillcolor="#fbeceb"];
   search [label="Hybrid search over 349 passages\\nBM25 + embeddings, fused by RRF\\n(question + previous turn)"];
@@ -78,7 +75,7 @@ st.markdown(
     f"""
 ### Implementation details
 - **App:** multi-page Streamlit app, password-protected. Passwords are stored only as salted PBKDF2-SHA256 hashes in
-  Streamlit secrets; the seed script that creates demo accounts keeps plain passwords in a gitignored file.
+  Streamlit secrets; the script that creates accounts keeps plain passwords in a gitignored file.
 - **Transaction data:** five HDB files combined into one Parquet file. Remaining lease at sale comes from HDB's own
   column (2015 onwards) or, for older records, 99 minus years since lease start (accurate to the year).
 - **Lease premium:** for each town and flat type in the chosen period, an ordinary least squares fit of
@@ -95,6 +92,12 @@ st.markdown(
   shows the passages themselves.
 """
 )
+
+st.markdown("### Lease effect by town")
+st.markdown("Extra price per square metre for each extra year of lease, 4-room flats sold since January 2024. "
+            "The map's town card turns this into \"10 fewer years of lease is about X% lower price here\".")
+st.dataframe(premium_table(sorted(town_premiums().values(), key=lambda p: p.pct_per_year)), hide_index=True,
+             width="stretch")
 
 st.markdown("### Quality checks")
 if EVAL_FILE.exists():
@@ -122,11 +125,10 @@ st.markdown(
 - **Singapore-wide averages mislead,** because newer towns (Punggol, Sengkang) simply have longer leases. Figures
   are always shown by town.
 - **Two dating systems.** Sales before March 2012 are dated by approval, later ones by registration, so the periods
-  aren't one continuous series. Lease Explorer uses recent sales only.
+  aren't one continuous series. The map and town figures use recent sales only.
 - **Remaining lease for older records** is worked out from the lease start year, accurate to the year.
 - **Loan limits change.** The 2019 documents use a 90% HDB loan limit; for resale applications from 20 August 2024
   HDB uses 75%. Runway uses 75% and says so.
 - **Sale prices, not asking prices.** Records show what flats actually sold for.
 """
 )
-footer()
