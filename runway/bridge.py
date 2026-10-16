@@ -10,7 +10,7 @@ import time
 from collections.abc import MutableMapping
 
 from runway.auth import check_login
-from runway.llm import LLM
+from runway.llm import LLM, screen_question
 from runway.rag import Chunk, Retriever
 
 MAX_ATTEMPTS = 5
@@ -38,10 +38,12 @@ def source_view(chunks: list[Chunk]) -> list[dict]:
 
 
 def clean_history(raw, n: int) -> list[dict]:
-    """Chat turns sent by the browser: keep the last n well-formed user/assistant turns, trimmed."""
+    """Chat turns sent by the browser: keep the last n well-formed user/assistant turns, trimmed.
+    Turns that were declined (NRIC/phone, injection) stay in the browser's chat, so drop them here."""
     turns = raw[-n:] if isinstance(raw, list) else []
-    return [{"role": h["role"], "content": str(h.get("content", ""))[:2000]}
-            for h in turns if isinstance(h, dict) and h.get("role") in {"user", "assistant"}]
+    turns = [{"role": h["role"], "content": str(h.get("content", ""))[:2000]}
+             for h in turns if isinstance(h, dict) and h.get("role") in {"user", "assistant"}]
+    return [h for h in turns if screen_question(h["content"]) not in {"personal", "injection"}]
 
 
 def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, index: Retriever) -> dict:
