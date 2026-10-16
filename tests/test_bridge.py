@@ -15,6 +15,13 @@ def index():
     return Retriever(load_chunks())
 
 
+@pytest.fixture(autouse=True)
+def no_lockouts():
+    import runway.bridge
+
+    runway.bridge.LOCKS.clear()  # the lockout is shared by every session in the process
+
+
 @pytest.fixture
 def bot(monkeypatch):
     import runway.llm as llm_mod
@@ -40,6 +47,13 @@ def test_wrong_password_and_lockout(bot, index):
         assert send("login", state, bot, index, u="reviewer", p="nope")["ok"] is False
     assert "Too many attempts" in send("login", state, bot, index, u="reviewer", p="Review-pass-1")["error"]
     assert "user" not in state
+
+
+def test_lockout_survives_a_page_reload(bot, index):
+    """A reload starts a new Streamlit session; the lockout must follow the username, not the session."""
+    for _ in range(5):
+        send("login", {}, bot, index, u="reviewer", p="nope")
+    assert "Too many attempts" in send("login", {}, bot, index, u="reviewer", p="Review-pass-1")["error"]
 
 
 def test_no_accounts_fails_closed(bot, index):

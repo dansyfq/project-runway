@@ -17,6 +17,8 @@ from runway.rag import Chunk, Retriever
 
 MAX_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
+# username -> (failed attempts, locked until). Module-level, so a page reload (a new session) can't reset it.
+LOCKS: dict[str, tuple[int, float]] = {}
 NUMBERS_NOTE = "Numbers from Runway's calculator, not the AI."
 # The facts the interface's flatFacts() sends; the explanation template needs the first five.
 REQUIRED_FACTS = {"Remaining lease (years)", "Youngest buyer is this old when lease ends", "Years short of age 95",
@@ -51,15 +53,18 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
     if kind == "login":
         if not users:
             return {"ok": False, "error": "Sign-in isn't set up yet. The app owner needs to add accounts."}
-        if time.time() < state.get("locked_until", 0):
-            return {"ok": False, "error": "Too many attempts. Wait a minute and try again."}
         user = str(payload.get("u", "")).strip().lower()
+        attempts, locked_until = LOCKS.get(user, (0, 0.0))
+        if time.time() < locked_until:
+            return {"ok": False, "error": "Too many attempts. Wait a minute and try again."}
         if check_login(user, str(payload.get("p", "")), users):
-            state.update(user=user, role="full", attempts=0)
+            LOCKS.pop(user, None)
+            state.update(user=user, role="full")
             return {"ok": True, "user": user, "role": "full"}
-        state["attempts"] = state.get("attempts", 0) + 1
-        if state["attempts"] >= MAX_ATTEMPTS:
-            state.update(locked_until=time.time() + LOCKOUT_SECONDS, attempts=0)
+        if len(LOCKS) > 10_000:  # shortcut: forgets all counts if flooded with made-up usernames; fine for one process
+            LOCKS.clear()
+        attempts += 1
+        LOCKS[user] = (0, time.time() + LOCKOUT_SECONDS) if attempts >= MAX_ATTEMPTS else (attempts, 0.0)
         return {"ok": False, "error": "That username and password don't match."}
 
     if kind == "logout":
