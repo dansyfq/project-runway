@@ -142,3 +142,12 @@ def test_bracketed_figure_is_not_mistaken_for_a_citation():
     assert invented_numbers("CPF covers [90]% of the limit [1].", "- CPF usable: 80.9") == {"90"}
     text, used_llm = fake_llm("CPF covers [90]% of the limit [1].").explain(FACTS, [SOURCE])
     assert not used_llm
+
+
+def test_answer_rejects_figures_not_in_passages_or_question():
+    """Free answers may quote the documents and the user's own numbers, never compute or invent new ones."""
+    computed = fake_llm("At 30 with 55 years left you can use 77.8% [1].").answer(
+        "I'm 30 and the lease has 55 years. How much CPF can I use?", [SOURCE])
+    assert computed.error == llm_mod.INVENTED_FIGURE and computed.text == llm_mod.offline_answer([SOURCE])
+    quoted = fake_llm("Use is pro-rated from 75% [1].").answer("What is the HDB loan limit?", [SOURCE])
+    assert quoted.error is None and quoted.text == "Use is pro-rated from 75% [1]."

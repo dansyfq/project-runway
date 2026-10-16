@@ -10,7 +10,7 @@ import time
 from collections.abc import MutableMapping
 
 from runway.auth import check_login
-from runway.llm import LLM, screen_question
+from runway.llm import INVENTED_FIGURE, LLM, screen_question
 from runway.rag import Chunk, Retriever
 
 MAX_ATTEMPTS = 5
@@ -95,7 +95,8 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
         sources = index.search(f"{previous} {question}", k=5)
         answer = bot.answer(question, sources, history=history)
-        note = "The AI service didn't respond, so here are the official passages." if answer.error else None
+        why = "used a figure not in the documents" if answer.error == INVENTED_FIGURE else "service didn't respond"
+        note = f"The AI {why}, so here are the official passages." if answer.error else None
         offline = bool(answer.error) or (not bot.available and not answer.blocked)
         return {"text": answer.text, "sources": source_view(answer.sources), "blocked": answer.blocked,
                 "offline": offline, "note": note}
