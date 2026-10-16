@@ -43,9 +43,12 @@ INJECTION_PATTERNS = [
     r"developer mode",
     r"pretend (to be|you are)",
 ]
+OFF_TOPIC_PATTERNS = [r"\bwrite (me )?(a |an |some )?(python|code|program|script|poem|song|story|essay)\b"]
 ADVICE_PATTERNS = [
-    r"should i (buy|sell|get|choose|take)",
+    r"should (i|we) (buy|sell|get|choose|take)",
     r"\b(is|would) (it|this|that) (be )?(a )?(good|bad|wise|smart) (buy|investment|deal|idea)",
+    r"\b(is|would) it (be )?(wise|smart|sensible|a good idea) to (buy|sell|get|take)",
+    r"do you think (i|we) should",
     r"worth (buying|it)",
     r"which (flat|town|estate|unit) should i",
     r"(will|are|is) ([a-z]+ ){0,3}(prices?|values?) (go(ing)? (up|down)|rise|fall|drop|crash|increase|decrease)",
@@ -103,6 +106,8 @@ def screen_question(question: str) -> str | None:
         return "injection"
     if any(re.search(p, q) for p in ADVICE_PATTERNS):
         return "advice"
+    if any(re.search(p, q) for p in OFF_TOPIC_PATTERNS):  # "write code for my loan" has a topic word
+        return "off_topic"
     words = set(re.findall(r"[a-z0-9\-]+", q))
     if not (words & TOPIC_WORDS or any(w.startswith("eligib") for w in words)):
         return "off_topic"
