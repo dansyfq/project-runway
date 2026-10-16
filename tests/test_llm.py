@@ -166,3 +166,17 @@ def test_template_reads_right_when_lease_ends_exactly_at_95():
              "Youngest buyer is this old when lease ends": "95"}
     text = template_explanation(facts)
     assert "is 95, so it covers them to age 95" in text and "past 95" not in text
+
+
+def test_hourly_ai_budget_falls_back_to_passages(monkeypatch):
+    """The site is open to guests: past the process-wide hourly cap, no more API calls are made."""
+    from collections import deque
+
+    monkeypatch.setattr(llm_mod, "AI_CALLS_PER_HOUR", 2)
+    monkeypatch.setattr(llm_mod, "_calls", deque())
+    bot = fake_llm("The HDB loan limit is pro-rated from 75% [1].")
+    assert bot.answer("What is the HDB loan limit?", [SOURCE]).error is None
+    assert bot.explain(FACTS, [SOURCE])[1] is True
+    over = bot.answer("What is the HDB loan limit?", [SOURCE])
+    assert over.error == llm_mod.AI_BUSY and over.text == llm_mod.offline_answer([SOURCE])
+    assert bot.explain(FACTS, [SOURCE]) == (template_explanation(FACTS), False)

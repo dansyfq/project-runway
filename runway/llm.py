@@ -9,6 +9,9 @@ template, so the model cannot slip in an invented figure.
 from __future__ import annotations
 
 import re
+import threading
+import time
+from collections import deque
 from dataclasses import dataclass
 
 import numpy as np
@@ -96,6 +99,26 @@ class Answer:
 
 
 INVENTED_FIGURE = "answer had a figure not in the passages or question"
+AI_BUSY = "hourly AI limit reached"
+
+# Guests can ask without signing in, so cap OpenAI calls (chat and embeddings) for the whole process.
+AI_CALLS_PER_HOUR = 300
+_calls: deque[float] = deque()
+_calls_lock = threading.Lock()
+
+
+class AIBusy(RuntimeError):
+    """The hourly AI budget is used up; callers fall back to passages, the template or BM25."""
+
+
+def spend_ai_call() -> None:
+    now = time.time()
+    with _calls_lock:
+        while _calls and now - _calls[0] > 3600:
+            _calls.popleft()
+        if len(_calls) >= AI_CALLS_PER_HOUR:
+            raise AIBusy(AI_BUSY)
+        _calls.append(now)
 
 
 def screen_question(question: str) -> str | None:
@@ -153,11 +176,13 @@ class LLM:
     def embed(self, texts: list[str]) -> np.ndarray:
         vectors = []
         for start in range(0, len(texts), 256):
+            spend_ai_call()
             resp = self._client.embeddings.create(model=self.embed_model, input=texts[start : start + 256])
             vectors.extend(d.embedding for d in resp.data)
         return np.array(vectors, dtype=np.float32)
 
     def _chat(self, system: str, messages: list[dict], temperature: float = 0.1) -> str:
+        spend_ai_call()
         resp = self._client.chat.completions.create(
             model=self.chat_model,
             messages=[{"role": "system", "content": system}, *messages],
@@ -180,6 +205,8 @@ class LLM:
         recent = (history or [])[-6:]  # last 3 exchanges give follow-up context
         try:
             text = self._chat(ANSWER_SYSTEM, [*recent, {"role": "user", "content": prompt}])
+        except AIBusy:
+            return Answer(text=offline_answer(sources), sources=sources, error=AI_BUSY)
         except Exception as exc:  # network/quota errors: show passages and say why
             return Answer(text=offline_answer(sources), sources=sources, error=f"{type(exc).__name__}: {exc}")
         # Same guard as explain(): every figure must come from the passages, the question or the chat so far.
