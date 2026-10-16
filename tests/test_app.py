@@ -53,8 +53,8 @@ def test_interface_has_no_demo_wording_or_built_in_accounts():
 def test_interface_calculator_matches_python_rules(tmp_path):
     """The map's in-browser calculator must give the same numbers as runway/cpf_rules.py."""
     calc = GAME[GAME.index("function calc(price, lease){"):GAME.index("const VTXT = ")]
-    cases = [(p, lease, age, avg) for p in (300_000, 550_000) for lease in (15, 20, 21, 45, 58, 65, 75, 95)
-             for age, avg in ((25, 25), (28, 30), (45, 50), (70, 70))]
+    cases = [(p, lease, age, avg) for p in (300_000, 550_000) for lease in (15, 20, 20.5, 21, 45, 58, 58.75, 65, 66.6, 74.99, 75, 95)
+             for age, avg in ((21, 21), (25, 25), (28, 30), (45, 50), (70, 70), (74, 74))]
     script = (f"let S={{age:0,avg:0,oa:0,oaSet:false}};\n{calc}\n"
               f"const out={json.dumps(cases)}.map(([p,l,a,v])=>{{S.age=a;S.avg=v;const r=calc(p,l);"
               f"return [r.cap,r.loan,r.tenure,r.monthly,r.cashLife];}});\nconsole.log(JSON.stringify(out));")
