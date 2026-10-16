@@ -1,27 +1,29 @@
-town,landmark,photo_file,caption,status
-ANG MO KIO,Ang Mo Kio Town Garden,,,to download from Wikimedia Commons
-BEDOK,Bedok Reservoir,,,to download from Wikimedia Commons
-BISHAN,Bishan-Ang Mo Kio Park,,,to download from Wikimedia Commons
-BUKIT BATOK,Little Guilin,,,to download from Wikimedia Commons
-BUKIT MERAH,York Hill estate,bukit_merah.jpg,York Hill estate · Wikimedia Commons,have
-BUKIT PANJANG,Zhenghua Nature Park,,,to download from Wikimedia Commons
-BUKIT TIMAH,Bukit Timah Hill,,,to download from Wikimedia Commons
-CENTRAL AREA,Pinnacle@Duxton,central_area.jpg,View from the tallest HDB flat · Wikimedia Commons,have
-CHOA CHU KANG,Choa Chu Kang Park,,,to download from Wikimedia Commons
-CLEMENTI,Clementi Woods Park,,,to download from Wikimedia Commons
-GEYLANG,Geylang Serai Market,,,to download from Wikimedia Commons
-HOUGANG,Punggol Park,,,to download from Wikimedia Commons
-JURONG EAST,Jurong Lake Gardens,,,to download from Wikimedia Commons
-JURONG WEST,Jurong Central Park,,,to download from Wikimedia Commons
-KALLANG/WHAMPOA,Kallang Riverside,,,to download from Wikimedia Commons
-MARINE PARADE,East Coast Park,,,to download from Wikimedia Commons
-PASIR RIS,Pasir Ris Park,,,to download from Wikimedia Commons
-PUNGGOL,Punggol Waterway,punggol.jpg,Punggol Waterway · Wikimedia Commons,have
-QUEENSTOWN,SkyVille@Dawson,,,to download from Wikimedia Commons
-SEMBAWANG,Sembawang Park,,,to download from Wikimedia Commons
-SENGKANG,Sengkang Riverside Park,,,to download from Wikimedia Commons
-SERANGOON,Serangoon Gardens,,,to download from Wikimedia Commons
-TAMPINES,Our Tampines Hub,,,to download from Wikimedia Commons
-TOA PAYOH,Dragon Playground,,,to download from Wikimedia Commons
-WOODLANDS,Woodlands Avenue 4,woodlands.jpg,Woodlands Avenue 4 · Wikimedia Commons,have
-YISHUN,Lower Seletar Reservoir,,,to download from Wikimedia Commons
+town,landmark,photo_file,caption,source_url,status
+ANG MO KIO,Ang Mo Kio Town Garden,ang_mo_kio.jpg,Ang Mo Kio Town Garden West Singapore - panoramio.jpg · Qingwu Zhou (周庆武) · CC BY-SA 3.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Ang_Mo_Kio_Town_Garden_West_Singapore_-_panoramio.jpg,have
+BEDOK,Bedok Reservoir,bedok.jpg,Solar panels floating on the surface of Bedok Reservoir.jpg · Wzhkevin · CC BY-SA 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Solar_panels_floating_on_the_surface_of_Bedok_Reservoir.jpg,have
+BISHAN,Bishan-Ang Mo Kio Park,bishan.jpg,Bishan-Ang Mo Kio Park.jpg · Wirbel1980. · CC BY-SA 3.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Bishan-Ang_Mo_Kio_Park.jpg,have
+BUKIT BATOK,Little Guilin,bukit_batok.jpg,"Little Guilin Park, Singapore (3823573035).jpg · William Cho · CC BY-SA 2.0 · Wikimedia Commons","https://commons.wikimedia.org/wiki/File:Little_Guilin_Park,_Singapore_(3823573035).jpg",have
+BUKIT MERAH,York Hill estate,bukit_merah.jpg,"Building, Bukit Merah, Singapore.jpg · Johan Jönsson (Julle) · CC BY-SA 4.0 · Wikimedia Commons","https://commons.wikimedia.org/wiki/File:Building,_Bukit_Merah,_Singapore.jpg",have
+BUKIT PANJANG,Zhenghua Nature Park,bukit_panjang.jpg,"Park in Bukit Panjang, Singapore.jpg · Teojincheng · CC0 · Wikimedia Commons","https://commons.wikimedia.org/wiki/File:Park_in_Bukit_Panjang,_Singapore.jpg",have
+BUKIT TIMAH,Bukit Timah Hill,bukit_timah.jpg,"Ferns Rain Tree Bukit Timah Singapore Feb23 D72 25191.jpg · This Photo was taken by Timothy A. Gonsalves.  Feel free to use my photos, but p · CC BY-SA 4.0 · Wikimedia Commons",https://commons.wikimedia.org/wiki/File:Ferns_Rain_Tree_Bukit_Timah_Singapore_Feb23_D72_25191.jpg,have
+CENTRAL AREA,Pinnacle@Duxton,central_area.jpg,"The Pinnacle@Duxton (I).jpg · This Photo was taken by Supanut Arunoprayote.
+
+Feel free to use any of my images · CC BY 4.0 · Wikimedia Commons",https://commons.wikimedia.org/wiki/File:The_Pinnacle@Duxton_(I).jpg,have
+CHOA CHU KANG,Choa Chu Kang Park,choa_chu_kang.jpg,Choa Chu Kang Park Connector along Brickland Road.jpg · Wzhkevin · CC BY-SA 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Choa_Chu_Kang_Park_Connector_along_Brickland_Road.jpg,have
+CLEMENTI,Clementi Woods Park,clementi.jpg,Tentera Diraja Mosque at Clementi.jpg · M. Adrian Jurhami · CC BY 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Tentera_Diraja_Mosque_at_Clementi.jpg,have
+GEYLANG,Geylang Serai Market,geylang.jpg,Geylang Serai Market aka Pasar Geylang Serai (2025) - img 06.jpg · Chainwit. · CC BY 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Geylang_Serai_Market_aka_Pasar_Geylang_Serai_(2025)_-_img_06.jpg,have
+HOUGANG,Hougang Avenue HDB,hougang.jpg,Singapore hougang hdb balcony 2002.jpg · Timo Sippala · CC BY-SA 2.5 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Singapore_hougang_hdb_balcony_2002.jpg,have
+JURONG EAST,Jurong Lake Gardens,jurong_east.jpg,Jurong Lake Gardens Stoneboat 0005.jpg · Stefan Fussan · CC BY-SA 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Jurong_Lake_Gardens_Stoneboat_0005.jpg,have
+JURONG WEST,Jurong Central Park,jurong_west.jpg,Jurong Central Park 2019.jpg · Allkayloh · CC BY-SA 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Jurong_Central_Park_2019.jpg,have
+KALLANG/WHAMPOA,Kallang Riverside,kallang_whampoa.jpg,Kallang Riverside.jpg · Shroom lattes · CC BY-SA 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Kallang_Riverside.jpg,have
+MARINE PARADE,East Coast Park,marine_parade.jpg,"Beach at East Coast Park, Singapore - 20050809-01.jpg · BertholdD. · CC BY-SA 3.0 · Wikimedia Commons","https://commons.wikimedia.org/wiki/File:Beach_at_East_Coast_Park,_Singapore_-_20050809-01.jpg",have
+PASIR RIS,Pasir Ris Park beach,pasir_ris.jpg,Beach at Pasir Ris Park.jpg · Wzhkevin · CC BY-SA 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Beach_at_Pasir_Ris_Park.jpg,have
+PUNGGOL,Punggol Waterway,punggol.jpg,"Eastern end of Punggol Waterway, Singapore - Jul 22, 2012 (1).jpg · Alvin Wong · CC BY 2.0 · Wikimedia Commons","https://commons.wikimedia.org/wiki/File:Eastern_end_of_Punggol_Waterway,_Singapore_-_Jul_22,_2012_(1).jpg",have
+QUEENSTOWN,Queenstown Singapore flats Dawson Road,queenstown.jpg,Dawson Place.JPG · Terence Ong · CC BY 2.5 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Dawson_Place.JPG,have
+SEMBAWANG,Sembawang Park,sembawang.jpg,Sembawang Tree at Sembawang Park - October 2023.jpg · Jun Jie Yam · CC0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Sembawang_Tree_at_Sembawang_Park_-_October_2023.jpg,have
+SENGKANG,Sengkang Riverside Park,sengkang.jpg,"Sengkang Riverside Park, 16 Dec 2021 - 5.jpg · Nigos · CC BY-SA 4.0 · Wikimedia Commons","https://commons.wikimedia.org/wiki/File:Sengkang_Riverside_Park,_16_Dec_2021_-_5.jpg",have
+SERANGOON,Serangoon Gardens,serangoon.jpg,"Chomp Chomp Food Centre, Serangoon Gardens, Singapore - 20131102.jpg · ProjectManhattan. · CC0 · Wikimedia Commons","https://commons.wikimedia.org/wiki/File:Chomp_Chomp_Food_Centre,_Serangoon_Gardens,_Singapore_-_20131102.jpg",have
+TAMPINES,Our Tampines Hub,tampines.jpg,Our Tampines Hub Singapore April 2026.jpg · Leongyy02 · CC BY-SA 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Our_Tampines_Hub_Singapore_April_2026.jpg,have
+TOA PAYOH,Dragon Playground,toa_payoh.jpg,Toa Payoh Playground (Singapore).jpg · Skiattt · CC BY-SA 4.0 · Wikimedia Commons,https://commons.wikimedia.org/wiki/File:Toa_Payoh_Playground_(Singapore).jpg,have
+WOODLANDS,Woodlands Avenue 4,woodlands.jpg,"HDB flats along Woodlands Avenue 4, Singapore.jpg · Slivester. · CC BY-SA 2.5 · Wikimedia Commons","https://commons.wikimedia.org/wiki/File:HDB_flats_along_Woodlands_Avenue_4,_Singapore.jpg",have
+YISHUN,Lower Seletar Reservoir,yishun.jpg,"Cirrus clouds over the Lower Seletar Reservoir (333740180).jpg · Balaji Dutt M V from Singapore, Singapore · CC BY 2.0 · Wikimedia Commons",https://commons.wikimedia.org/wiki/File:Cirrus_clouds_over_the_Lower_Seletar_Reservoir_(333740180).jpg,have
