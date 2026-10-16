@@ -1518,7 +1518,7 @@ function renderList(){
     const head=['Block','Street','Town','Flat type','Storey','Price','Lease left (years)','Sold','CPF verdict','CPF you can use','Cash on top of CPF'];
     const rows=S.list.map(f=>{const r=calc(f.price,f.lease);return [f.blk,f.st,TBY[f.town].name,f.ft,f.sr,Math.round(f.price),f.lease.toFixed(1),f.m,VTXT[r.status],Math.round(r.cap),Math.round(r.cashLife)];});
     const csv=[head].concat(rows).map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='runway_shortlist.csv'; document.body.appendChild(a); a.click(); a.remove();
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})); a.download='runway_shortlist.csv'; document.body.appendChild(a); a.click(); a.remove();
   };
 }
 
