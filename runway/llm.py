@@ -65,6 +65,7 @@ TOPIC_WORDS = {
     "account", "oa", "bank", "housing", "home", "property", "downpayment", "cash", "years", "remaining",
     "tenure", "interest", "proximity", "ehg", "seller", "sell", "income", "decay", "pro-rate",
     "prorate", "pro-rated", "coverage", "youngest", "absd", "bsd",
+    "year", "minimum", "rule", "rules", "pro-rating", "prorating", "co-own", "owner", "owners",
 }
 
 ANSWER_SYSTEM = """You are Ask Runway, an assistant that explains Singapore HDB resale rules in plain English.
@@ -132,6 +133,7 @@ def screen_question(question: str) -> str | None:
     if any(re.search(p, q) for p in OFF_TOPIC_PATTERNS):  # "write code for my loan" has a topic word
         return "off_topic"
     words = set(re.findall(r"[a-z0-9\-]+", q))
+    words |= {part for w in words for part in w.split("-")}  # "20-year" also counts as "year"
     if not (words & TOPIC_WORDS or any(w.startswith("eligib") for w in words)):
         return "off_topic"
     return None
