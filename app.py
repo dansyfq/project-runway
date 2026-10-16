@@ -1,6 +1,6 @@
-"""Runway: how much lease you have left, and what it buys you.
+"""Runway: how much lease you have left.
 
-Entry point for the multi-page Streamlit app. Every page sits behind the login.
+Entry point for the multi-page Streamlit app. Every page sits behind the sign-in.
 Run locally with:  streamlit run app.py
 """
 
@@ -9,9 +9,9 @@ import time
 import streamlit as st
 
 from runway.auth import check_login
-from runway.ui import inject_css
+from runway.ui import details_card, inject_css, signin_banner
 
-st.set_page_config(page_title="Runway", page_icon="🛫", layout="wide")
+st.set_page_config(page_title="Runway", layout="wide")
 inject_css()
 
 MAX_ATTEMPTS = 5
@@ -26,12 +26,9 @@ def configured_users() -> dict[str, str]:
 
 
 def login_page() -> None:
-    _, mid, _ = st.columns([1, 1.2, 1])
+    _, mid, _ = st.columns([1, 1.1, 1])
     with mid:
-        st.markdown("<div class='rw-brand'>RUNWAY</div>", unsafe_allow_html=True)
-        st.markdown("#### How much lease you have left, and what it buys you")
-        st.caption("A learning prototype for the AI Champions Bootcamp. Please sign in to continue.")
-
+        st.markdown(signin_banner(), unsafe_allow_html=True)
         users = configured_users()
         if not users:
             st.error("Sign-in isn't set up yet. The app owner needs to add accounts to the app's secrets.")
@@ -62,21 +59,26 @@ if "user" not in st.session_state:
     st.stop()
 
 pages = {
-    "Runway": [st.Page("app_pages/home.py", title="Home", icon=":material/flight_takeoff:", default=True)],
-    "Use cases": [
-        st.Page("app_pages/lease_explorer.py", title="Lease Explorer", icon=":material/insights:"),
-        st.Page("app_pages/ask_runway.py", title="Ask Runway", icon=":material/forum:"),
+    "": [
+        st.Page("app_pages/map.py", title="Map", icon=":material/location_on:", default=True),
+        st.Page("app_pages/shortlist.py", title="Shortlist", icon=":material/kid_star:"),
+        st.Page("app_pages/ask_runway.py", title="Ask", icon=":material/forum:"),
     ],
-    "About this project": [
+    "More": [
+        st.Page("app_pages/details.py", title="Your details", icon=":material/person:"),
         st.Page("app_pages/about.py", title="About Us", icon=":material/info:"),
-        st.Page("app_pages/methodology.py", title="Methodology", icon=":material/account_tree:"),
+        st.Page("app_pages/methodology.py", title="How it works", icon=":material/account_tree:"),
     ],
 }
 
+st.logo("assets/runway_lockup.svg", size="large")
+nav = st.navigation(pages)
+
 with st.sidebar:
-    st.caption(f"Signed in as **{st.session_state['user']}**")
+    details_card()
+    st.toggle("Large text", key="large_text")
     if st.button("Sign out", width="stretch"):
         st.session_state.clear()
         st.rerun()
 
-st.navigation(pages).run()
+nav.run()

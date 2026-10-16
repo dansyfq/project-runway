@@ -10,17 +10,16 @@ can put towards a flat depends on whether its lease will last until the youngest
 and the HDB loan are both scaled down. Runway works this out for your own ages and flat, shows what a shorter lease
 costs in each town you're considering, and explains the result in plain English with the official rule quoted.
 
-> Educational prototype only. Not for real-world decisions. See the disclaimer on the app's main page.
-
 ## What's in the app
 
 | Page | What it does |
 |---|---|
-| **Home** | Overview and the required disclaimer. |
-| **Lease Explorer** (use case 1) | Age-95 test, CPF share, HDB loan limit and loan tenure for your inputs; lease premium per town (chart, scatter, CSV export) from 986,090 resale records; an AI explanation of your result. |
-| **Ask Runway** (use case 2) | RAG assistant over 32 official CPF Board, HDB, MND/MOM, IRAS and CEA documents. Cites sources, declines advice and prompt-injection attempts, can use your Lease Explorer numbers. |
-| **About Us** | Scope, objectives, features, data sources. |
-| **Methodology** | Data flow, one flowchart per use case, implementation details, test results, data caveats. |
+| **Map** (use case 1) | Town Safari: every flat sold in a town in Jul–Sep 2026 on a OneMap base map, coloured by how much CPF the buyer could use. Tap one for the verdict card, runway bar, CPF you can use, cash you need and more numbers. |
+| **Shortlist** | Kept flats recalculated for your details, saved as a CSV file, and town stamps. |
+| **Ask** (use case 2) | RAG assistant over 32 official CPF Board, HDB, MND/MOM, IRAS and CEA documents. Cites sources, sums up the chat, declines advice and prompt-injection attempts. |
+| **Your details** | Youngest buyer's age, other buyer's age, rough CPF and first town. No names or NRIC. |
+| **About Us** | Notice (required disclaimer), scope, objectives, features, data sources, credits, team. |
+| **How it works** | Data flow, one flowchart per use case, lease effect by town, test results, data caveats. |
 
 The LLM explains; it never calculates. All figures come from `runway/cpf_rules.py` and `runway/lease_data.py`.
 Explanations containing a number the code didn't produce are thrown away and replaced by a plain template.
