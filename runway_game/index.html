@@ -1552,7 +1552,7 @@ const history = () => S.chat.filter(m=>!m.typing).slice(-7).map(m=>({role:m.me?'
 async function ask(q, ctx){
   const prior = history();
   S.chat.push({me:true, html:esc(q)});
-  if(/\b[stfgm]\d{7}[a-z]\b/i.test(q) || /\b[689]\d{7}\b/.test(q)){ pushBot({warn:true, html:'<p>Please remove your NRIC or phone number. Runway never needs them.</p>'}); return; }
+  if(/\b[stfgm]\d{7}[a-z]\b/i.test(q) || /\b[689]\d{7}\b/.test(q)){ S.chat[S.chat.length-1].html=esc(redact(q).txt); /* never keep it: chat history goes to the server */ pushBot({warn:true, html:'<p>Please remove your NRIC or phone number. Runway never needs them.</p>'}); return; }
   const typing = {typing:true, html:'<p class="small">Checking the official documents…</p>'};
   S.chat.push(typing); renderChat();
   let b;
