@@ -69,7 +69,7 @@ data = game_data() if me and not state.get("data_sent") else None  # sent once p
 
 msg = runway_game(me=me, data=data, replies=replies[-5:], key="runway", default=None)
 
-if msg and msg.get("id") not in handled:
+if isinstance(msg, dict) and isinstance(msg.get("id"), str) and msg["id"] not in handled:  # untrusted
     handled.add(msg["id"])
     reply = handle(msg, state, configured_users(), llm(), retriever())
     replies.append({"id": msg["id"], "value": reply})

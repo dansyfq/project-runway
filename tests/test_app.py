@@ -31,6 +31,16 @@ def test_host_sends_data_once_signed_in():
     assert not at.exception
 
 
+@pytest.mark.parametrize("msg", [["not", "a", "dict"], "text", {"id": ["unhashable"], "type": "ask"}])
+def test_host_ignores_malformed_messages(monkeypatch, msg):
+    import streamlit.components.v1 as components
+
+    monkeypatch.setattr(components, "declare_component", lambda *a, **k: lambda **kw: msg)
+    at = AppTest.from_file("app.py", default_timeout=60)
+    at.run()
+    assert not at.exception
+
+
 def test_game_data_has_every_town_with_a_photo_and_credit():
     data = load_game_data()
     towns = {t["id"] for t in data["M"]["towns"]}
