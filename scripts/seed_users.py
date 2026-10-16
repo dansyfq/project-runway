@@ -1,7 +1,7 @@
 """Create demo login accounts without putting any credentials in the repo.
 
 Where the accounts come from (first match wins):
-  1. RUNWAY_DEMO_USERS env var, e.g. "lecturer:pass1,reviewer:pass2"
+  1. RUNWAY_DEMO_USERS env var, e.g. "reviewer:pass1"
   2. demo_accounts.local.toml  (gitignored; [accounts] name = "password")
   3. Otherwise a "reviewer" account with a random password is generated and saved to
      demo_accounts.local.toml so you can hand them out.
