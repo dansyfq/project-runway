@@ -77,3 +77,8 @@ def test_lone_surrogate_password_fails_cleanly():
     users = {"demo": hash_password("Pw12345678", iterations=1000)}
     assert not check_login("demo", "\ud800", users)
 
+
+def test_malformed_stored_hash_fails_closed():
+    assert not verify_password("x", "pbkdf2_sha256$abc$!!$!!")
+    assert not verify_password("x", "pbkdf2_sha256$1000$not base64$x")
+

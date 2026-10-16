@@ -24,14 +24,14 @@ def hash_password(password: str, salt: bytes | None = None, iterations: int = IT
 
 
 def verify_password(password: str, stored: str) -> bool:
-    try:
+    try:  # a malformed secrets entry fails closed (binascii.Error is a ValueError)
         algo, iterations, salt_b64, digest_b64 = stored.split("$")
+        if algo != ALGO:
+            return False
+        expected = base64.b64decode(digest_b64)
+        actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8", "surrogatepass"), base64.b64decode(salt_b64), int(iterations))
     except ValueError:
         return False
-    if algo != ALGO:
-        return False
-    expected = base64.b64decode(digest_b64)
-    actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8", "surrogatepass"), base64.b64decode(salt_b64), int(iterations))
     return hmac.compare_digest(actual, expected)
 
 
