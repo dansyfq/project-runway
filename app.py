@@ -73,6 +73,10 @@ msg = runway_game(me=me, data=data, replies=replies[-5:], key="runway", default=
 
 if isinstance(msg, dict) and isinstance(msg.get("id"), str) and msg["id"] not in handled:  # untrusted
     handled.add(msg["id"])
-    reply = handle(msg, state, configured_users(), llm(), retriever())
+    try:
+        reply = handle(msg, state, configured_users(), llm(), retriever())
+    except Exception as exc:  # always answer: without a reply the interface waits 90 s
+        print(f"[runway] {msg.get('type')} failed: {type(exc).__name__}: {exc}")
+        reply = {"ok": False, "error": "Something went wrong. Try again."}
     replies.append({"id": msg["id"], "value": reply})
     st.rerun()

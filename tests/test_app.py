@@ -34,6 +34,23 @@ def test_host_ignores_malformed_messages(monkeypatch, msg):
     assert not at.exception
 
 
+def test_host_always_replies_even_if_handle_fails(monkeypatch):
+    """No reply means the interface waits 90 s; any unexpected error must still answer the message."""
+    import streamlit.components.v1 as components
+
+    import runway.bridge
+
+    def boom(*_):
+        raise RuntimeError("unexpected")
+
+    monkeypatch.setattr(components, "declare_component", lambda *a, **k: lambda **kw: {"id": "m1", "type": "ask"})
+    monkeypatch.setattr(runway.bridge, "handle", boom)
+    at = AppTest.from_file("app.py", default_timeout=60)
+    at.run()
+    assert not at.exception
+    assert at.session_state["replies"][-1] == {"id": "m1", "value": {"ok": False, "error": "Something went wrong. Try again."}}
+
+
 def test_game_data_has_every_town_with_a_photo_and_credit():
     data = load_game_data()
     towns = {t["id"] for t in data["M"]["towns"]}
