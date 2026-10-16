@@ -78,3 +78,13 @@ def test_loan_tenure_caps():
     assert max_loan_tenure([70], 80) == 0
     with pytest.raises(ValueError):
         max_loan_tenure([], 80)
+
+
+def test_cpf_board_example_in_dollars():
+    """Two 25-year-olds, 65 years left, $550,000: CPF up to $495,000 (CPF Board FAQ)."""
+    from runway.cpf_rules import flat_money
+
+    money = flat_money(550_000, 65, [25, 25])
+    assert money.cpf_cap == pytest.approx(495_000)
+    assert money.cash_on_top == pytest.approx(55_000)
+    assert money.loan_max == pytest.approx(550_000 * 0.675)
