@@ -61,7 +61,7 @@ TOPIC_WORDS = {
     "eip", "quota", "town", "price", "partner", "spouse", "couple", "single", "singles", "refund", "ordinary",
     "account", "oa", "bank", "housing", "home", "property", "downpayment", "cash", "years", "remaining",
     "tenure", "interest", "proximity", "ehg", "seller", "sell", "income", "decay", "pro-rate",
-    "prorate", "pro-rated", "coverage", "youngest",
+    "prorate", "pro-rated", "coverage", "youngest", "absd", "bsd",
 }
 
 ANSWER_SYSTEM = """You are Ask Runway, an assistant that explains Singapore HDB resale rules in plain English.
