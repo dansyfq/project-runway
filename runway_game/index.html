@@ -1261,6 +1261,7 @@ function vline(r){
   if(r.status==='part') return `This flat has ${yrs} years left. Your youngest buyer is ${S.age}, so the lease runs out ${Math.round(95-r.end)} years before age 95 and your CPF use is reduced.`;
   return `This flat has ${yrs} years left. CPF and HDB loans cannot be used when 20 years or less remain.`;
 }
+const needYrs=()=>95-S.age>20?`${95-S.age} years`:'more than 20 years';
 function meter(t){
   if(t.low) return {n:0,txt:'Not enough sales here to say'};
   const n = t.pct>=1.3?3:t.pct>=0.8?2:1;
@@ -1294,9 +1295,9 @@ function renderOnb(){
       <div class="stepper" data-st="st.number_input"><button type="button" id="aMinus" aria-label="Younger">−</button><output id="aOut">${S.age}</output><button type="button" id="aPlus" aria-label="Older">+</button></div>
       <div class="chips">${[25,30,35,40,50,60].map(a=>`<button type="button" class="chip" data-a="${a}" aria-pressed="${a===S.age}">${a}</button>`).join('')}</div>
       <p class="small" id="aNeed"></p><button class="btn primary" id="nx">Next</button>`;
-    const set=a=>{S.age=Math.max(21,Math.min(85,a));S.avg=Math.max(S.avg,S.age);$('#aOut').textContent=S.age;$$('[data-a]').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.a===S.age));$('#aNeed').textContent=`You need ${95-S.age} years of lease to use CPF fully.`;};
+    const set=a=>{S.age=Math.max(21,Math.min(85,a));S.avg=S.age;$('#aOut').textContent=S.age;$$('[data-a]').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.a===S.age));$('#aNeed').textContent=`You need ${needYrs()} of lease to use CPF fully.`;};
     $('#aMinus').onclick=()=>set(S.age-1); $('#aPlus').onclick=()=>set(S.age+1);
-    $$('[data-a]').forEach(c=>c.onclick=()=>set(+c.dataset.a)); set(S.age); S.avg=S.age;
+    $$('[data-a]').forEach(c=>c.onclick=()=>set(+c.dataset.a)); set(S.age);
   } else if(i===2){
     const opts=[50000,100000,150000,200000,300000];
     b.innerHTML = `${dots(2)}<h1>About how much CPF do you have?</h1><p class="lead">Ordinary Account, all buyers together. A rough number is fine.</p>
@@ -1411,7 +1412,7 @@ function openBlock(g){
 $('#chgTown').onclick=()=>openSheet(`<div class="pad"><h1 style="font-size:1.6rem">Choose a town</h1><p class="small">Diamonds show how much lease length changes prices in each town.</p>${townListHtml()}</div>`,()=>bindTownList(t=>{S.town=t;needFit=true;closeSheet();drawMap();}));
 $('#ageChip').onclick=()=>openSheet(ageSheetHtml(),bindAgeSheet);
 function ageSheetHtml(){return `<div class="pad"><h1 style="font-size:1.6rem">Youngest buyer's age</h1><div class="stepper"><button type="button" id="sMinus" aria-label="Younger">−</button><output id="sOut">${S.age}</output><button type="button" id="sPlus" aria-label="Older">+</button></div><p class="small" id="sNeed"></p><button class="btn primary" data-closesheet>Done</button></div>`;}
-function bindAgeSheet(){const set=a=>{S.age=Math.max(21,Math.min(85,a));S.avg=Math.max(S.avg,S.age);$('#sOut').textContent=S.age;$('#sNeed').textContent=`Needs ${95-S.age} years of lease for full CPF.`;S.dirty=true;};$('#sMinus').onclick=()=>set(S.age-1);$('#sPlus').onclick=()=>set(S.age+1);set(S.age);}
+function bindAgeSheet(){const avg0=S.avg,set=a=>{S.age=Math.max(21,Math.min(85,a));S.avg=Math.max(avg0,S.age);$('#sOut').textContent=S.age;$('#sNeed').textContent=`Needs ${needYrs()} of lease for full CPF.`;S.dirty=true;};$('#sMinus').onclick=()=>set(S.age-1);$('#sPlus').onclick=()=>set(S.age+1);set(S.age);}
 
 /* ---------- sheets ---------- */
 function openSheet(html,after){
@@ -1640,7 +1641,7 @@ function recommend(p){
   const need=95-p.age, out=[];
   TOWNS.forEach(t=>{
     const all=(SALES[t.id]||[]).filter(s=>s.ft===p.ft); if(all.length<3) return;
-    const afford=all.filter(s=>s.price<=p.budget), good=afford.filter(s=>s.lease>=need);
+    const afford=all.filter(s=>s.price<=p.budget), good=afford.filter(s=>s.lease>20&&s.lease>=need);
     const pref=p.towns.includes(t.id);
     out.push({t,n:all.length,afford:afford.length,good:good.length,medP:median(all.map(s=>s.price)),medL:median(all.map(s=>s.lease)),pref,score:good.length/all.length*60+afford.length/all.length*30+(pref?15:0)});
   });
@@ -1738,9 +1739,9 @@ function renderSub(){
       <p class="small">Average age decides how long your HDB loan can be.</p>
       <span class="label">CPF Ordinary Account</span>
       <div class="chips">${[50000,100000,150000,200000,300000].map(o=>`<button type="button" class="chip" data-o="${o}" aria-pressed="${S.oaSet&&S.oa===o}">${exact(o)}</button>`).join('')}<button type="button" class="chip" data-o="skip" aria-pressed="${!S.oaSet}">Not sure</button></div>`;
-    const upd=()=>{$('#dA').textContent=S.age;$('#dV').textContent=S.avg;};
-    $('#dAm').onclick=()=>{S.age=Math.max(21,S.age-1);upd();}; $('#dAp').onclick=()=>{S.age=Math.min(85,S.age+1);S.avg=Math.max(S.avg,S.age);upd();};
-    $('#dVm').onclick=()=>{S.avg=Math.max(S.age,S.avg-1);upd();}; $('#dVp').onclick=()=>{S.avg=Math.min(85,S.avg+1);upd();};
+    let avg0=S.avg; const upd=()=>{$('#dA').textContent=S.age;$('#dV').textContent=S.avg;};
+    $('#dAm').onclick=()=>{S.age=Math.max(21,S.age-1);S.avg=Math.max(avg0,S.age);upd();}; $('#dAp').onclick=()=>{S.age=Math.min(85,S.age+1);S.avg=Math.max(avg0,S.age);upd();};
+    $('#dVm').onclick=()=>{avg0=S.avg=Math.max(S.age,S.avg-1);upd();}; $('#dVp').onclick=()=>{avg0=S.avg=Math.min(85,S.avg+1);upd();};
     $$('[data-o]').forEach(c=>c.onclick=()=>{if(c.dataset.o==='skip')S.oaSet=false;else{S.oaSet=true;S.oa=+c.dataset.o;}$$('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===c));});
   } else if(s==='size'){
     const big=document.documentElement.classList.contains('big');
