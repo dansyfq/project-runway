@@ -116,7 +116,7 @@ NUMBER_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
 
 def numbers_in(text: str) -> set[str]:
     """Numbers as normalised strings, ignoring citation markers like [2]."""
-    text = re.sub(r"\[\d+\]", "", text)
+    text = re.sub(r"\[\d\]", "", text)  # citations are [1]..[5]; "[90]" is a figure
     return {n.replace(",", "").rstrip(".") for n in NUMBER_RE.findall(text)}
 
 

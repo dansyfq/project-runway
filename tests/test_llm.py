@@ -135,3 +135,10 @@ def test_summarise_offline_lists_questions(monkeypatch):
     history = [{"role": "user", "content": "Is my HDB loan cut too?"}, {"role": "assistant", "content": "Yes [1]."}]
     assert LLM().summarise(history) == "You asked about:\n- Is my HDB loan cut too?"
     assert LLM().summarise([]) == "Nothing to sum up yet."
+
+
+def test_bracketed_figure_is_not_mistaken_for_a_citation():
+    """Citations are [1]..[5]; "[90]%" is a figure and must be caught."""
+    assert invented_numbers("CPF covers [90]% of the limit [1].", "- CPF usable: 80.9") == {"90"}
+    text, used_llm = fake_llm("CPF covers [90]% of the limit [1].").explain(FACTS, [SOURCE])
+    assert not used_llm
