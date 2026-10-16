@@ -17,6 +17,11 @@ MAX_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
 FULL_CONTENT_USERS = {"reviewer", "lecturer"}  # everyone else sees the short About and How it works
 NUMBERS_NOTE = "Numbers from Runway's calculator, not the AI."
+# The facts the interface's flatFacts() sends; the explanation template needs the first five.
+REQUIRED_FACTS = {"Remaining lease (years)", "Youngest buyer is this old when lease ends", "Years short of age 95",
+                  "CPF usable (% of Valuation Limit)", "HDB loan limit (% of price or value)"}
+FACT_KEYS = REQUIRED_FACTS | {"Youngest buyer age", "Lease covers youngest buyer to age 95", "CPF can be used",
+                              "Full HDB loan limit (%)", "Lease premium by town"}
 WHY_QUERY = {
     True: "lease covers youngest buyer to age 95 CPF up to valuation limit",
     False: "remaining lease does not cover youngest buyer to age 95 pro-rated CPF usage valuation limit loan-to-value",
@@ -77,7 +82,9 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
         question = str(payload.get("q", ""))[:1000]
         facts = payload.get("facts")
         if facts:  # "Why?" for one flat: explain Runway's own numbers, never new ones
-            facts = {str(k): str(v) for k, v in facts.items()}
+            if not isinstance(facts, dict) or not REQUIRED_FACTS <= facts.keys():
+                return {"ok": False, "error": "bad facts"}
+            facts = {k: str(facts[k])[:60] for k in FACT_KEYS if k in facts}  # only known keys reach the AI
             sources = index.search(WHY_QUERY[facts.get("Lease covers youngest buyer to age 95") == "yes"], k=4)
             text, used_llm = bot.explain(facts, sources)
             return {"text": text, "sources": source_view(sources), "offline": False,
