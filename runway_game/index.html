@@ -1258,7 +1258,7 @@ const VICON = {full:ICON.ok, part:ICON.half, none:ICON.no};
 function vline(r){
   const yrs = Math.floor(r.lease);
   if(r.status==='full') return `This flat has ${yrs} years left. Your youngest buyer is ${S.age}, so the lease lasts past age 95.`;
-  if(r.status==='part') return `This flat has ${yrs} years left. Your youngest buyer is ${S.age}, so the lease runs out ${Math.round(95-r.end)} years before age 95 and your CPF use is reduced.`;
+  if(r.status==='part') return `This flat has ${yrs} years left. Your youngest buyer is ${S.age}, so the lease runs out ${95-S.age-yrs} years before age 95 and your CPF use is reduced.`;
   return `This flat has ${yrs} years left. CPF and HDB loans cannot be used when 20 years or less remain.`;
 }
 const needYrs=()=>95-S.age>20?`${95-S.age} years`:'more than 20 years';
@@ -1439,7 +1439,7 @@ function openEnc(f){
     </div>
     <div class="pad" style="padding-top:12px" data-st="st.dialog">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span class="price">${exact(f.price)}</span><span class="small">sold ${f.m}</span></div>
-      <div class="leasebar"><div class="lh"><span class="label">Lease left</span><span class="lv">${f.lease.toFixed(0)} years</span></div><div class="hp" role="img" aria-label="${f.lease.toFixed(0)} of 99 years"><i style="width:0" data-w="${lpct}"></i></div><span class="small">Started ${f.lc}. Leases are 99 years.</span></div>
+      <div class="leasebar"><div class="lh"><span class="label">Lease left</span><span class="lv">${Math.floor(f.lease)} years</span></div><div class="hp" role="img" aria-label="${Math.floor(f.lease)} of 99 years"><i style="width:0" data-w="${lpct}"></i></div><span class="small">Started ${f.lc}. Leases are 99 years.</span></div>
       <div id="encResult"><button class="btn primary" id="checkBtn" data-st="st.button → rules.py" style="width:100%">Check for age ${S.age}</button></div>
     </div>`, ()=>{
       requestAnimationFrame(()=>{const i=$('.hp i'); if(i) i.style.width=i.dataset.w+'%';});
@@ -1539,9 +1539,9 @@ function md(text){
 function flatFacts({f, r}){
   const t = TBY[f.town], facts = {
     'Youngest buyer age': String(S.age), 'Remaining lease (years)': String(Math.floor(f.lease)),
-    'Youngest buyer is this old when lease ends': String(Math.floor(r.end)),
+    'Youngest buyer is this old when lease ends': String(S.age + Math.floor(f.lease)),
     'Lease covers youngest buyer to age 95': r.status==='full'?'yes':'no',
-    'Years short of age 95': String(Math.max(0, Math.round(95 - r.end))),
+    'Years short of age 95': String(Math.max(0, 95 - S.age - Math.floor(f.lease))),
     'CPF can be used': r.status==='none'?'no':'yes',
     'CPF usable (% of Valuation Limit)': (r.ratio*100).toFixed(1),
     'HDB loan limit (% of price or value)': (r.ltv*100).toFixed(1), 'Full HDB loan limit (%)': '75'};
