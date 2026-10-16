@@ -1,0 +1,433 @@
+category,lat,lng,name
+mall,1.28047,103.85347,Marina Bay Link Mall
+mall,1.29597,103.85875,Suntec City Mall
+mall,1.29238,103.85466,Citylink Mall
+mall,1.28951,103.85567,Esplanade Mall
+mall,1.28414,103.85199,Change Alley Mall
+mall,1.28841,103.84232,Central Mall
+mall,1.28097,103.8103,Depot Heights Shopping Centre
+mall,1.31428,103.77135,Clementi Avenue 2 Shopping Centre
+mall,1.3155,103.76457,The Clementi Mall
+mall,1.30532,103.78852,Rochester Mall
+mall,1.28762,103.80339,Queensway Shopping Centre
+mall,1.30598,103.79706,Commonwealth Car Mall
+mall,1.28893,103.80561,Anchorpoint Shopping Centre
+mall,1.28889,103.83421,Concorde Shopping Centre
+mall,1.29389,103.85312,Raffles City Shopping Centre
+mall,1.29202,103.84982,Excelsior Shopping Centre
+mall,1.30065,103.84944,Parklane Shopping Mall
+mall,1.30277,103.86517,Golden Mile Shopping Centre
+mall,1.31148,103.85678,City Square Mall
+mall,1.30062,103.84223,Concorde Hotel And Shopping Mall
+mall,1.30148,103.83789,Orchard Shopping Centre
+mall,1.30231,103.83475,Takashimaya Shopping Centre
+mall,1.30551,103.82998,Far East Shopping Centre
+mall,1.30613,103.82868,Forum The Shopping Mall
+mall,1.29207,103.8426,Ue Shopping Mall
+mall,1.29813,103.84414,Singapore Shopping Centre
+mall,1.30637,103.82704,Tanglin Shopping Centre
+mall,1.30485,103.82388,Tanglin Mall
+mall,1.29302,103.82694,Valley Point Shopping Centre
+mall,1.31759,103.78584,Cold Storage Jelita Shopping Centre
+mall,1.31026,103.79535,Holland Road Shopping Centre
+mall,1.32557,103.84249,Balestier Hill Shopping Centre
+mall,1.31812,103.8439,Goldhill Shopping Centre
+mall,1.32695,103.84655,Zhongshan Mall
+mall,1.31868,103.8627,Bendemeer Shopping Mall
+mall,1.33869,103.87204,The Woodleigh Mall
+mall,1.33172,103.87943,Macpherson Mall
+mall,1.30825,103.88583,51 Old Airport Road Food Centre And Shopping Mall
+mall,1.30384,103.87275,Kallang Wave Mall
+mall,1.33222,103.89958,Ubi Car Mall
+mall,1.31748,103.89283,Plq Mall
+mall,1.30382,103.90104,Katong Shopping Centre
+mall,1.31288,103.92395,Siglap Shopping Centre
+mall,1.32467,103.92941,Bedok Mall
+mall,1.37783,103.94236,Elias Mall
+mall,1.34259,103.95307,Eastpoint Mall
+mall,1.35258,103.9447,Tampines Mall
+mall,1.35433,103.94432,Eastlink Mall
+mall,1.35348,103.87883,Upper Serangoon Shopping Centre
+mall,1.37932,103.88785,Hougang Green Shopping Mall
+mall,1.37244,103.89372,Hougang Mall
+mall,1.37173,103.89421,Kang Kar Mall
+mall,1.38315,103.8923,Sengkang Grand Mall
+mall,1.39222,103.90447,Rivervale Mall
+mall,1.35458,103.87779,Icb Shopping Centre
+mall,1.36749,103.83928,Kebun Baru Mall
+mall,1.37285,103.84761,Djit Sun Mall
+mall,1.35779,103.84467,Bishan North Shopping Mall
+mall,1.35069,103.84895,Junction 8 Shopping Centre
+mall,1.34332,103.77585,Bukit Timah Shopping Centre
+mall,1.33226,103.74807,The Furniture Mall
+mall,1.33484,103.72046,Taman Jurong Shopping Centre
+mall,1.34637,103.71247,Boon Lay Shopping Centre
+mall,1.34159,103.69702,Pioneer Mall
+mall,1.34874,103.69774,Gek Poh Shopping Centre
+mall,1.3501,103.74921,Cathay Cineplex West Mall
+mall,1.35019,103.74902,West Mall
+mall,1.38358,103.77077,Fajar Shopping Centre
+mall,1.38542,103.76624,Greenridge Shopping Centre
+mall,1.35774,103.76814,The Rail Mall
+mall,1.3785,103.76302,Hillion Mall
+mall,1.38005,103.75246,Teck Whye Shopping Centre
+mall,1.37744,103.74438,Keat Hong Shopping Centre
+mall,1.39222,103.74361,Limbang Shopping Centre
+mall,1.44185,103.82483,Sembawang Shopping Centre
+mall,1.418,103.84124,Wisteria Mall
+mall,1.39139,103.87607,The Seletar Mall
+hawker,1.28165,103.84877,Market Street Interim Hawker Centre
+hawker,1.2829,103.84928,China Square Food Centre
+hawker,1.28498,103.84257,People's Park Food Centre
+hawker,1.27934,103.84665,Amoy Street Food Centre
+hawker,1.28033,103.84473,Maxwell Food Centre
+hawker,1.28054,103.84447,Maxwell Road Food Centre
+hawker,1.22321,103.86093,Kusu Island Hawker Centre
+hawker,1.26657,103.81925,Seah Im Food Centre
+hawker,1.27326,103.80763,Telok Blangah Food Centre
+hawker,1.27598,103.79134,Pasir Panjang Food Centre
+hawker,1.31438,103.77077,Clementi Ave 2 Market/Cooked Food Centre
+hawker,1.31174,103.75981,Ayer Rajah Food Centre
+hawker,1.31159,103.75445,Food Centre
+hawker,1.30043,103.78723,Temporary Food Centre
+hawker,1.29971,103.79788,Tanglin Halt Food Centre
+hawker,1.28695,103.80813,Abc Brickworks Market & Food Centre
+hawker,1.28733,103.81834,Redhill Food Centre
+hawker,1.2863,103.80449,Alexandra Village Food Centre
+hawker,1.2837,103.81695,Bukit Merah Central Food Centre
+hawker,1.28797,103.80581,Ikea Food Centre
+hawker,1.28825,103.83994,Kukoh 21 Food Centre
+hawker,1.28793,103.82963,Havelock Road Cooked Food Centre
+hawker,1.28145,103.82326,Tiong Bahru Food Centre
+hawker,1.301,103.85421,Albert Centre Market & Food Centre
+hawker,1.30614,103.8641,North Bridge Road Market And Food Centre
+hawker,1.30288,103.86388,Golden Mile Food Centre
+hawker,1.30734,103.85685,Berseh Food Centre
+hawker,1.31616,103.85023,Pek Kio Market & Food Centre
+hawker,1.31081,103.83649,Environment Building Hawker Centre
+hawker,1.31219,103.83941,Newton Food Centre
+hawker,1.29234,103.83119,Zion Riverside Food Centre
+hawker,1.31625,103.80564,Empress Road Market And Food Centre
+hawker,1.30812,103.79277,Holland Drive Market And Food Centre
+hawker,1.31115,103.79483,Holland Village Market & Food Centre
+hawker,1.32416,103.81417,Adam Food Centre
+hawker,1.32408,103.81418,Adam Road Food Centre
+hawker,1.33523,103.85704,Kim Keat Palm Market And Food Centre
+hawker,1.34022,103.85487,Blk 210 Lorong 8 Toa Payoh Market & Food Centre
+hawker,1.31922,103.86302,Bendemeer Market And Food Centre
+hawker,1.3214,103.87005,Geylang Bahru Market And Food Centre
+hawker,1.33179,103.86797,Broadway Food Centre
+hawker,1.32785,103.88712,Circuit Road Market And Food Centre
+hawker,1.31503,103.87162,Upper Boon Keng Market And Food Centre
+hawker,1.31708,103.87942,Sims Vista Market And Food Centre
+hawker,1.3074,103.88413,Kallang Estate Fresh Market And Food Centre
+hawker,1.3094,103.90185,Dunman Food Centre
+hawker,1.31511,103.89559,Haig Road Market And Cooked Food Centre
+hawker,1.30235,103.88398,Jalan Batu Hawker Centre
+hawker,1.30229,103.90634,Marine Parade Central Market And Food Centre
+hawker,1.30509,103.92973,East Coast Seafood Centre
+hawker,1.33331,103.9307,Kaki Bukit 511 Market And Food Centre
+hawker,1.32482,103.93054,Bedok Interchange Hawker Centre
+hawker,1.32035,103.95547,Bedok Food Centre
+hawker,1.37343,103.95155,Pasir Ris Central Hawker Centre
+hawker,1.34579,103.94459,Tampines Round Market And Food Centre
+hawker,1.35355,103.94038,Our Tampines Hub Hawker Centre
+hawker,1.3591,103.88606,Kovan Hougang Market And Food Centre
+hawker,1.37543,103.88298,Ci Yuan Hawker Centre
+hawker,1.36422,103.86657,Chomp Chomp Food Centre
+hawker,1.37449,103.83921,Mayflower Market And Food Centre
+hawker,1.37296,103.85446,Cheng San Market And Cooked Food Centre
+hawker,1.36821,103.85636,Chong Boon Market And Food Centre
+hawker,1.36681,103.83914,Kebun Baru Market And Food Centre
+hawker,1.36718,103.84016,Kebun Baru Food Centre
+hawker,1.37238,103.82899,Sembawang Hills Food Centre
+hawker,1.34352,103.73785,Yuhua Village Market And Food Centre
+hawker,1.34541,103.7317,Yuhua Market & Hawker Centre
+hawker,1.34531,103.73158,Yuhua Market And Hawker Centre
+hawker,1.32085,103.74289,Teban Gardens Market And Food Centre
+hawker,1.33459,103.72152,Taman Jurong Market & Food Centre
+hawker,1.33325,103.71048,Quality Road Food Centre
+hawker,1.31567,103.72037,Jurong Port Road Food Centre
+hawker,1.34131,103.6974,Jurong West Hawker Centre
+hawker,1.37753,103.77253,Bukit Panjang Hawker Centre
+hawker,1.44342,103.77701,Marsiling Lane Market & Cooked Food Centre
+hawker,1.43992,103.8007,Kampung Admiralty Hawker Centre
+hawker,1.44036,103.80154,Admiralty Wet Market & Food Centre
+hawker,1.43351,103.77975,Marsiling Mall Hawker Centre
+hawker,1.43153,103.82842,Chong Pang Market & Food Centre
+hawker,1.42503,103.84472,Yishun Park Hawker Centre
+hawker,1.39948,103.90639,Market & Food Centre
+school,1.27551,103.83992,Cantonment Primary School
+school,1.27496,103.82418,Radin Mas Primary School
+school,1.27613,103.80864,Blangah Rise Primary School
+school,1.31262,103.75703,Qifa Primary School
+school,1.30027,103.76935,The Japanese Primary School
+school,1.31615,103.76758,Pei Tong Primary School
+school,1.31581,103.76305,Clementi Primary School
+school,1.29981,103.79996,New Town Primary School
+school,1.29599,103.8079,Queenstown Primary School
+school,1.28596,103.81523,Gan Eng Seng Primary School
+school,1.2913,103.82394,Alexandra Primary School
+school,1.2845,103.82615,Zhangde Primary School
+school,1.30409,103.85739,Stamford Primary School
+school,1.3125,103.8509,Farrer Park Primary School
+school,1.30378,103.84628,Saint Margaret's Primary School
+school,1.29418,103.83602,River Valley Primary School
+school,1.32125,103.80779,Nanyang Primary School
+school,1.31673,103.78421,Henry Park Primary School
+school,1.33007,103.80622,Raffles Girls' Primary School
+school,1.34053,103.85567,First Toa Payoh Primary School
+school,1.32221,103.86535,Bendemeer Primary School
+school,1.33564,103.87549,Cedar Primary School
+school,1.32651,103.88176,Canossa Catholic Primary School
+school,1.32439,103.90437,Eunos Primary School
+school,1.30554,103.91776,Ngee Ann Primary School
+school,1.31997,103.92375,Opera Estate Primary School
+school,1.31772,103.9457,Temasek Primary School
+school,1.324,103.93775,Bedok Green Primary School
+school,1.3339,103.93203,Yu Neng Primary School
+school,1.33032,103.93189,Fengshan Primary School
+school,1.33481,103.94121,Saint Anthony's Canossian Primary School
+school,1.33535,103.92127,Damai Primary School
+school,1.33091,103.91135,Telok Kurau Primary School
+school,1.37597,103.93514,Meridian Primary School
+school,1.37503,103.94536,Elias Park Primary School
+school,1.37279,103.95729,Casuarina Primary School
+school,1.37231,103.96292,Pasir Ris Primary School
+school,1.36552,103.96095,White Sands Primary School
+school,1.37777,103.93969,Park View Primary School
+school,1.34789,103.93965,Junyuan Primary School
+school,1.35735,103.94887,Gongshang Primary School
+school,1.35304,103.9618,East Spring Primary School
+school,1.34857,103.95167,Angsana Primary School
+school,1.35059,103.95123,Chongzheng Primary School
+school,1.35146,103.95072,Yumin Primary School
+school,1.35049,103.94357,Tampines Primary School
+school,1.36069,103.94894,Tampines North Primary School
+school,1.34941,103.93679,Saint Hilda's Primary School
+school,1.34021,103.95218,Changkat Primary School
+school,1.37804,103.88117,Hougang Primary School
+school,1.36674,103.89368,Holy Innocents' Primary School
+school,1.37782,103.88557,Yio Chu Kang Primary School
+school,1.37141,103.88304,Xinmin Primary School
+school,1.3782,103.89475,Punggol Primary School
+school,1.358,103.89022,Xinghua Primary School
+school,1.39496,103.8899,Springdale Primary School
+school,1.38384,103.89122,Palm View Primary School
+school,1.39066,103.88726,Anchor Green Primary School
+school,1.38289,103.89585,North Vista Primary School
+school,1.39206,103.89092,Nan Chiau Primary School
+school,1.38753,103.90351,North Spring Primary School
+school,1.39453,103.89786,Compassvale Primary School
+school,1.39357,103.90472,Rivervale Primary School
+school,1.38925,103.89953,Seng Kang Primary School
+school,1.36017,103.8697,Zhonghua Primary School
+school,1.34897,103.86836,Yangzheng Primary School
+school,1.34925,103.86233,Saint Gabriel's Primary School
+school,1.37189,103.85181,Jing Shan Primary School
+school,1.3652,103.85103,Teck Ghee Primary School
+school,1.36036,103.85419,Townsville Primary School
+school,1.38467,103.84124,Anderson Primary School
+school,1.36909,103.83904,Ang Mo Kio Primary School
+school,1.34938,103.85517,Kuo Chuan Presbyterian Primary School
+school,1.34604,103.84928,Guangyang Primary School
+school,1.33806,103.77611,Pei Hwa Presbyterian Primary School
+school,1.33775,103.76686,Bukit Timah Primary School
+school,1.34868,103.73297,Jurong Primary School
+school,1.34292,103.74086,Yuhua Primary School
+school,1.3364,103.73667,Fuhua Primary School
+school,1.33838,103.71805,Lakeside Primary School
+school,1.33664,103.69968,Frontier Primary School
+school,1.35149,103.70758,Corporation Primary School
+school,1.33924,103.6989,Jurong West Primary School
+school,1.34268,103.68772,Xingnan Primary School
+school,1.33895,103.68783,Juying Primary School
+school,1.34872,103.69487,Pioneer Primary School
+school,1.34715,103.70053,Westwood Primary School
+school,1.34471,103.69896,West Grove Primary School
+school,1.34684,103.71901,Rulang Primary School
+school,1.34757,103.72156,Shuqun Primary School
+school,1.34285,103.71297,Boon Lay Garden Primary School
+school,1.34919,103.741,Princess Elizabeth Primary School
+school,1.35416,103.75421,Lianhua Primary School
+school,1.36464,103.74929,Saint Anthony's Primary School
+school,1.35906,103.74816,Dazhong Primary School
+school,1.34595,103.75359,Bukit View Primary School
+school,1.34525,103.75626,Keming Primary School
+school,1.38359,103.76029,West View Primary School
+school,1.38587,103.76781,Greenridge Primary School
+school,1.3798,103.76917,Zhenghua Primary School
+school,1.37347,103.76932,Bukit Panjang Primary School
+school,1.38424,103.77375,Beacon Primary School
+school,1.38946,103.76608,West Spring Primary School
+school,1.38356,103.75368,Teck Whye Primary School
+school,1.40282,103.74699,Unity Primary School
+school,1.39696,103.75119,Yew Tee Primary School
+school,1.39391,103.74742,Kranji Primary School
+school,1.38177,103.74729,South View Primary School
+school,1.38041,103.73614,Concord Primary School
+school,1.37774,103.74186,Chua Chu Kang Primary School
+school,1.4471,103.80192,Riverside Primary School
+school,1.42918,103.79056,Innova Primary School
+school,1.44011,103.80463,Greenwood Primary School
+school,1.43306,103.79039,Woodgrove Primary School
+school,1.43477,103.79784,Woodlands Ring Primary School
+school,1.44204,103.78834,Qihua Primary School
+school,1.43675,103.79177,Woodlands Primary School
+school,1.44268,103.80011,Admiralty Primary School
+school,1.44415,103.79455,Evergreen Primary School
+school,1.43442,103.7737,Marsiling Primary School
+school,1.43064,103.77818,Fuchun Primary School
+school,1.4327,103.78578,Si Ling Primary School
+school,1.45418,103.81743,Endeavour Primary School
+school,1.45667,103.81361,Northoaks Primary School
+school,1.45193,103.82232,Wellington Primary School
+school,1.45106,103.81597,Canberra Primary School
+school,1.44504,103.82102,Sembawang Primary School
+school,1.42765,103.83048,Jiemin Primary School
+school,1.4335,103.83829,Xishan Primary School
+school,1.43368,103.83292,Ahmad Ibrahim Primary School
+school,1.4335,103.83403,Yishun Primary School
+school,1.41741,103.8303,Peiying Primary School
+school,1.42794,103.84837,North View Primary School
+school,1.4213,103.84079,Northland Primary School
+school,1.41628,103.8388,Naval Base Primary School
+school,1.39762,103.88021,Fern Green Primary School
+school,1.39284,103.87516,Sengkang Green Primary School
+school,1.38998,103.8741,Fernvale Primary School
+school,1.41156,103.89897,Punggol Cove Primary School
+school,1.40441,103.911,Oasis Primary School
+school,1.4018,103.89877,Punggol Green Primary School
+school,1.39915,103.91867,Waterway Primary School
+school,1.40001,103.91307,Horizon Primary School
+school,1.40533,103.90539,Punggol View Primary School
+school,1.3964,103.91257,Greendale Primary School
+school,1.4003,103.90743,Edgefield Primary School
+cc,1.28119,103.84301,Kreta Ayer Community Club
+cc,1.27608,103.8416,Tanjong Pagar Community Club
+cc,1.27593,103.81975,Radin Mas Community Club
+cc,1.27484,103.80789,Telok Blangah Community Club
+cc,1.30281,103.76498,West Coast Community Centre
+cc,1.31882,103.76815,Clementi Community Centre
+cc,1.30253,103.78327,Dover Community Centre
+cc,1.29915,103.80131,Queenstown Community Centre
+cc,1.28979,103.81445,Leng Kee Community Club
+cc,1.28525,103.81583,Bukit Merah Community Centre
+cc,1.28557,103.82339,Henderson Community Club
+cc,1.2895,103.83098,Kim Seng Community Centre
+cc,1.28347,103.83191,Tiong Bahru Community Centre
+cc,1.30278,103.8636,Kampong Glam Community Club
+cc,1.30797,103.8618,Jalan Besar Community Club
+cc,1.31309,103.85142,Pek Kio Community Centre
+cc,1.31055,103.83918,Cairnhill Community Club
+cc,1.30923,103.79266,Buona Vista Community Club
+cc,1.31216,103.78982,Ulu Pandan Community Club
+cc,1.32336,103.82689,Tanglin Community Club
+cc,1.33456,103.85048,Toa Payoh Central Community Club
+cc,1.33485,103.85941,Toa Payoh South Community Club
+cc,1.33627,103.8547,Toa Payoh East Community Club
+cc,1.32464,103.85698,Whampoa Community Club
+cc,1.32637,103.84764,Moulmein Community Centre
+cc,1.3178,103.86237,Kallang Community Club
+cc,1.33259,103.86711,Potong Pasir Community Club
+cc,1.32354,103.88448,Macpherson Community Club
+cc,1.31557,103.87262,Geylang West Community Club
+cc,1.31024,103.88482,Mountbatten Community Club
+cc,1.31649,103.89694,Geylang Serai Community Club
+cc,1.31786,103.90075,Kampong Ubi Community Centre
+cc,1.32313,103.91273,Kampong Kembangan Community Club
+cc,1.30746,103.90417,Joo Chiat Community Club
+cc,1.30059,103.88475,Katong Community Centre
+cc,1.30483,103.90955,Marine Parade Community Club
+cc,1.31349,103.93069,Siglap South Community Centre
+cc,1.32426,103.93606,Bedok Community Centre
+cc,1.32163,103.94334,Siglap Community Centre
+cc,1.32698,103.93162,Kampong Chai Chee Community Centre
+cc,1.33264,103.91526,Eunos Community Club
+cc,1.36847,103.95944,Pasir Ris East Community Club
+cc,1.37843,103.94248,Pasir Ris Elias Community Club
+cc,1.35359,103.94068,Tampines Central Community Club
+cc,1.35729,103.94666,Tampines North Community Club
+cc,1.34592,103.94778,Tampines Changkat Community Club
+cc,1.34875,103.93563,Tampines West Community Club
+cc,1.34502,103.95523,Changi Simei Community Club
+cc,1.35466,103.88955,Aljunied Community Centre
+cc,1.3578,103.88609,Paya Lebar Kovan Community Club
+cc,1.37773,103.89625,Punggol Park Community Centre
+cc,1.37515,103.88289,Ci Yuan Community Club
+cc,1.37438,103.89182,Punggol Community Club
+cc,1.36476,103.89262,Hougang Community Club
+cc,1.39363,103.90178,Rivervale Community Centre
+cc,1.39713,103.88667,Anchorvale Community Club
+cc,1.3927,103.89415,Sengkang Community Club
+cc,1.3736,103.87389,Hwi Yoh Community Centre
+cc,1.36999,103.87401,The Serangoon Community Club
+cc,1.35161,103.87037,Braddell Heights Community Club
+cc,1.38152,103.84143,Yio Chu Kang Community Club
+cc,1.37178,103.84957,Cheng San Community Club
+cc,1.36309,103.85354,Teck Ghee Community Club
+cc,1.37295,103.83762,Kebun Baru Community Club
+cc,1.36677,103.84074,Ang Mo Kio Community Centre
+cc,1.35859,103.84563,Bishan North Community Centre
+cc,1.35142,103.83639,Thomson Community Club
+cc,1.34977,103.85075,Bishan Community Club
+cc,1.34049,103.77168,Bukit Timah Community Club
+cc,1.32078,103.74762,Ayer Rajah Community Club
+cc,1.33996,103.73712,Yuhua Community Club
+cc,1.33531,103.72163,Taman Jurong Community Club
+cc,1.34075,103.70458,The Frontier Community Club
+cc,1.34236,103.69232,Nanyang Community Club
+cc,1.34872,103.69882,Gek Poh Ville Community Club
+cc,1.34833,103.71815,Jurong Spring Community Club
+cc,1.35056,103.72534,Jurong Green Community Club
+cc,1.34823,103.71149,Boon Lay Community Club
+cc,1.35906,103.74946,Hong Kah North Community Club
+cc,1.34893,103.75826,Bukit Batok East Community Club
+cc,1.35019,103.74751,Bukit Batok Community Club
+cc,1.36197,103.7643,Hillview Community Club
+cc,1.38681,103.77152,Zhenghua Community Club
+cc,1.37635,103.77065,Bukit Panjang Community Club
+cc,1.38159,103.76466,Senja-Cashew Community Club
+cc,1.38115,103.75191,Chua Chu Kang Community Club
+cc,1.39496,103.74485,Yew Tee Community Club
+cc,1.38407,103.74492,Keat Hong Community Club
+cc,1.43177,103.78501,Woodgrove Community Centre
+cc,1.43973,103.78824,Woodlands Community Club
+cc,1.42942,103.77499,Fuchun Community Club
+cc,1.43904,103.80261,Woodlands Galaxy Community Club
+cc,1.42755,103.79224,Ace The Place Community Club
+cc,1.44066,103.77362,Marsiling Community Club
+cc,1.44513,103.81972,Canberra Community Club
+cc,1.45171,103.82881,Sembawang Community Club
+cc,1.41961,103.84733,Nee Soon Spring Community Centre
+cc,1.42875,103.83632,Nee Soon Central Community Club
+cc,1.41497,103.83488,Nee Soon South Community Club
+cc,1.43083,103.82923,Chong Pang Community Club
+cc,1.43102,103.83849,Nee Soon East Community Club
+cc,1.40328,103.90729,Punggol Vista Community Centre
+cc,1.40452,103.89566,Punggol West Community Centre
+cc,1.39361,103.91346,Punggol 21 Community Club
+clinic,1.31248,103.76548,Clementi Polyclinic
+clinic,1.29864,103.78984,National Healthcare Group Polyclinics
+clinic,1.29848,103.80096,Queenstown Polyclinic
+clinic,1.2837,103.81705,Bukit Merah Polyclinic
+clinic,1.27937,103.83839,Outram Polyclinic
+clinic,1.3345,103.85899,Toa Payoh Polyclinic
+clinic,1.31669,103.85869,Kallang Polyclinic And Long Term Care
+clinic,1.31949,103.88717,Geylang Polyclinic
+clinic,1.31733,103.90571,Eunos Polyclinic
+clinic,1.30223,103.90788,Marine Parade Polyclinic
+clinic,1.32671,103.93203,Bedok Polyclinic
+clinic,1.36859,103.9592,Pasir Ris Polyclinic
+clinic,1.3573,103.94591,Tampines Polyclinic
+clinic,1.36991,103.889,Hougang Polyclinic
+clinic,1.39269,103.89433,Sengkang Polyclinic
+clinic,1.37432,103.84568,Ang Mo Kio Polyclinic
+clinic,1.34972,103.73072,Jurong Polyclinic
+clinic,1.33856,103.69901,Pioneer Polyclinic
+clinic,1.35202,103.74782,Bukit Batok Polyclinic
+clinic,1.352,103.74791,National Healthcare Group Polyclinic's Gallery
+clinic,1.38234,103.75078,Choa Chu Kang Polyclinic
+clinic,1.43089,103.77521,Woodlands Polyclinic
+clinic,1.43036,103.83919,Yishun Polyclinic
+clinic,1.40288,103.9132,Punggol Polyclinic

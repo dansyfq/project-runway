@@ -1,0 +1,185 @@
+lat,lng,name,codes,line_colors
+1.44064,103.80096,Admiralty,NS10,red
+1.31626,103.88267,Aljunied,EW9,green
+1.37005,103.84954,Ang Mo Kio,NS16,red
+1.38803,103.90546,Bakau,SE3,gray
+1.38006,103.77264,Bangkit,BP9,gray
+1.34244,103.88045,Bartley,CC12,yellow
+1.28253,103.85973,Bayfront,CC34-DT16,yellow-blue
+1.31312,103.94231,Bayshore,TE29,brown
+1.34166,103.77594,Beauty World,DT5,blue
+1.32394,103.93,Bedok,EW5,green
+1.33475,103.91804,Bedok North,DT29,blue
+1.33628,103.93189,Bedok Reservoir,DT30,blue
+1.29886,103.85037,Bencoolen,DT21,blue
+1.31358,103.86307,Bendemeer,DT23,blue
+1.35146,103.84826,Bishan,NS17-CC15,red-yellow
+1.31982,103.86152,Boon Keng,NE9,purple
+1.33847,103.70578,Boon Lay,EW27,green
+1.32256,103.81575,Botanic Gardens,CC19-DT9,yellow-blue
+1.3406,103.84679,Braddell,NS18,red
+1.2969,103.85055,Bras Basah,CC2,yellow
+1.36345,103.83284,Bright Hill,TE7,brown
+1.38306,103.89305,Buangkok,NE15,purple
+1.30053,103.85609,Bugis,EW12-DT14,green-blue
+1.34906,103.74959,Bukit Batok,NS2,red
+1.35889,103.75182,Bukit Gombak,NS3,red
+1.3783,103.76214,Bukit Panjang,DT1-BP6,blue-gray
+1.30726,103.79071,Buona Vista,EW21-CC22,green-yellow
+1.33768,103.83999,Caldecott,CC17-TE9,yellow-brown
+1.44337,103.8295,Canberra,NS12,red
+1.27311,103.83703,Cantonment,CC31,yellow
+1.36966,103.76448,Cashew,DT2,blue
+1.35734,103.98856,Changi Airport,CG2,green
+1.39631,103.89371,Cheng Lim,SW1,gray
+1.28502,103.844,Chinatown,NE4-DT19,purple-blue
+1.34247,103.73259,Chinese Garden,EW25,green
+1.38475,103.74453,Choa Chu Kang,NS4-BP1,red-gray
+1.29321,103.85183,City Hall,NS25-EW13,red-green
+1.28898,103.84687,Clarke Quay,NE5,purple
+1.3151,103.76523,Clementi,EW23,green
+1.30244,103.79831,Commonwealth,EW20,green
+1.39452,103.90044,Compassvale,SE1,gray
+1.39388,103.91264,Coral Edge,PE3,gray
+1.39946,103.90585,Cove,PE1,gray
+1.30844,103.88832,Dakota,CC8,yellow
+1.40528,103.90856,Damai,PE7,gray
+1.29879,103.84502,Dhoby Ghaut,NS24-NE6-CC1,red-purple-yellow
+1.31142,103.77863,Dover,EW22,green
+1.27919,103.85335,Downtown,DT17,blue
+1.29326,103.85597,Esplanade,CC3,yellow
+1.31981,103.90306,Eunos,EW7,green
+1.33564,103.96224,Expo,DT35-CG1,blue-green
+1.38455,103.7708,Fajar,BP10,gray
+1.39719,103.88917,Farmway,SW2,gray
+1.31271,103.85438,Farrer Park,NE8,purple
+1.31763,103.80778,Farrer Road,CC20,yellow
+1.39192,103.8763,Fernvale,SW5,gray
+1.29239,103.84416,Fort Canning,DT20,blue
+1.27945,103.86812,Gardens by the Bay,TE22,brown
+1.32161,103.87198,Geylang Bahru,DT24,blue
+1.29462,103.83348,Great World,TE15,brown
+1.31942,103.66042,Gul Circle,EW30,green
+1.26539,103.8224,HarbourFront,NE1-CC29,purple-yellow
+1.28749,103.83371,Havelock,TE16,brown
+1.28265,103.78177,Haw Par Villa,CC25,yellow
+1.36245,103.76707,Hillview,DT3,blue
+1.31212,103.79574,Holland Village,CC21,yellow
+1.3719,103.89275,Hougang,NE14,purple
+1.35434,103.76921,Hume,DT4,blue
+1.30513,103.85523,Jalan Besar,DT22,blue
+1.38668,103.76452,Jelapang,BP12,gray
+1.32772,103.67829,Joo Koon,EW29,green
+1.33312,103.7423,Jurong East,NS1-EW24,red-green
+1.3996,103.91644,Kadaloor,PE5,gray
+1.33502,103.90861,Kaki Bukit ,DT28,blue
+1.31145,103.87134,Kallang,EW10,green
+1.38392,103.9022,Kangkar,SE4,gray
+1.29783,103.88618,Katong Park,TE24,brown
+1.3786,103.74903,Keat Hong,BP3,gray
+1.32106,103.91276,Kembangan,EW6,green
+1.2933,103.78441,Kent Ridge,CC24,yellow
+1.27043,103.83069,Keppel,CC30,yellow
+1.41732,103.833,Khatib,NS14,red
+1.33566,103.78416,King Albert Park,DT6,blue
+1.35998,103.88487,Kovan,NE13,purple
+1.42522,103.76199,Kranji,NS7,red
+1.3982,103.88124,Kupang,SW3,gray
+1.27233,103.80278,Labrador Park,CC27,yellow
+1.3443,103.7208,Lakeside,EW26,green
+1.30744,103.86303,Lavender,EW11,green
+1.39211,103.88007,Layar,SW6,gray
+1.38474,103.83663,Lentor,TE5,brown
+1.30657,103.8493,Little India,NE7-DT12,purple-blue
+1.35149,103.86339,Lorong Chuan,CC14,yellow
+1.32673,103.8901,MacPherson,CC10-DT26,yellow-blue
+1.27517,103.85475,Marina Bay,NS27-CC33-TE20,red-yellow-brown
+1.27175,103.86272,Marina South Pier,NS28,red
+1.30261,103.90498,Marine Parade,TE26,brown
+1.30666,103.91511,Marine Terrace,TE27,brown
+1.43254,103.77422,Marsiling,NS8,red
+1.34861,103.83924,Marymount,CC16,yellow
+1.32697,103.88296,Mattar,DT25,blue
+1.28069,103.84401,Maxwell,TE18,brown
+1.37215,103.83679,Mayflower,TE6,brown
+1.39698,103.90887,Meridian,PE2,gray
+1.30625,103.8825,Mountbatten,CC7,yellow
+1.30709,103.81901,Napier,TE12,brown
+1.31296,103.83886,Newton,NS21-DT11,red-blue
+1.41183,103.90031,Nibong,PW5,gray
+1.29967,103.8635,Nicoll Highway,CC5,yellow
+1.32008,103.84349,Novena,NS20,red
+1.40232,103.91268,Oasis,PE6,gray
+1.29961,103.78724,one-north,CC23,yellow
+1.30322,103.83198,Orchard,NS22-TE14,red-brown
+1.30241,103.82401,Orchard Boulevard,TE13,brown
+1.28069,103.84024,Outram Park,EW16-NE3-TE17,green-purple-brown
+1.27618,103.79161,Pasir Panjang,CC26,yellow
+1.37303,103.94925,Pasir Ris,EW1,green
+1.31805,103.89232,Paya Lebar,EW8-CC9,green-yellow
+1.37618,103.77126,Pending,BP8,gray
+1.37776,103.76663,Petir,BP7,gray
+1.37862,103.75801,Phoenix,BP5,gray
+1.33757,103.69735,Pioneer,EW28,green
+1.33125,103.86909,Potong Pasir,NE10,purple
+1.27332,103.84741,Prince Edward Road,CC32,yellow
+1.29385,103.86015,Promenade,CC4-DT15,yellow-blue
+1.40525,103.90235,Punggol,NE17-PTC,purple-gray
+1.41502,103.91033,Punggol Coast,NE18,purple
+1.41684,103.90666,Punggol Point,PW3,gray
+1.29455,103.80605,Queenstown,EW19,green
+1.28441,103.85147,Raffles Place,NS26-EW14,red-green
+1.38403,103.89735,Ranggung,SE5,gray
+1.28965,103.81676,Redhill,EW18,green
+1.38671,103.89048,Renjong,SW8,gray
+1.39458,103.91613,Riviera,PE4,gray
+1.30395,103.85263,Rochor,DT13,blue
+1.39151,103.90594,Rumbia,SE2,gray
+1.40975,103.90458,Sam Kee,PW1,gray
+1.41598,103.90219,Samudera,PW4,gray
+1.38779,103.76959,Segar,BP11,gray
+1.44909,103.82006,Sembawang,NS11,red
+1.39133,103.89529,Sengkang,NE16-STC,purple-gray
+1.38268,103.76238,Senja,BP13,gray
+1.34981,103.87377,Serangoon,NE12-CC13,purple-yellow
+1.27766,103.85055,Shenton Way,TE19,brown
+1.31001,103.93003,Siglap,TE28,brown
+1.34318,103.95338,Simei,EW3,green
+1.33059,103.79722,Sixth Avenue,DT7,blue
+1.30033,103.8385,Somerset,NS23,red
+1.40539,103.89724,Soo Teck,PW7,gray
+1.38026,103.74528,South View,BP2,gray
+1.39777,103.81793,Springleaf,TE4,brown
+1.30295,103.87539,Stadium,CC6,yellow
+1.32019,103.82546,Stevens,DT10-TE11,blue-brown
+1.40853,103.89853,Sumang,PW6,gray
+1.33487,103.88815,Tai Seng,CC11,yellow
+1.35337,103.94508,Tampines,EW2-DT32,green-blue
+1.35608,103.95498,Tampines East,DT33,blue
+1.34552,103.93856,Tampines West,DT31,blue
+1.3257,103.80775,Tan Kah Kee,DT8,blue
+1.32726,103.94651,Tanah Merah,EW4-CG,green-green
+1.29932,103.89737,Tanjong Katong,TE25,brown
+1.27657,103.84588,Tanjong Pagar,EW15,green
+1.29726,103.87345,Tanjong Rhu,TE23,brown
+1.41271,103.90665,Teck Lee,PW2,gray
+1.37667,103.75365,Teck Whye,BP4,gray
+1.28212,103.84874,Telok Ayer,DT18,blue
+1.27059,103.80986,Telok Blangah,CC28,yellow
+1.39743,103.87565,Thanggam,SW4,gray
+1.28609,103.82764,Tiong Bahru,EW17,green
+1.3323,103.84733,Toa Payoh,NS19,red
+1.38945,103.88581,Tongkang,SW7,gray
+1.32081,103.64957,Tuas Crescent,EW31,green
+1.34043,103.63696,Tuas Link,EW33,green
+1.3295,103.64015,Tuas West Road,EW32,green
+1.32976,103.89938,Ubi,DT27,blue
+1.34169,103.96126,Upper Changi,DT34,blue
+1.35449,103.83282,Upper Thomson,TE8,brown
+1.43718,103.78696,Woodlands,NS9-TE2,red-brown
+1.44865,103.78552,Woodlands North,TE1,brown
+1.42715,103.7943,Woodlands South,TE3,brown
+1.3392,103.87075,Woodleigh,NE11,purple
+1.39746,103.7474,Yew Tee,NS5,red
+1.38178,103.84497,Yio Chu Kang,NS15,red
+1.42938,103.83503,Yishun,NS13,red
