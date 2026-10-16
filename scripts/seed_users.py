@@ -3,7 +3,7 @@
 Where the accounts come from (first match wins):
   1. RUNWAY_DEMO_USERS env var, e.g. "lecturer:pass1,reviewer:pass2"
   2. demo_accounts.local.toml  (gitignored; [accounts] name = "password")
-  3. Otherwise three accounts with random passwords are generated and saved to
+  3. Otherwise a "reviewer" account with a random password is generated and saved to
      demo_accounts.local.toml so you can hand them out.
 
 Output: `.streamlit/secrets.toml` (gitignored) gets an [auth.users] table of
@@ -30,7 +30,7 @@ from runway.auth import hash_password  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 ACCOUNTS_FILE = ROOT / "demo_accounts.local.toml"
 SECRETS_FILE = ROOT / ".streamlit" / "secrets.toml"
-DEFAULT_USERS = ("lecturer", "reviewer", "demo")
+DEFAULT_USERS = ("reviewer",)
 
 
 def random_password(length: int = 14) -> str:

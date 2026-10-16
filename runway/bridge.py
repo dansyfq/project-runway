@@ -1,7 +1,9 @@
 """Messages between the Runway interface (runway_game/index.html) and Python.
 
 The interface sends one message at a time: {"id", "type", "payload"}. `handle` returns the reply
-value; the host sends it back keyed by id. Sign-in, the AI and the documents stay server-side.
+value; the host sends it back keyed by id. Everyone can use Runway as a guest (the "demo" view);
+logging in gives the reviewer view (full About Us and How it works). Passwords, the AI and the
+documents stay server-side.
 """
 
 from __future__ import annotations
@@ -15,7 +17,6 @@ from runway.rag import Chunk, Retriever
 
 MAX_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
-FULL_CONTENT_USERS = {"reviewer", "lecturer"}  # everyone else sees the short About and How it works
 NUMBERS_NOTE = "Numbers from Runway's calculator, not the AI."
 # The facts the interface's flatFacts() sends; the explanation template needs the first five.
 REQUIRED_FACTS = {"Remaining lease (years)", "Youngest buyer is this old when lease ends", "Years short of age 95",
@@ -26,10 +27,6 @@ WHY_QUERY = {
     True: "lease covers youngest buyer to age 95 CPF up to valuation limit",
     False: "remaining lease does not cover youngest buyer to age 95 pro-rated CPF usage valuation limit loan-to-value",
 }
-
-
-def role_for(user: str) -> str:
-    return "full" if user in FULL_CONTENT_USERS else "brief"
 
 
 def source_view(chunks: list[Chunk]) -> list[dict]:
@@ -58,27 +55,24 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
             return {"ok": False, "error": "Too many attempts. Wait a minute and try again."}
         user = str(payload.get("u", "")).strip().lower()
         if check_login(user, str(payload.get("p", "")), users):
-            state.update(user=user, role=role_for(user), attempts=0, data_sent=False)
-            return {"ok": True}
+            state.update(user=user, role="full", attempts=0)
+            return {"ok": True, "user": user, "role": "full"}
         state["attempts"] = state.get("attempts", 0) + 1
         if state["attempts"] >= MAX_ATTEMPTS:
             state.update(locked_until=time.time() + LOCKOUT_SECONDS, attempts=0)
         return {"ok": False, "error": "That username and password don't match."}
 
     if kind == "logout":
-        for key in ("user", "role", "data_sent"):
-            state.pop(key, None)
+        state.pop("user", None)
+        state["role"] = "brief"
         state.get("replies", []).clear()  # in place: the host appends this reply to the same list
-        return {"ok": True}
-
-    if not state.get("user"):  # everything below needs a signed-in user
-        return {"ok": False, "error": "signed out"}
+        return {"ok": True, "role": "brief"}
 
     if kind == "booted":
         state["data_sent"] = True
         return {"ok": True}
     if kind == "need_data":
-        state["data_sent"] = False
+        state.update(want_data=True, data_sent=False)
         return {"ok": True}
 
     if kind == "ask":
