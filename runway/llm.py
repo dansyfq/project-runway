@@ -70,6 +70,9 @@ Rules you must follow:
 7. Keep answers short: 2 to 6 sentences, or a short list. Use simple words; define CPF terms the first time.
 8. Some passages are from 2019 (when the HDB loan limit was 90%). Current HDB rules use 75%. Prefer the most recent figure and say which year applies if they differ."""
 
+SUMMARY_SYSTEM = """Sum up this chat about HDB resale rules in 3 to 5 short bullet points, in plain English.
+Use only what the chat says. Do not add new figures or advice."""
+
 EXPLAIN_SYSTEM = """You explain one HDB buyer's computed result in plain English.
 
 Rules:
@@ -183,6 +186,19 @@ class LLM:
             return template_explanation(facts), False
         return text, True
 
+    def summarise(self, history: list[dict]) -> str:
+        """Short recap of the chat. Without the AI, list the questions asked."""
+        questions = [t["content"] for t in history if t["role"] == "user"]
+        if not questions:
+            return "Nothing to sum up yet."
+        if self.available:
+            transcript = "\n".join(f"{t['role'].upper()}: {t['content']}" for t in history[-12:])
+            try:
+                return self._chat(SUMMARY_SYSTEM, [{"role": "user", "content": transcript}], temperature=0.0)
+            except Exception as exc:
+                print(f"[runway] summary call failed, listing questions: {type(exc).__name__}: {exc}")
+        return "You asked about:\n" + "\n".join(f"- {q}" for q in questions)
+
 
 def offline_answer(sources: list[Chunk]) -> str:
     if not sources:
@@ -219,6 +235,6 @@ def template_explanation(facts: dict[str, str]) -> str:
             "instead of the full 75%, so the shortfall bites twice."
         )
     if "Lease premium by town" in facts:
-        lines.append(f"Across your towns, each extra year of lease adds roughly: {facts['Lease premium by town']}.")
+        lines.append(f"Each extra year of lease adds roughly: {facts['Lease premium by town']}.")
     lines.append("Confirm your own figures with your HFE letter and CPF Board's housing usage calculator.")
     return " ".join(lines)
