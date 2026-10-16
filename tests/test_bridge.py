@@ -80,7 +80,7 @@ def test_ask_offline_returns_official_passages(bot, index):
     reply = send("ask", {}, bot, index, q="How long is the HFE letter valid?", history=[])
     assert reply["offline"] is True and reply["sources"]
     assert all(s["url"].startswith("https://") for s in reply["sources"])
-    assert reply["note"] == "The AI explainer is offline, so here are the official passages."
+    assert reply["note"] == "The AI explainer is offline, so here are the official pages."
 
 
 def test_fallback_text_does_not_contradict_the_note(bot, index, monkeypatch):

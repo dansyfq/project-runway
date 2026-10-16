@@ -958,10 +958,8 @@ details.more summary{font:600 .9rem var(--ui);color:var(--rust);cursor:pointer;m
 .msg.bot .who{font:600 .72rem var(--ui);color:var(--rust);text-transform:uppercase;letter-spacing:.12em}
 .msg.bot ul{margin:0;padding-left:20px}
 .msg.warn{background:var(--part-soft)}
-.src{font-family:var(--ui)}
-.src summary{font:600 .85rem var(--ui);color:var(--rust);cursor:pointer;min-height:40px;display:flex;align-items:center}
-.src .s1{border-left:3px solid var(--rust);padding:6px 10px;background:var(--white);border-radius:0 8px 8px 0;font-size:.82rem;margin-top:6px}
-.src .s1 b{display:block;font-weight:600;color:var(--ink)}
+.src{font:.82rem/1.5 var(--ui);display:flex;flex-direction:column;gap:2px;margin-top:4px}
+.src a,.src span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .composer{position:sticky;bottom:0;background:var(--white);padding:10px 16px 12px;border-top:1px solid var(--sand);display:flex;gap:8px}
 .composer .inp{flex:1;min-height:52px}
 .composer .btn{min-height:52px;flex:none}
@@ -1302,7 +1300,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
     <!-- ASK -->
     <section class="screen" id="scrAsk" hidden>
       <div class="pad" style="flex:1">
-        <div class="scr-h"><h1>Ask Runway</h1><p class="ui" style="font-size:.9rem">Speak or type. Answers come from CPF, HDB and MND documents.</p></div>
+        <div class="scr-h"><h1>Ask Runway</h1><p class="ui" style="font-size:.9rem">Answers come from CPF, HDB and MND.</p></div>
         <div class="voicebar" data-st="Azure Speech en-SG voice"><label><input type="checkbox" id="autoRead"> Read answers aloud</label><span id="voiceName">Checking voices…</span></div>
         <div class="upcard" data-st="st.file_uploader → extract → recommend">
           <b class="ui" style="font-size:1rem;color:var(--ink)">Have a document? I can suggest towns.</b>
@@ -1800,9 +1798,37 @@ function renderList(){
 
 /* ---------- Ask Runway ---------- */
 const SUGG=['Can I still use CPF for an old flat?','Is my HDB loan cut too?','How long can my loan be?','Why do short leases cost more in Clementi than Yishun?'];
-function srcHtml(src, open){
+// Follow-up questions, picked by the words in the latest question and answer (no AI needed).
+const FOLLOW=[
+  [/cpf|valuation|ordinary account/, 'How much of my CPF can I use for this flat?'],
+  [/cpf|valuation|pro-rat/, 'What is the Valuation Limit?'],
+  [/95|lease|youngest/, 'How many years of lease do I need for full CPF use?'],
+  [/partner|youngest|two buyers|co-owner/, 'What if my partner is the younger buyer?'],
+  [/20 years|20-year|minimum|old flat/, 'What does the 20-year minimum lease mean?'],
+  [/loan|ltv|75%|loan-to-value/, 'Is my HDB loan cut too?'],
+  [/loan|tenure|65|repay/, 'How long can my loan be?'],
+  [/loan|bank/, 'Should I compare an HDB loan with a bank loan?'],
+  [/cash|downpayment|down payment|pay/, 'How much cash do I need upfront?'],
+  [/grant|enhanced|ehg|first-timer/, 'Which CPF housing grants can I get?'],
+  [/option|otp|resale|process|apply/, 'What are the steps to buy a resale flat?'],
+  [/sell|refund|accrued|interest/, 'What happens to my CPF when I sell the flat?'],
+  [/town|premium|price|cost|clementi|yishun/, 'Why do short leases cost more in some towns?'],
+  [/town|mature|estate/, 'Which towns have longer leases left?'],
+  [/age|older|55|retire/, 'Can I use CPF after age 55?'],
+  [/income|ceiling|eligib/, 'Am I eligible for an HDB loan?']];
+function suggestions(){
+  const asked = new Set(S.chat.filter(m=>m.me).map(m=>plain(m.html).toLowerCase()));
+  const last = S.chat.filter(m=>!m.typing).slice(-2).map(m=>plain(m.html)).join(' ').toLowerCase();
+  const fresh = q => !asked.has(q.toLowerCase());
+  const hits = last ? FOLLOW.filter(([re,q])=>re.test(last) && fresh(q)).map(([,q])=>q) : [];
+  return [...new Set(hits.concat(SUGG.filter(fresh), FOLLOW.map(([,q])=>q).filter(fresh)))].slice(0,4);
+}
+function srcHtml(src){
   if(!src || !src.length) return '';
-  return `<details class="src"${open?' open':''}><summary>Where this comes from (${src.length})</summary>${src.map((s,i)=>`<div class="s1"><b>[${i+1}] ${esc(s.publisher)} · ${esc(s.title)}</b>${s.heading?esc(s.heading)+'. ':''}${esc(s.text)}${s.url?` <a href="${esc(s.url)}" target="_blank" rel="noopener">Open</a>`:''}</div>`).join('')}</details>`;
+  const docs = new Map();  // one line per document, keeping the [n] numbers the answer cites
+  src.forEach((s,i)=>{ const k = s.url || s.title; if(!docs.has(k)) docs.set(k, {s, n:[]}); docs.get(k).n.push(i+1); });
+  return `<div class="src">${[...docs.values()].map(({s,n})=>{ const t = `${n.map(x=>`[${x}]`).join('')} ${esc(s.publisher)} · ${esc(s.title)}`;
+    return s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.title)}">${t}</a>` : `<span>${t}</span>`; }).join('')}</div>`;
 }
 function md(text){
   const lines = esc(text||'').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').split(/\n/);
@@ -1846,14 +1872,15 @@ const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wid
 const INTRO='<p>Hello. Ask me about using CPF, HDB loans, or lease. You can speak or type. I answer from official documents.</p>';
 function renderChat(){
   const all=[{bot:true,html:INTRO}].concat(S.chat);
-  $('#chat').innerHTML = all.map((m,i)=>m.me?`<div class="msg me">${m.html}</div>`:`<div class="msg bot ${m.warn?'warn':''}"><span class="who">Runway</span>${m.html}${m.src?srcHtml(m.src,m.open):''}<button type="button" class="speakbtn" data-say="${i}" aria-pressed="false">${SPK}Listen</button></div>`).join('');
+  $('#chat').innerHTML = all.map((m,i)=>m.me?`<div class="msg me">${m.html}</div>`:`<div class="msg bot ${m.warn?'warn':''}"><span class="who">Runway</span>${m.html}${m.src?srcHtml(m.src):''}<button type="button" class="speakbtn" data-say="${i}" aria-pressed="false">${SPK}Listen</button></div>`).join('');
   $$('[data-say]').forEach(b=>b.onclick=()=>{const m=all[+b.dataset.say];if(b.getAttribute('aria-pressed')==='true'){stopSpeak();return;}speak(plain(m.html),b);});
   const hasSum=S.chat.some(m=>m.me);
-  $('#sugg').innerHTML = SUGG.map(s=>`<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('') + (hasSum?`<button class="chip" type="button" id="sumBtn" data-st="summarise chain">Sum up this chat</button>`:'');
+  $('#sugg').innerHTML = suggestions().map(s=>`<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('') + (hasSum?`<button class="chip" type="button" id="sumBtn" data-st="summarise chain">Sum up this chat</button>`:'');
   $$('#sugg [data-q]').forEach(c=>c.onclick=()=>ask(c.dataset.q));
   const sb=$('#sumBtn'); if(sb) sb.onclick=async()=>{sb.disabled=true; try{const r=await RW.send('summary',{history:history(40)}); pushBot({html:'<p><b>In short:</b></p>'+md(r.text)});}catch(e){sb.disabled=false;}};
   const sc=$('#scrAsk'); requestAnimationFrame(()=>sc.scrollTop=sc.scrollHeight);
 }
+$('#autoRead').onchange=e=>{ if(!e.target.checked){stopSpeak();return;} const btns=$$('[data-say]'); if(btns.length) btns[btns.length-1].click(); };
 function pushBot(b){S.chat.push(b);renderChat();$('#chatLive').textContent=plain(b.html);if($('#autoRead').checked){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1]);}}
 function plain(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.small').forEach(x=>x.remove());return d.textContent.replace(/\s+/g,' ').trim();}
 
@@ -1971,7 +1998,8 @@ function speak(text,btn){
   u.rate=.92;
   if(btn){speakingBtn=btn;btn.setAttribute('aria-pressed','true');btn.lastChild.textContent='Stop';}
   u.onend=u.onerror=()=>{if(speakingBtn===btn)stopSpeak();};
-  TTS.speak(u);
+  window._utter=u;  // Chrome drops utterances it garbage-collects mid-speech
+  setTimeout(()=>TTS.speak(u),60);  // Chrome silently skips a speak() right after cancel()
 }
 
 /* ---------- voice: speech to text (en-SG) ---------- */
