@@ -25,6 +25,8 @@ DECLINE_INJECTION = (
     "I can only answer questions about HDB resale rules, CPF usage and lease, using the official documents "
     "in my library. I can't change how I work."
 )
+DECLINE_PERSONAL = "Please remove your NRIC or phone number. Runway never needs them."
+PERSONAL_PATTERNS = [r"\b[stfgm]\d{7}[a-z]\b", r"\b[689]\d{7}\b"]
 DECLINE_OFF_TOPIC = (
     "I only cover buying an HDB resale flat: CPF usage, the lease-to-age-95 rule, HDB loans, grants and "
     "the resale process. Try asking about one of those."
@@ -85,12 +87,14 @@ Rules:
 class Answer:
     text: str
     sources: list[Chunk]
-    blocked: str | None = None  # "advice", "injection" or "off_topic" when declined before the LLM
+    blocked: str | None = None  # "personal", "advice", "injection" or "off_topic": declined before the LLM
     error: str | None = None  # set when the AI call failed and we fell back to showing passages
 
 
 def screen_question(question: str) -> str | None:
     q = question.lower()
+    if any(re.search(p, q) for p in PERSONAL_PATTERNS):
+        return "personal"
     if any(re.search(p, q) for p in INJECTION_PATTERNS):
         return "injection"
     if any(re.search(p, q) for p in ADVICE_PATTERNS):
@@ -102,7 +106,8 @@ def screen_question(question: str) -> str | None:
 
 
 def decline_message(reason: str) -> str:
-    return {"advice": DECLINE_ADVICE, "injection": DECLINE_INJECTION}.get(reason, DECLINE_OFF_TOPIC)
+    return {"advice": DECLINE_ADVICE, "injection": DECLINE_INJECTION, "personal": DECLINE_PERSONAL}.get(
+        reason, DECLINE_OFF_TOPIC)
 
 
 NUMBER_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
