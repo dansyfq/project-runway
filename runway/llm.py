@@ -232,7 +232,7 @@ def template_explanation(facts: dict[str, str]) -> str:
     if facts.get("Lease covers youngest buyer to age 95") == "yes":
         lines.append(
             f"The flat's {facts['Remaining lease (years)']} years of lease lasts until your youngest buyer is "
-            f"{facts['Youngest buyer is this old when lease ends']}, which is past 95, so CPF can be used up to "
+            f"{facts['Youngest buyer is this old when lease ends']}, so it covers them to age 95 and CPF can be used up to "
             "the full Valuation Limit (the lower of the price and HDB's valuation)."
         )
     elif facts.get("CPF can be used") == "no":

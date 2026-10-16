@@ -159,3 +159,10 @@ def test_answer_rejects_figures_not_in_passages_or_question():
     assert computed.error == llm_mod.INVENTED_FIGURE and computed.text == llm_mod.offline_answer([SOURCE])
     quoted = fake_llm("Use is pro-rated from 75% [1].").answer("What is the HDB loan limit?", [SOURCE])
     assert quoted.error is None and quoted.text == "Use is pro-rated from 75% [1]."
+
+
+def test_template_reads_right_when_lease_ends_exactly_at_95():
+    facts = {**FACTS, "Lease covers youngest buyer to age 95": "yes", "Remaining lease (years)": "65",
+             "Youngest buyer is this old when lease ends": "95"}
+    text = template_explanation(facts)
+    assert "is 95, so it covers them to age 95" in text and "past 95" not in text
