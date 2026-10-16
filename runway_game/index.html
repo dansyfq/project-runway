@@ -1078,7 +1078,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
 .lhero .ph{position:absolute;inset:-4%;will-change:transform;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
 .lhero .ph img{width:100%;height:100%;object-fit:cover;object-position:70% 45%;display:block;animation:rwKen 28s ease-in-out infinite alternate;filter:saturate(.92) contrast(1.02);opacity:0;transition:opacity 1.2s}
 .lhero .wash{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(246,243,238,.96) 0%,rgba(246,243,238,.86) 34%,rgba(246,243,238,.25) 62%,rgba(246,243,238,0) 80%),linear-gradient(180deg,rgba(246,243,238,.35) 0%,rgba(255,255,255,0) 30%,rgba(255,255,255,0) 78%,#fff 100%)}
-.lhero .credit{position:absolute;right:16px;bottom:14px;z-index:5;font:400 11px var(--ui);color:rgba(255,255,255,.9);text-decoration:none;background:rgba(17,17,17,.35);padding:4px 8px;border-radius:3px}
+#scrLanding .lhero .credit{position:absolute;right:16px;bottom:14px;z-index:5;font:400 11px var(--ui);color:#fff;text-decoration:none;background:rgba(17,17,17,.7);padding:4px 8px;border-radius:3px}
 .lwrap{position:relative;z-index:4;width:100%;max-width:1280px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(20px,4vw,56px)}
 .lhero .lwrap{display:flex;flex-direction:column;gap:28px}
 .leyebrow{display:flex;align-items:center;gap:12px;font:600 12px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:#7A2E1D}
@@ -1204,19 +1204,19 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
           <p class="body">For an HDB buyer, the lease is the runway. Since 2019, how much CPF you can use depends on one question: will the flat's lease last until the youngest buyer turns 95? Most buyers only find out after they have paid the option fee.</p></div>
         <div class="lcard reveal" style="transition-delay:.15s">
           <div class="leyebrow" style="color:#3A3A3A">One flat, two buyers</div>
-          <div class="lbuyers"><div><small>Youngest buyer</small><b>35</b><span>needs 60 years of lease. This 58-year flat is 2 short.</span></div>
-            <div class="alt"><small>Youngest buyer</small><b>25</b><span>needs 70 years. The same flat is 12 short, and CPF use is cut.</span></div></div>
+          <div class="lbuyers"><div><small>Youngest buyer</small><b>35</b><span>needs 60 years of lease. This 62-year flat covers it, with 2 to spare.</span></div>
+            <div class="alt"><small>Youngest buyer</small><b>25</b><span>needs 70 years. The same flat is 8 short, and CPF use is cut.</span></div></div>
           <p style="margin:0;font:italic 400 17px/1.5 var(--serif);border-top:1px solid #D9D4CC;padding-top:18px">The same flat can be fully financeable for one person and need extra cash from another, purely because of age.</p>
         </div>
       </div>
       <div class="lwrap lgrid" style="padding-top:0">
         <div class="ltown reveal"><img loading="lazy" alt="HDB flats along Woodlands Avenue 4" src="https://commons.wikimedia.org/wiki/Special:FilePath/HDB_flats_along_Woodlands_Avenue_4,_Singapore.jpg?width=1400">
           <div class="cap"><b>Woodlands · newer estate</b><span>75 – 85 years of lease</span></div>
-          <p>Longer leases, so the age-95 test rarely bites. Prices here move little with lease, which is why Singapore-wide averages hide the pattern.</p>
+          <p>Longer leases, so the age-95 test rarely bites. Each extra year of lease adds about 0.9% to the price per square metre, well below the mature towns.</p>
           <small>Woodlands Ave 4 · Slivester · CC BY-SA 2.5 · Wikimedia Commons</small></div>
         <div class="ltown reveal" style="transition-delay:.15s"><img loading="lazy" alt="View from the tallest HDB flat in Toa Payoh" src="https://commons.wikimedia.org/wiki/Special:FilePath/View_from_the_tallest_HDB_flat_in_Singapore.jpg?width=1400">
           <div class="cap"><b style="color:#7A2E1D">Toa Payoh · mature town</b><span style="color:#7A2E1D">55 – 60 years of lease</span></div>
-          <p>Central, well-loved and running short. Every missing year of lease knocks about 1.5% off the price per square metre, three times what it does in Yishun.</p>
+          <p>Central, well-loved and running short. Every missing year of lease knocks about 1.5% off the price per square metre, nearly three times what it does in Yishun.</p>
           <small>Toa Payoh · Wikimedia Commons · CC BY-SA 2.0</small></div>
       </div></div>
 
@@ -1242,7 +1242,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
         <div class="col reveal" style="position:sticky;top:96px"><div class="leyebrow">03 · Lease by town</div>
           <h2>A shorter lease costs three times more in some towns.</h2>
           <p class="body">Across Singapore, price per square metre barely moves with lease. That is an illusion, because long leases sit in new towns. Compare within a town and the pattern is clear.</p>
-          <div style="font:11.5px/1.5 var(--ui);color:#3A3A3A">4-room resale flats sold from 2024. A market pattern, not a guarantee.</div></div>
+          <div style="font:11.5px/1.5 var(--ui);color:#3A3A3A">Resale flats sold Jan 2024 – Sep 2026, compared within each town and flat type. A market pattern, not a guarantee.</div></div>
         <div class="ltable reveal" style="transition-delay:.15s"><div class="hd"><span>Town</span><span>Per extra year of lease</span></div><div id="lTownRows"></div>
           <div style="padding-top:18px;font:italic 400 16px/1.5 var(--serif)" id="lTownNote"></div></div>
       </div></div>
@@ -1331,7 +1331,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
           <input type="file" id="upDoc" accept=".pdf,.txt,.md,.text" hidden>
           <span class="redact"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Names, NRIC and phone numbers are removed before anything is read.</span>
         </div>
-        <div class="chat" id="chat" data-st="st.chat_message"></div>
+        <div class="chat" id="chat" data-st="st.chat_message"></div><p id="chatLive" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)"></p>
         <div class="chips" id="sugg" data-st="st.pills"></div>
       </div>
       <form class="composer" id="askForm" data-st="st.audio_input + st.chat_input">
@@ -1366,12 +1366,13 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
         <p class="small" style="margin:0">For reviewers. Everyone else can use Runway without an account.</p>
         <label class="field"><span>Username</span><input class="inp" id="u" autocomplete="username" autocapitalize="none" required></label>
         <label class="field"><span>Password</span><input class="inp" id="pw" type="password" autocomplete="current-password" required></label>
-        <p class="err" id="loginErr" hidden>That username and password don't match.</p>
+        <p class="err" id="loginErr" role="alert" hidden>That username and password don't match.</p>
         <button class="btn primary" type="submit" id="loginBtn">Log in</button>
       </form>
     </div>
     <div id="sheetHost"></div>
-    <div id="toastHost"></div>
+    <div id="toastHost" role="status"></div>
+    <div id="rwLoading" role="status" hidden style="position:fixed;left:16px;right:16px;bottom:24px;z-index:90;max-width:420px;margin:0 auto;background:#111;color:#fff;border-radius:14px;padding:14px 18px;font:600 15px/1.4 var(--ui);text-align:center">Loading the map and recent sales…</div>
   </div>
 
   
@@ -1399,15 +1400,20 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
     err ? m.reject(err) : m.resolve(value); pump();
   }
   RW.me = {user: null, role: 'brief'};
-  RW.enter = (target, arg) => { if(window.RWAPP) RWAPP.enter(target, arg); else RW.pendingEnter = {target, arg}; };
+  // The map data (~3 MB) is fetched on the first click into the app, not for landing-page readers.
+  RW.enter = (target, arg) => {
+    if(window.RWAPP) return RWAPP.enter(target, arg);
+    RW.pendingEnter = {target, arg};
+    const box = document.getElementById('rwLoading'); box.textContent = 'Loading the map and recent sales…'; box.hidden = false;
+    if(!RW.asked){ RW.asked = true; RW.send('need_data').catch(() => { RW.asked = false; box.textContent = 'Runway did not respond. Tap again to retry.'; }); }
+  };
   window.addEventListener('message', ev => {
     const d = ev.data; if(!d || d.type !== 'streamlit:render') return;
     const a = d.args || {};
     (a.replies || []).forEach(r => finish(r.id, r.value));
     if(a.me) RW.me = a.me;
     if(!RW.booted){
-      if(a.data){ RW.booted = true; startRunway(a.data.M, a.data.PHOTOS, a.data.F, RW.me); RW.send('booted'); loginButtons(); }
-      else if(!RW.asked){ RW.asked = true; RW.send('need_data'); }
+      if(a.data){ RW.booted = true; document.getElementById('rwLoading').hidden = true; startRunway(a.data.M, a.data.PHOTOS, a.data.F, RW.me); RW.send('booted'); loginButtons(); }
     }
     setHeight();
   });
@@ -1436,6 +1442,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
   });
   RW.logout = () => RW.send('logout').then(() => { RW.me = {user: null, role: 'brief'}; loginButtons(); if(window.RWAPP) RWAPP.setUser(null, 'brief'); });
   window.addEventListener('resize', setHeight);
+  if(window.parent === window) document.body.insertAdjacentHTML('afterbegin', '<a href="/" style="position:fixed;z-index:99;inset:12px 12px auto;background:#111;color:#fff;padding:12px 16px;border-radius:10px;font:600 15px system-ui;text-align:center">This page only works inside the app. Open Runway</a>');
   post('streamlit:componentReady', {apiVersion: 1});
   setHeight();
 })();
@@ -1453,9 +1460,9 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
     cut: {q: 'How much is my CPF use cut by?', a: 'When the lease does not cover the youngest buyer to 95, the Valuation Limit is pro-rated. CPF Board\'s example: two 25-year-olds buying a $550,000 flat with 65 years left can use up to $495,000. The HDB loan limit, 75% today, is pro-rated the same way.', doc: 'MND · Annex A, 9 May 2019', quote: 'Valuation Limit pro-rated according to the extent that the remaining lease can cover the youngest buyer using CPF to the age of 95.'},
     twenty: {q: 'What does the 20-year minimum lease mean?', a: 'The remaining lease at the point of purchase, which is the flat application date for HDB flats, must be more than 20 years, whatever your age. Below that, no CPF and no HDB loan.', doc: 'MND · Annex A, 9 May 2019', quote: 'Remaining lease at the point of purchase is more than 20 years. For HDB flats, the point of purchase refers to the flat application date.'}
   };
-  const TOWNS = [['Yishun', .51], ['Hougang', .65], ['Choa Chu Kang / Bukit Batok', .84], ['Tampines', .92], ['Bedok / Bukit Merah', 1.27], ['Queenstown', 1.40], ['Ang Mo Kio', 1.49], ['Toa Payoh', 1.54], ['Clementi', 1.62]];
+  const TOWNS = [['Yishun', .54], ['Hougang', .68], ['Choa Chu Kang', .79], ['Woodlands', .91], ['Tampines', .93], ['Bedok', 1.19], ['Queenstown', 1.40], ['Ang Mo Kio', 1.43], ['Toa Payoh', 1.52], ['Clementi', 1.55]];  // same figures as the map's town rows
   function renderRule(){
-    const need = 95 - L.age, gap = L.lease - need, ok = gap >= 0, share = landingShare(L.age, L.lease), span = Math.max(need, L.lease);
+    const loanTxt = L.age >= 65 ? 'An HDB loan is not possible from age 65, because it must be repaid by then.' : '', need = 95 - L.age, gap = L.lease - need, ok = gap >= 0, share = landingShare(L.age, L.lease), span = Math.max(need, L.lease);
     $('#lLease').textContent = L.lease + ' yrs'; $('#lAge').textContent = L.age;
     const b = $('#lBadge'); b.textContent = L.lease <= 20 ? 'No CPF' : ok ? 'CPF up to Valuation Limit' : 'CPF pro-rated';
     b.style.background = ok ? '#fff' : '#7A2E1D'; b.style.color = ok ? '#111' : '#fff';
@@ -1464,8 +1471,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
     $('#lNeed').style.left = Math.min(99.5, need / span * 100) + '%';
     $('#lCovers').textContent = `Lease covers ${L.lease} years`; $('#lNeeds').textContent = `Needs ${need} to reach 95`;
     $('#lBody').textContent = L.lease <= 20 ? 'The flat would have to be paid in cash: no CPF and no HDB loan.'
-      : ok ? `This flat has ${L.lease} years left and needs ${need} to reach 95. It does, with ${gap} to spare, so CPF can be used up to the Valuation Limit and the HDB loan up to 75%.`
-      : `It needs ${need} years and falls ${-gap} short, so you can use about ${Math.round(share * 100)}% of the Valuation Limit: (${L.lease} − 20) ÷ (${need} − 20). The 75% HDB loan limit is cut the same way, to about ${Math.round(share * 75)}%.`;
+      : ok ? `This flat has ${L.lease} years left and needs ${need} to reach 95. It does, with ${gap} to spare, so CPF can be used up to the Valuation Limit${loanTxt ? '. ' + loanTxt : ' and the HDB loan up to 75%.'}`
+      : `It needs ${need} years and falls ${-gap} short, so you can use about ${Math.round(share * 100)}% of the Valuation Limit: (${L.lease} − 20) ÷ (${need} − 20). ${loanTxt || `The 75% HDB loan limit is cut the same way, to about ${Math.round(share * 75)}%.`}`;
   }
   $$('[data-rule]').forEach(btn => btn.onclick = () => {
     const d = +btn.dataset.d;
@@ -1473,7 +1480,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
     renderRule();
   });
   function renderTowns(){
-    $('#lTownRows').innerHTML = TOWNS.map(([n, v]) => { const on = n === L.hover; return `<div class="tr" data-town="${n}"><span class="nm" style="color:${on ? '#7A2E1D' : '#111'}">${n}</span><span class="bar"><i style="width:${Math.round(v / 1.62 * 100)}%;background:${on ? '#7A2E1D' : '#D9D4CC'}"></i></span><span class="pc" style="color:${on ? '#7A2E1D' : '#111'}">${v.toFixed(2)}%</span></div>`; }).join('');
+    $('#lTownRows').innerHTML = TOWNS.map(([n, v]) => { const on = n === L.hover; return `<div class="tr" data-town="${n}"><span class="nm" style="color:${on ? '#7A2E1D' : '#111'}">${n}</span><span class="bar"><i style="width:${Math.round(v / TOWNS[TOWNS.length - 1][1] * 100)}%;background:${on ? '#7A2E1D' : '#D9D4CC'}"></i></span><span class="pc" style="color:${on ? '#7A2E1D' : '#111'}">${v.toFixed(2)}%</span></div>`; }).join('');
     const t = TOWNS.find(x => x[0] === L.hover);
     $('#lTownNote').textContent = `In ${t[0]}, a 58-year flat trades about ${Math.round((1 - Math.pow(1 + t[1] / 100, -12)) * 100)}% per sqm below a comparable 70-year one.`;
     $$('#lTownRows .tr').forEach(r => r.onmouseenter = () => { if(L.hover !== r.dataset.town){ L.hover = r.dataset.town; renderTowns(); } });
@@ -1526,7 +1533,7 @@ const ICON={
   plane:'<svg viewBox="0 0 32 32"><path d="M30 16c0-1-1-1.6-2-1.6h-7.4L13.4 3h-3l3.6 11.4H7.4L5 11H2.5l1.8 5-1.8 5H5l2.4-3.4H14L10.4 29h3l7.2-11.4H28c1 0 2-.6 2-1.6z" fill="#F2C230" stroke="#111" stroke-width="1"/></svg>'
 };
 
-const S={layers:{sales:true,mrt:true,bus:true,hawker:true,clinic:true,mall:true,school:false,cc:false},match:null,role:null,onb:0,tab:'map',town:'CLEMENTI',age:30,avg:30,oa:120000,oaSet:true,pins:[],enc:null,checked:false,list:[],stamps:new Set(),chat:[],docs:[],sub:null};
+const S={layers:{sales:true,mrt:true,bus:true,hawker:true,clinic:true,mall:true,school:false,cc:false},match:null,role:null,onb:0,tab:'map',town:'CLEMENTI',age:30,avg:30,oa:100000,oaSet:false,pins:[],enc:null,checked:false,list:[],stamps:new Set(),chat:[],docs:[],sub:null};
 
 /* ---------- rule engine (rules.py) ---------- */
 function calc(price, lease){
@@ -1545,11 +1552,14 @@ const VICON = {full:ICON.ok, part:ICON.half, none:ICON.no};
 function vline(r){
   const yrs = Math.floor(r.lease);
   if(r.status==='full') return `This flat has ${yrs} years left. Your youngest buyer is ${S.age}, so the lease lasts past age 95.`;
-  if(r.status==='part') return `This flat has ${yrs} years left. Your youngest buyer is ${S.age}, so the lease runs out ${Math.round(95-r.end)} years before age 95 and your CPF use is reduced.`;
+  if(r.status==='part') return `This flat has ${yrs} years left. Your youngest buyer is ${S.age}, so the lease runs out ${95-S.age-yrs} year${95-S.age-yrs===1?'':'s'} before age 95 and your CPF use is reduced.`;
   return `This flat has ${yrs} years left. CPF and HDB loans cannot be used when 20 years or less remain.`;
 }
+// The average follows the youngest buyer unless the user set it (Your details or a document); it can't be below the youngest.
+const syncAvg=()=>{S.avg=Math.max(S.avgSet||0,S.age);};
+const needYrs=()=>95-S.age>20?`${95-S.age} years`:'more than 20 years';
 function meter(t){
-  if(t.low) return {n:0,txt:'Not enough sales here to say'};
+  if(t.low) return {n:0,txt:'Too few sales to measure the lease effect here'};
   const n = t.pct>=1.3?3:t.pct>=0.8?2:1;
   const d = Math.round((1-Math.pow(1+t.pct/100,-10))*100);
   return {n,txt:`10 fewer years of lease ≈ ${d}% lower price here`};
@@ -1575,27 +1585,27 @@ function sub(name){S.sub=name; show('scrSub'); renderSub(); $('#scrSub').scrollT
 const NOTICE = `<p><b>IMPORTANT NOTICE:</b> This web application is a prototype developed for <b>educational purposes only.</b> The information provided here is <b>NOT intended for real-world usage</b> and should not be relied upon for making any decisions, especially those related to financial, legal, or healthcare matters.</p><p><b>Furthermore, please be aware that the LLM may generate inaccurate or incorrect information. You assume full responsibility for how you use any generated output.</b></p><p>Always consult with qualified professionals for accurate and personalised advice.</p>`;
 function dots(i){return `<div class="dots" aria-label="Step ${i} of 3">${[1,2,3].map(k=>`<i class="${k<=i?'on':''}"></i>`).join('')}</div>`;}
 function renderOnb(){
-  const b=$('#onbBody'), i=S.onb;
+  const b=$('#onbBody'), i=S.onb, back=`<button class="back" type="button" id="onbBack">${ICON.back}Back</button>`;
   if(i===1){
-    b.innerHTML = `${dots(1)}<h1>How old is the youngest buyer?</h1><p class="lead">This decides how much lease you need.</p>
+    b.innerHTML = `${back}${dots(1)}<h1>How old is the youngest buyer?</h1><p class="lead">This decides how much lease you need.</p>
       <div class="stepper" data-st="st.number_input"><button type="button" id="aMinus" aria-label="Younger">−</button><output id="aOut">${S.age}</output><button type="button" id="aPlus" aria-label="Older">+</button></div>
       <div class="chips">${[25,30,35,40,50,60].map(a=>`<button type="button" class="chip" data-a="${a}" aria-pressed="${a===S.age}">${a}</button>`).join('')}</div>
       <p class="small" id="aNeed"></p><button class="btn primary" id="nx">Next</button>`;
-    const set=a=>{S.age=Math.max(21,Math.min(85,a));S.avg=Math.max(S.avg,S.age);$('#aOut').textContent=S.age;$$('[data-a]').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.a===S.age));$('#aNeed').textContent=`You need ${95-S.age} years of lease to use CPF fully.`;};
+    const set=a=>{S.age=Math.max(21,Math.min(85,a));syncAvg();$('#aOut').textContent=S.age;$$('[data-a]').forEach(c=>c.setAttribute('aria-pressed',+c.dataset.a===S.age));$('#aNeed').textContent=`You need ${needYrs()} of lease to use CPF fully.`;};
     $('#aMinus').onclick=()=>set(S.age-1); $('#aPlus').onclick=()=>set(S.age+1);
-    $$('[data-a]').forEach(c=>c.onclick=()=>set(+c.dataset.a)); set(S.age); S.avg=S.age;
+    $$('[data-a]').forEach(c=>c.onclick=()=>set(+c.dataset.a)); set(S.age);
   } else if(i===2){
     const opts=[50000,100000,150000,200000,300000];
-    b.innerHTML = `${dots(2)}<h1>About how much CPF do you have?</h1><p class="lead">Ordinary Account, all buyers together. A rough number is fine.</p>
+    b.innerHTML = `${back}${dots(2)}<h1>About how much CPF do you have?</h1><p class="lead">Ordinary Account, all buyers together. A rough number is fine.</p>
       <div class="chips" data-st="st.pills">${opts.map(o=>`<button type="button" class="chip" data-o="${o}" aria-pressed="${S.oaSet&&S.oa===o}">${exact(o)}</button>`).join('')}<button type="button" class="chip" data-o="skip" aria-pressed="${!S.oaSet}">Not sure</button></div>
       <button class="btn primary" id="nx">Next</button>`;
     $$('[data-o]').forEach(c=>c.onclick=()=>{if(c.dataset.o==='skip'){S.oaSet=false;}else{S.oaSet=true;S.oa=+c.dataset.o;} $$('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===c));});
   } else {
-    b.innerHTML = `${dots(3)}<h1>Which town first?</h1><p class="lead">You can change it any time.</p>${townListHtml()}`;
+    b.innerHTML = `${back}${dots(3)}<h1>Which town first?</h1><p class="lead">You can change it any time.</p>${townListHtml()}`;
     bindTownList(t=>{S.town=t; finishOnb();});
-    return;
   }
-  $('#nx').onclick=()=>{S.onb++; renderOnb(); $('#scrOnb').scrollTop=0;};
+  if($('#nx')) $('#nx').onclick=()=>{S.onb++; renderOnb(); $('#scrOnb').scrollTop=0;};
+  $('#onbBack').onclick=()=>{if(S.onb>1){S.onb--; renderOnb();} else show('scrLanding');};
 }
 function finishOnb(){ needFit=true; S.onbDone=true; const a=S.after; S.after=null; if(a) go(a.target,a.arg); else tab('map'); }
 function townListHtml(){
@@ -1682,11 +1692,12 @@ function drawMap(){
     const s=g[0], r=calc(s.price,s.lease), ok=g.some(fits); if(ok&&S.match)nMatch+=g.filter(fits).length;
     const icon=L.divIcon({className:'pinicon',iconSize:[60,52],iconAnchor:[30,17],html:`<div class="pinwrap ${ok?'':'dim'}" style="animation-delay:${Math.min(i*15,600)}ms">${diaSvg(r.status,r.ratio,g.length)}<b>${Math.floor(s.lease)} yrs</b></div>`});
     const mk=L.marker([s.la,s.ln],{icon,keyboard:true,zIndexOffset:ok?1000:0,title:`Block ${s.blk} ${s.st}: ${g.length} sale${g.length>1?'s':''}, ${Math.floor(s.lease)} years left`,riseOnHover:true});
-    mk.on('click',()=>g.length>1?openBlock(g):openEnc(s));
+    const go=()=>g.length>1?openBlock(g):openEnc(s);
+    mk.on('click',go).on('keydown',e=>{if(e.originalEvent.key==='Enter'||e.originalEvent.key===' '){e.originalEvent.preventDefault();go();}}); // Leaflet 1.9 pins are tabbable but ignore Enter
     LY.sales.addLayer(mk);
   });
-  const n=(SALES[S.town]||[]).length;
-  $('#mapHint').textContent = !n?'No sales here in Jul–Sep 2026. Try another town.' : S.match?`${nMatch} of ${n} recent sales match your document. Tap a bright diamond.`:`${n} sales here in Jul–Sep 2026. Drag to look around, tap a diamond.`;
+  const n=(SALES[S.town]||[]).length, nType=(SALES[S.town]||[]).filter(s=>!S.match||!S.match.ft||s.ft===S.match.ft).length;
+  $('#mapHint').textContent = !n?'No sales here in Jul–Sep 2026. Try another town.' : S.match?`${nMatch} of ${nType} recent ${esc(S.match.ft||'')} sales are within ${money(S.match.max)}. Tap a bright diamond.`:`${n} sales here in Jul–Sep 2026. Drag to look around, tap a diamond.`;
 }
 $('#matchChip').onclick=()=>{S.match=null;drawMap();};
 $('#layerChip').onclick=()=>openSheet(`<div class="pad"><h1 style="font-size:1.6rem">What to show on the map</h1><p class="small">Roads, blocks and town lines are always shown. Bus stops appear when you zoom in.</p><div class="layers">${LAYERDEF.map(([k,l,c,svg])=>`<button type="button" class="layer" data-ly="${k}" aria-pressed="${!!S.layers[k]}"><span class="sw" style="background:${c}"><svg viewBox="0 0 24 24">${svg}</svg></span>${l}<span class="tg" aria-hidden="true"></span></button>`).join('')}</div><button class="btn primary" data-closesheet>Done</button></div>`,()=>$$('[data-ly]').forEach(b=>b.onclick=()=>{const k=b.dataset.ly;S.layers[k]=!S.layers[k];b.setAttribute('aria-pressed',S.layers[k]);applyLayers();}));
@@ -1698,16 +1709,25 @@ function openBlock(g){
 $('#chgTown').onclick=()=>openSheet(`<div class="pad"><h1 style="font-size:1.6rem">Choose a town</h1><p class="small">Diamonds show how much lease length changes prices in each town.</p>${townListHtml()}</div>`,()=>bindTownList(t=>{S.town=t;needFit=true;closeSheet();drawMap();}));
 $('#ageChip').onclick=()=>openSheet(ageSheetHtml(),bindAgeSheet);
 function ageSheetHtml(){return `<div class="pad"><h1 style="font-size:1.6rem">Youngest buyer's age</h1><div class="stepper"><button type="button" id="sMinus" aria-label="Younger">−</button><output id="sOut">${S.age}</output><button type="button" id="sPlus" aria-label="Older">+</button></div><p class="small" id="sNeed"></p><button class="btn primary" data-closesheet>Done</button></div>`;}
-function bindAgeSheet(){const set=a=>{S.age=Math.max(21,Math.min(85,a));S.avg=Math.max(S.avg,S.age);$('#sOut').textContent=S.age;$('#sNeed').textContent=`Needs ${95-S.age} years of lease for full CPF.`;S.dirty=true;};$('#sMinus').onclick=()=>set(S.age-1);$('#sPlus').onclick=()=>set(S.age+1);set(S.age);}
+function bindAgeSheet(){const set=a=>{S.age=Math.max(21,Math.min(85,a));syncAvg();$('#sOut').textContent=S.age;$('#sNeed').textContent=`Needs ${needYrs()} of lease for full CPF.`;S.dirty=true;};$('#sMinus').onclick=()=>set(S.age-1);$('#sPlus').onclick=()=>set(S.age+1);set(S.age);}
 
 /* ---------- sheets ---------- */
 function openSheet(html,after){
+  if(!$('#sheetHost .sheet')) S.opener=document.activeElement;
   $('#sheetHost').innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><div class="scrim" data-closesheet></div><div class="panel"><div class="grab"></div><button class="close" type="button" aria-label="Close" data-closesheet>${ICON.close}</button>${html}</div></div>`;
   $$('#sheetHost [data-closesheet]').forEach(b=>b.onclick=closeSheet);
+  const h=$('#sheetHost .panel h1, #sheetHost .panel h2'); if(h){h.id='sheetTitle'; $('#sheetHost .sheet').setAttribute('aria-labelledby','sheetTitle');}
   if(after) after();
   const f=$('#sheetHost .close'); if(f) f.focus({preventScroll:true});
 }
-function closeSheet(){ $('#sheetHost').innerHTML=''; sideProf(); if(S.dirty && S.tab==='map' && !$('#scrMap').hidden){S.dirty=false;drawMap();} }
+document.addEventListener('keydown',e=>{
+  if(!$('#sheetHost .sheet')) return;
+  if(e.key==='Escape') return closeSheet();
+  if(e.key!=='Tab') return;
+  const f=$$('#sheetHost button,#sheetHost a[href],#sheetHost input,#sheetHost select,#sheetHost summary').filter(x=>!x.disabled&&x.offsetParent), a=f[0], z=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus();} else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus();}
+});
+function closeSheet(){ const had=$('#sheetHost .sheet'); $('#sheetHost').innerHTML=''; if(had&&S.opener&&S.opener.isConnected) S.opener.focus({preventScroll:true}); sideProf(); if(S.dirty && S.tab==='map' && !$('#scrMap').hidden){S.dirty=false;drawMap();} }
 
 /* ---------- encounter ---------- */
 function bldgSvg(f){
@@ -1725,7 +1745,7 @@ function openEnc(f){
     </div>
     <div class="pad" style="padding-top:12px" data-st="st.dialog">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span class="price">${exact(f.price)}</span><span class="small">sold ${f.m}</span></div>
-      <div class="leasebar"><div class="lh"><span class="label">Lease left</span><span class="lv">${f.lease.toFixed(0)} years</span></div><div class="hp" role="img" aria-label="${f.lease.toFixed(0)} of 99 years"><i style="width:0" data-w="${lpct}"></i></div><span class="small">Started ${f.lc}. Leases are 99 years.</span></div>
+      <div class="leasebar"><div class="lh"><span class="label">Lease left</span><span class="lv">${Math.floor(f.lease)} years</span></div><div class="hp" role="img" aria-label="${Math.floor(f.lease)} of 99 years"><i style="width:0" data-w="${lpct}"></i></div><span class="small">Started ${f.lc}. Leases are 99 years.</span></div>
       <div id="encResult"><button class="btn primary" id="checkBtn" data-st="st.button → rules.py" style="width:100%">Check for age ${S.age}</button></div>
     </div>`, ()=>{
       requestAnimationFrame(()=>{const i=$('.hp i'); if(i) i.style.width=i.dataset.w+'%';});
@@ -1747,13 +1767,14 @@ function showResult(){
         <span class="t" style="right:0">${r.end<95?'95':Math.floor(r.end)}</span>
       </div>
       <div class="tiles">
-        <div class="tile"><span class="k">CPF you can use</span><span class="v">${r.status==='none'?'$0':'up to '+money(r.cap)}</span><span class="s">${r.status==='full'?'full amount':r.status==='part'?Math.round(r.ratio*100)+'% of the price':'not allowed'}</span></div>
-        <div class="tile"><span class="k">Cash you need</span><span class="v">${r.cashLife>0?'at least '+money(r.cashLife):'$0 extra'}</span><span class="s">${r.cashLife>0?'on top of CPF':'CPF is not cut'}</span></div>
+        <div class="tile"><span class="k">CPF you can use</span><span class="v">${r.status==='none'?'$0':'up to '+money(r.cap)}</span><span class="s">${r.status==='full'?'full amount':r.status==='part'?Math.floor(r.ratio*100)+'% of the price':'not allowed'}</span></div>
+        ${r.status!=='none'&&!r.loan?`<div class="tile"><span class="k">Cash you need</span><span class="v">${S.oaSet?(r.cashNow>0?'about '+money(r.cashNow):'$0 extra'):'No HDB loan'}</span><span class="s">${S.oaSet?'no HDB loan, so CPF and cash pay it all':'pay with CPF and cash'}</span></div>`
+          :`<div class="tile"><span class="k">Cash you need</span><span class="v">${r.cashLife>0?'at least '+money(r.cashLife):'$0 extra'}</span><span class="s">${r.cashLife>0?'on top of CPF':'CPF is not cut'}</span></div>`}
       </div>
       <details class="more"><summary>More numbers</summary>
         <dl class="kv">
           <dt>HDB loan, up to</dt><dd>${r.loan?exact(r.loan):'not available'}</dd>
-          ${r.loan?`<dt>Loan length</dt><dd>${Math.floor(r.tenure)} years</dd><dt>Monthly, about</dt><dd>${exact(r.monthly)}</dd>`:''}
+          ${r.loan?`<dt>Loan length</dt><dd>${+r.tenure.toFixed(1)} years</dd><dt>Monthly, about</dt><dd>${exact(r.monthly)}</dd>`:''}
           ${S.oaSet?`<dt>Cash at the start</dt><dd>${exact(r.cashNow)}</dd>`:''}
         </dl>
         <p class="small" style="margin-top:8px">Simplified. Assumes the price equals the valuation, a 2.6% HDB rate, and no grants. Check with CPF's housing calculator.</p>
@@ -1777,7 +1798,7 @@ function keep(){
   toast(newStamp?`New town stamp: ${TBY[f.town].name}`:'Kept in your shortlist', newStamp);
 }
 function toast(msg,stamp){
-  $('#toastHost').innerHTML=`<div class="toast" role="status">${stamp?`<svg class="st" viewBox="0 0 42 42"><circle cx="21" cy="21" r="18" fill="#F4E7E2" stroke="#7A2E1D" stroke-width="3" stroke-dasharray="4 3"/><path d="M21 9 33 21 21 33 9 21Z" fill="#7A2E1D"/></svg>`:''}<span>${esc(msg)}</span></div>`;
+  $('#toastHost').innerHTML=`<div class="toast">${stamp?`<svg class="st" viewBox="0 0 42 42"><circle cx="21" cy="21" r="18" fill="#F4E7E2" stroke="#7A2E1D" stroke-width="3" stroke-dasharray="4 3"/><path d="M21 9 33 21 21 33 9 21Z" fill="#7A2E1D"/></svg>`:''}<span>${esc(msg)}</span></div>`;
   clearTimeout(toast.t); toast.t=setTimeout(()=>$('#toastHost').innerHTML='',2600);
 }
 
@@ -1798,15 +1819,15 @@ function renderList(){
   $$('[data-li]').forEach(b=>b.onclick=()=>{const f=S.list[+b.dataset.li];if(S.town!==f.town){S.town=f.town;needFit=true;}tab('map');openEnc(f);showResult();});
   const gm=$('[data-gomap]'); if(gm) gm.onclick=()=>tab('map');
   const ex=$('#expBtn'); if(ex) ex.onclick=()=>{
-    const head=['Block','Street','Town','Flat type','Storey','Price','Lease left (years)','Sold','CPF verdict','CPF you can use','Cash on top of CPF'];
-    const rows=S.list.map(f=>{const r=calc(f.price,f.lease);return [f.blk,f.st,TBY[f.town].name,f.ft,f.sr,Math.round(f.price),f.lease.toFixed(1),f.m,VTXT[r.status],Math.round(r.cap),Math.round(r.cashLife)];});
+    const head=['Block','Street','Town','Flat type','Storey','Price','Lease left (years)','Sold','CPF verdict','CPF you can use','Cash on top of CPF','For youngest buyer aged'];
+    const rows=S.list.map(f=>{const r=calc(f.price,f.lease);return [f.blk,f.st,TBY[f.town].name,f.ft,f.sr,Math.round(f.price),f.lease.toFixed(1),f.m,VTXT[r.status],Math.round(r.cap),Math.round(r.cashLife),S.age];});
     const csv=[head].concat(rows).map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='runway_shortlist.csv'; document.body.appendChild(a); a.click(); a.remove();
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'})); a.download='runway_shortlist.csv'; document.body.appendChild(a); a.click(); a.remove();
   };
 }
 
 /* ---------- Ask Runway ---------- */
-const SUGG=['Can I still use CPF for an old flat?','Is my HDB loan cut too?','How long can my loan be?','Why did Clementi cut my CPF more than Yishun?'];
+const SUGG=['Can I still use CPF for an old flat?','Is my HDB loan cut too?','How long can my loan be?','Why do short leases cost more in Clementi than Yishun?'];
 function srcHtml(src, open){
   if(!src || !src.length) return '';
   return `<details class="src"${open?' open':''}><summary>Where this comes from (${src.length})</summary>${src.map((s,i)=>`<div class="s1"><b>[${i+1}] ${esc(s.publisher)} · ${esc(s.title)}</b>${s.heading?esc(s.heading)+'. ':''}${esc(s.text)}${s.url?` <a href="${esc(s.url)}" target="_blank" rel="noopener">Open</a>`:''}</div>`).join('')}</details>`;
@@ -1825,26 +1846,26 @@ function md(text){
 function flatFacts({f, r}){
   const t = TBY[f.town], facts = {
     'Youngest buyer age': String(S.age), 'Remaining lease (years)': String(Math.floor(f.lease)),
-    'Youngest buyer is this old when lease ends': String(Math.floor(r.end)),
+    'Youngest buyer is this old when lease ends': String(S.age + Math.floor(f.lease)),
     'Lease covers youngest buyer to age 95': r.status==='full'?'yes':'no',
-    'Years short of age 95': String(Math.max(0, Math.round(95 - r.end))),
+    'Years short of age 95': String(Math.max(0, 95 - S.age - Math.floor(f.lease))),
     'CPF can be used': r.status==='none'?'no':'yes',
     'CPF usable (% of Valuation Limit)': (r.ratio*100).toFixed(1),
     'HDB loan limit (% of price or value)': (r.ltv*100).toFixed(1), 'Full HDB loan limit (%)': '75'};
   if(!t.low) facts['Lease premium by town'] = `${t.name} ${t.pct.toFixed(2)}% per year`;
   return facts;
 }
-const history = () => S.chat.filter(m=>!m.typing).slice(-7).map(m=>({role:m.me?'user':'assistant', content:plain(m.html)}));
+const history = (n=7) => S.chat.filter(m=>!m.typing&&!m.skip).slice(-n).map(m=>({role:m.me?'user':'assistant', content:plain(m.html)}));
 async function ask(q, ctx){
   const prior = history();
-  S.chat.push({me:true, html:esc(q)});
-  if(/\b[stfgm]\d{7}[a-z]\b/i.test(q) || /\b[689]\d{7}\b/.test(q)){ pushBot({warn:true, html:'<p>Please remove your NRIC or phone number. Runway never needs them.</p>'}); return; }
+  const mine = {me:true, html:esc(q)}; S.chat.push(mine);
+  if(/\b[stfgm]\d{7}[a-z]\b/i.test(q) || /\b[689]\d{3}\s?\d{4}\b/.test(q) || /[\w.+-]+@[\w-]+\.[\w.]+/.test(q)){ mine.html=esc(redact(q).txt); mine.skip=true; /* never keep it: chat history goes to the server */ pushBot({warn:true, skip:true, html:'<p>Please remove your NRIC, phone number or email. Runway never needs them.</p>'}); return; }
   const typing = {typing:true, html:'<p class="small">Checking the official documents…</p>'};
   S.chat.push(typing); renderChat();
   let b;
   try{
     const r = await RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior});
-    b = {html: md(r.text) + (r.note ? `<p class="small">${esc(r.note)}</p>` : ''), src: r.sources, open: !!r.offline, warn: r.blocked === 'personal'};
+    b = {html: md(r.text) + (r.note ? `<p class="small">${esc(r.note)}</p>` : ''), src: r.sources, open: !!r.offline, warn: r.blocked === 'personal', skip: !!r.blocked}; if(r.blocked) mine.skip = true;
   }catch(e){ b = {warn:true, html:'<p>Runway could not reach its documents just now. Try again in a moment.</p>'}; }
   S.chat.splice(S.chat.indexOf(typing), 1);
   pushBot(b);
@@ -1858,10 +1879,10 @@ function renderChat(){
   const hasSum=S.chat.some(m=>m.me);
   $('#sugg').innerHTML = SUGG.map(s=>`<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('') + (hasSum?`<button class="chip" type="button" id="sumBtn" data-st="summarise chain">Sum up this chat</button>`:'');
   $$('#sugg [data-q]').forEach(c=>c.onclick=()=>ask(c.dataset.q));
-  const sb=$('#sumBtn'); if(sb) sb.onclick=async()=>{sb.disabled=true; try{const r=await RW.send('summary',{history:history()}); pushBot({html:'<p><b>In short:</b></p>'+md(r.text)});}catch(e){sb.disabled=false;}};
+  const sb=$('#sumBtn'); if(sb) sb.onclick=async()=>{sb.disabled=true; try{const r=await RW.send('summary',{history:history(40)}); pushBot({html:'<p><b>In short:</b></p>'+md(r.text)});}catch(e){sb.disabled=false;}};
   const sc=$('#scrAsk'); requestAnimationFrame(()=>sc.scrollTop=sc.scrollHeight);
 }
-function pushBot(b){S.chat.push(b);renderChat();if($('#autoRead').checked){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1]);}}
+function pushBot(b){S.chat.push(b);renderChat();$('#chatLive').textContent=plain(b.html);if($('#autoRead').checked){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1]);}}
 function plain(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.small').forEach(x=>x.remove());return d.textContent.replace(/\s+/g,' ').trim();}
 
 /* ---------- document upload → profile → town recommendations ---------- */
@@ -1927,7 +1948,7 @@ function recommend(p){
   const need=95-p.age, out=[];
   TOWNS.forEach(t=>{
     const all=(SALES[t.id]||[]).filter(s=>s.ft===p.ft); if(all.length<3) return;
-    const afford=all.filter(s=>s.price<=p.budget), good=afford.filter(s=>s.lease>=need);
+    const afford=all.filter(s=>s.price<=p.budget), good=afford.filter(s=>s.lease>20&&s.lease>=need);
     const pref=p.towns.includes(t.id);
     out.push({t,n:all.length,afford:afford.length,good:good.length,medP:median(all.map(s=>s.price)),medL:median(all.map(s=>s.lease)),pref,score:good.length/all.length*60+afford.length/all.length*30+(pref?15:0)});
   });
@@ -1936,7 +1957,7 @@ function recommend(p){
 function findTowns(n){
   const box=$(`[data-f="${n}"]`); const v=k=>box.querySelector(`[data-k="${k}"]`).value;
   const p={age:Math.max(21,Math.min(85,+v('age')||S.age)),avg:+v('avg')||+v('age'),budget:+v('budget')||600000,oa:+v('oa')||0,ft:v('ft'),towns:(S.chat[n]&&S.chat[n].doc?S.chat[n].doc.towns:[])};
-  S.age=p.age; S.avg=Math.max(p.avg,p.age); S.oa=p.oa; S.oaSet=true; S.dirty=true;
+  S.age=p.age; S.avgSet=p.avg; syncAvg(); S.oa=p.oa; S.oaSet=true; S.dirty=true;
   const r=recommend(p), top=r.slice(0,3);
   if(!top.length||top[0].afford===0){pushBot({html:`<p>None of the recent ${esc(p.ft)} sales were within ${money(p.budget)}. Try a smaller flat type or a higher budget.</p>`});return;}
   S.lastRec={p,top};
@@ -2023,14 +2044,14 @@ function renderSub(){
   const b=$('#subBody'), s=S.sub;
   if(s==='details'){
     b.innerHTML=`${backBtn()}<h1>Your details</h1>
-      <span class="label">Youngest buyer</span><div class="stepper"><button type="button" id="dA-" aria-label="Younger">−</button><output id="dA">${S.age}</output><button type="button" id="dA+" aria-label="Older">+</button></div>
-      <span class="label">Average age of all buyers</span><div class="stepper"><button type="button" id="dV-" aria-label="Younger">−</button><output id="dV">${S.avg}</output><button type="button" id="dV+" aria-label="Older">+</button></div>
+      <span class="label">Youngest buyer</span><div class="stepper"><button type="button" id="dAm" aria-label="Youngest buyer younger">−</button><output id="dA">${S.age}</output><button type="button" id="dAp" aria-label="Youngest buyer older">+</button></div>
+      <span class="label">Average age of all buyers</span><div class="stepper"><button type="button" id="dVm" aria-label="Average age younger">−</button><output id="dV">${S.avg}</output><button type="button" id="dVp" aria-label="Average age older">+</button></div>
       <p class="small">Average age decides how long your HDB loan can be.</p>
       <span class="label">CPF Ordinary Account</span>
       <div class="chips">${[50000,100000,150000,200000,300000].map(o=>`<button type="button" class="chip" data-o="${o}" aria-pressed="${S.oaSet&&S.oa===o}">${exact(o)}</button>`).join('')}<button type="button" class="chip" data-o="skip" aria-pressed="${!S.oaSet}">Not sure</button></div>`;
     const upd=()=>{$('#dA').textContent=S.age;$('#dV').textContent=S.avg;};
-    $('#dA-').onclick=()=>{S.age=Math.max(21,S.age-1);upd();}; $('#dA+').onclick=()=>{S.age=Math.min(85,S.age+1);S.avg=Math.max(S.avg,S.age);upd();};
-    $('#dV-').onclick=()=>{S.avg=Math.max(S.age,S.avg-1);upd();}; $('#dV+').onclick=()=>{S.avg=Math.min(85,S.avg+1);upd();};
+    $('#dAm').onclick=()=>{S.age=Math.max(21,S.age-1);syncAvg();upd();}; $('#dAp').onclick=()=>{S.age=Math.min(85,S.age+1);syncAvg();upd();};
+    $('#dVm').onclick=()=>{S.avgSet=S.avg=Math.max(S.age,S.avg-1);upd();}; $('#dVp').onclick=()=>{S.avgSet=S.avg=Math.min(85,S.avg+1);upd();};
     $$('[data-o]').forEach(c=>c.onclick=()=>{if(c.dataset.o==='skip')S.oaSet=false;else{S.oaSet=true;S.oa=+c.dataset.o;}$$('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===c));});
   } else if(s==='size'){
     const big=document.documentElement.classList.contains('big');
@@ -2093,7 +2114,7 @@ function aboutHtml(){
 }
 const FLOW_MAP = `<h2>Flowchart · Use case 1: Map</h2>
   <div class="flow">
-    <div class="fn t">Sign in</div><div class="ar"></div>
+    <div class="fn t">Open Runway (guest, or reviewer log-in)</div><div class="ar"></div>
     <div class="fn">Youngest age, rough CPF, first town</div><div class="ar"></div>
     <div class="fn">Town map: blocks, MRT, Jul–Sep 2026 sales</div><div class="ar"></div>
     <div class="fn">Tap a diamond, pick a sale</div><div class="ar"></div>
@@ -2126,7 +2147,7 @@ function methodHtml(){
     <tr><td>20 years or less left</td><td>No CPF, no HDB loan</td></tr></tbody></table></div>
   ${FLOW_MAP}${FLOW_ASK}</div>`;
   const t1=(()=>{const a=S.age,v=S.avg;S.age=25;S.avg=25;const r=calc(550000,65);S.age=a;S.avg=v;return r;})();
-  const req=[['Information from several official sources','32 documents + HDB sales data + OneMap'],['Personalised with non-identifying inputs','Ages, rough CPF, town; NRIC and phone blocked'],['Explanations and follow-up questions','Ask Runway, Why?, chat summary'],['Text, tables, charts and forms','Map, verdict card, runway bar, shortlist, file export'],['At least two use cases','Map (Town Safari) and Ask Runway'],['About Us and Methodology pages','More → About Us, How it works'],['One flowchart per use case','Below'],['Deployed with a password','Streamlit Community Cloud, hashed passwords in secrets'],['Required disclaimer','About Us → Notice, linked from the map']];
+  const req=[['Information from several official sources','32 documents + HDB sales data + OneMap'],['Personalised with non-identifying inputs','Ages, rough CPF, town; NRIC and phone blocked'],['Explanations and follow-up questions','Ask Runway, Why?, chat summary'],['Text, tables, charts and forms','Map, verdict card, runway bar, shortlist, file export'],['At least two use cases','Map (Town Safari) and Ask Runway'],['About Us and Methodology pages','More → About Us, How it works'],['One flowchart per use case','Below'],['Deployed with a password','Streamlit Community Cloud; reviewer log-in with hashed passwords in secrets (guests get the short view)'],['Required disclaimer','About Us → Notice, linked from the map']];
   return `<div class="doctext">
   <h1>How it works</h1>
   <p>Every number comes from plain arithmetic on HDB's transaction records and the published rules. The AI only explains. It never calculates.</p>
@@ -2152,7 +2173,7 @@ function methodHtml(){
     <tr><td>Average age 50, 80 yrs</td><td>15-year loan</td><td class="ok">Pass</td></tr>
     <tr><td>Chat with an NRIC, advice or prompt injection</td><td>Declined</td><td class="ok">Pass</td></tr>
     <tr><td>AI explanation with an invented figure</td><td>Replaced by template</td><td class="ok">Pass</td></tr></tbody></table></div>
-  <p class="small">Automated tests and 28 evaluation questions run on every change.</p>
+  <p class="small">The rows above are covered by the project's automated tests (pytest) and 28 evaluation questions.</p>
   ${FLOW_MAP}${FLOW_ASK}
 </div>`;
 }
