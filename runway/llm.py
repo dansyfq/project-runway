@@ -33,9 +33,10 @@ DECLINE_OFF_TOPIC = (
 )
 
 INJECTION_PATTERNS = [
-    r"ignore (all |any |the )?(previous|prior|above|earlier|your) (instructions|rules|prompt)",
-    r"disregard (the|your|all) (instructions|rules|system)",
+    r"(ignore|disregard|forget|override) (all |any |the |your |previous |prior |above |earlier )*(instructions|rules|prompt|directions|system)",
+    r"\bnew (instructions|rules)\b",
     r"(reveal|show|print|repeat) (me )?(your|the) (system )?(prompt|instructions)",
+    r"(reveal|show|print|repeat|leak)\b.{0,30}\bprompt\b",
     r"\bsystem prompt\b",
     r"you are now\b",
     r"\bjailbreak\b",
