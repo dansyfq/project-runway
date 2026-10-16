@@ -47,7 +47,7 @@ def test_seed_generates_accounts_and_keeps_other_secrets(tmp_path, monkeypatch):
     seed.main()
     accounts = tomllib.loads(seed.ACCOUNTS_FILE.read_text())["accounts"]
     secrets = tomllib.loads(seed.SECRETS_FILE.read_text())
-    assert set(accounts) == {"lecturer", "reviewer", "demo"}
+    assert set(accounts) == {"reviewer"}
     assert secrets["OPENAI_API_KEY"] == "sk-test"
     for name, pw in accounts.items():
         assert verify_password(pw, secrets["auth"]["users"][name])
