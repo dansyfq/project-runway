@@ -128,9 +128,12 @@ class Retriever:
     def search(self, query: str, k: int = 5) -> list[Chunk]:
         rankings = [np.argsort(-self.bm25.get_scores(tokenize(expand_query(query))))]
         if self.vectors is not None:
-            q = self.embed([query])[0]
-            q = q / np.linalg.norm(q)
-            rankings.append(np.argsort(-(self.vectors @ q)))
+            try:
+                q = self.embed([query])[0]
+            except Exception as exc:  # API down or over quota: the keyword ranking alone still answers
+                self.embed_error = f"{type(exc).__name__}: {exc}"
+            else:
+                rankings.append(np.argsort(-(self.vectors @ (q / np.linalg.norm(q)))))
         fused: dict[int, float] = {}
         for ranking in rankings:
             for rank, idx in enumerate(ranking[:50]):
