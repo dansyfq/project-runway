@@ -1,21 +1,57 @@
 """Runway: how much lease you have left.
 
-Entry point for the multi-page Streamlit app. Every page sits behind the sign-in.
+The interface (runway_game/index.html, built from the approved design) runs full-window as a
+Streamlit component. Python checks sign-in, sends the map data after sign-in, and answers
+questions from the official documents (runway/bridge.py).
 Run locally with:  streamlit run app.py
 """
 
-import time
+from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 
-from runway.auth import check_login
-from runway.ui import details_card, inject_css, signin_banner
+from runway.bridge import handle
+from runway.game_data import load_game_data
+from runway.llm import LLM
+from runway.rag import Retriever, load_chunks
 
-st.set_page_config(page_title="Runway", layout="wide")
-inject_css()
+st.set_page_config(page_title="Runway", layout="wide", initial_sidebar_state="collapsed")
+st.markdown(
+    """<style>
+    header[data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stDecoration"],
+    [data-testid="stStatusWidget"], footer {display: none !important;}
+    [data-testid="stMainBlockContainer"], .block-container {padding: 0 !important; max-width: 100% !important;}
+    [data-testid="stAppViewContainer"], [data-testid="stMain"] {padding: 0 !important; overflow: hidden;}
+    [data-testid="stVerticalBlock"] {gap: 0 !important;}
+    iframe {display: block; border: 0; width: 100vw; height: 100dvh !important;}
+    html, body {overflow: hidden;}
+    </style>""",
+    unsafe_allow_html=True,
+)
 
-MAX_ATTEMPTS = 5
-LOCKOUT_SECONDS = 60
+runway_game = components.declare_component("runway_game", path=str(Path(__file__).parent / "runway_game"))
+
+
+@st.cache_data(show_spinner=False)
+def game_data() -> dict:
+    return load_game_data()
+
+
+@st.cache_resource(show_spinner=False)
+def llm() -> LLM:
+    return LLM()
+
+
+@st.cache_resource(show_spinner=False)
+def retriever() -> Retriever:
+    chunks, bot = load_chunks(), llm()
+    if bot.available:
+        try:
+            return Retriever(chunks, embed=bot.embed)
+        except Exception as exc:  # embeddings are an enhancement; keyword search still works
+            print(f"[runway] embeddings failed, using keyword search: {type(exc).__name__}: {exc}")
+    return Retriever(chunks)
 
 
 def configured_users() -> dict[str, str]:
@@ -25,60 +61,16 @@ def configured_users() -> dict[str, str]:
         return {}
 
 
-def login_page() -> None:
-    _, mid, _ = st.columns([1, 1.1, 1])
-    with mid:
-        st.markdown(signin_banner(), unsafe_allow_html=True)
-        users = configured_users()
-        if not users:
-            st.error("Sign-in isn't set up yet. The app owner needs to add accounts to the app's secrets.")
-            st.stop()
+state = st.session_state
+replies = state.setdefault("replies", [])
+handled = state.setdefault("handled", set())
+me = {"user": state["user"], "role": state["role"]} if state.get("user") else None
+data = game_data() if me and not state.get("data_sent") else None  # sent once per page load
 
-        locked_until = st.session_state.get("locked_until", 0)
-        if time.time() < locked_until:
-            st.warning(f"Too many attempts. Try again in {int(locked_until - time.time())} seconds.")
-            st.stop()
+msg = runway_game(me=me, data=data, replies=replies[-5:], key="runway", default=None)
 
-        with st.form("login"):
-            username = st.text_input("Username", autocomplete="username")
-            password = st.text_input("Password", type="password", autocomplete="current-password")
-            submitted = st.form_submit_button("Sign in", type="primary", width="stretch")
-        if submitted:
-            if check_login(username, password, users):
-                st.session_state.update(user=username.strip().lower(), attempts=0)
-                st.rerun()
-            attempts = st.session_state.get("attempts", 0) + 1
-            st.session_state["attempts"] = attempts
-            if attempts >= MAX_ATTEMPTS:
-                st.session_state.update(locked_until=time.time() + LOCKOUT_SECONDS, attempts=0)
-            st.error("That username and password don't match.")
-
-
-if "user" not in st.session_state:
-    login_page()
-    st.stop()
-
-pages = {
-    "": [
-        st.Page("app_pages/map.py", title="Map", icon=":material/location_on:", default=True),
-        st.Page("app_pages/shortlist.py", title="Shortlist", icon=":material/kid_star:"),
-        st.Page("app_pages/ask_runway.py", title="Ask", icon=":material/forum:"),
-    ],
-    "More": [
-        st.Page("app_pages/details.py", title="Your details", icon=":material/person:"),
-        st.Page("app_pages/about.py", title="About Us", icon=":material/info:"),
-        st.Page("app_pages/methodology.py", title="How it works", icon=":material/account_tree:"),
-    ],
-}
-
-st.logo("assets/runway_lockup.svg", size="large")
-nav = st.navigation(pages)
-
-with st.sidebar:
-    details_card()
-    st.toggle("Large text", key="large_text")
-    if st.button("Sign out", width="stretch"):
-        st.session_state.clear()
-        st.rerun()
-
-nav.run()
+if msg and msg.get("id") not in handled:
+    handled.add(msg["id"])
+    reply = handle(msg, state, configured_users(), llm(), retriever())
+    replies.append({"id": msg["id"], "value": reply})
+    st.rerun()

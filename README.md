@@ -12,17 +12,21 @@ costs in each town you're considering, and explains the result in plain English 
 
 ## What's in the app
 
-| Page | What it does |
-|---|---|
-| **Map** (use case 1) | Town Safari: every flat sold in a town in Jul–Sep 2026 on a OneMap base map, coloured by how much CPF the buyer could use. Tap one for the verdict card, runway bar, CPF you can use, cash you need and more numbers. |
-| **Shortlist** | Kept flats recalculated for your details, saved as a CSV file, and town stamps. |
-| **Ask** (use case 2) | RAG assistant over 32 official CPF Board, HDB, MND/MOM, IRAS and CEA documents. Cites sources, sums up the chat, declines advice and prompt-injection attempts. |
-| **Your details** | Youngest buyer's age, other buyer's age, rough CPF and first town. No names or NRIC. |
-| **About Us** | Notice (required disclaimer), scope, objectives, features, data sources, credits, team. |
-| **How it works** | Data flow, one flowchart per use case, lease effect by town, test results, data caveats. |
+The interface in `runway_game/index.html` is the approved design hand-off, running full-window inside Streamlit:
 
-The LLM explains; it never calculates. All figures come from `runway/cpf_rules.py` and `runway/lease_data.py`.
-Explanations containing a number the code didn't produce are thrown away and replaced by a plain template.
+| Screen | What it does |
+|---|---|
+| **Sign in** | Username and password, checked in Python against hashed passwords in Streamlit secrets. |
+| **Setup** | Youngest buyer's age, rough CPF, first town. No names or NRIC. |
+| **Map** (use case 1) | Town Safari: every HDB block, MRT lines and the flats sold in Jul–Sep 2026. Tap a diamond for the verdict, runway bar, CPF you can use and cash you need. Keep, Why?, Next flat. |
+| **Shortlist** | Kept flats recalculated for your details, CSV download, and 26 town stamps with Wikimedia Commons photos. |
+| **Ask** (use case 2) | Answers from 32 official documents with sources, "Why?" for a flat, chat summary, read-aloud, and document upload that suggests towns. |
+| **More** | Your details, text size, About Us (with the required notice), How it works (flowcharts), Sources and credits. The `demo` account sees short versions; `reviewer` and `lecturer` see the full ones. |
+
+Python (`runway/bridge.py`) handles sign-in, sends the map data only after sign-in, and answers questions
+(`runway/rag.py` + `runway/llm.py`). The map's calculator runs in the browser and is tested against
+`runway/cpf_rules.py` so both give the same numbers. The AI never calculates; an explanation with a number
+the calculator didn't produce is replaced by a plain template.
 
 ## Run it locally
 
@@ -59,24 +63,25 @@ file's contents into **Streamlit Community Cloud > App settings > Secrets**. Use
 ## Project layout
 
 ```
-app.py                 entry point: login gate and page navigation
-app_pages/             the five pages
-runway/cpf_rules.py    age-95 rule, CPF share, HDB loan limit, loan tenure
-runway/lease_data.py   lease premium per town (log-linear least squares)
+app.py                 Streamlit host: full-window interface + message loop
+runway_game/index.html the interface (from design/runway-mockup.html in the hand-off)
+runway/bridge.py       sign-in, ask, why, summary messages
+runway/cpf_rules.py    age-95 rule, CPF share, HDB loan limit, loan tenure (Python reference)
 runway/rag.py          chunking, BM25 + embedding search, reciprocal rank fusion
 runway/llm.py          prompts, question screening, number guard, OpenAI calls
 runway/auth.py         password hashing and checks
-scripts/               build_dataset.py, to_corpus.py, seed_users.py
-data/resale.parquet    986,090 HDB resale transactions (1990 to Sep 2026)
+runway/game_data.py    map data and town photos sent after sign-in
+data/game/             towns, Jul-Sep 2026 sales, blocks, roads, MRT, amenities
+data/photos/           26 town photos + credits (scripts/fetch_town_photos.py)
 data/corpus/           32 official documents with source URLs
-eval/                  28 test questions and the evaluation script
-tests/                 pytest suite (rules, data, retrieval, LLM guards, auth, app smoke tests)
+data/resale.parquet    986,090 HDB resale transactions (offline analysis)
+eval/, tests/          evaluation questions and the pytest suite
 ```
 
 ## Checks
 
 ```bash
-pytest                 # 66 tests
+pytest                 # includes a check that the map's calculator matches cpf_rules.py (needs Node.js)
 python eval/run_eval.py   # retrieval, calculator, decline checks (+ LLM answers if a key is set)
 ```
 
