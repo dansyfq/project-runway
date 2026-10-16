@@ -95,10 +95,10 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
         sources = index.search(f"{previous} {question}", k=5)
         answer = bot.answer(question, sources, history=history)
-        why = {INVENTED_FIGURE: "used a figure not in the documents",
-               AI_BUSY: "has reached its limit for this hour"}.get(answer.error, "service didn't respond")
-        note = f"The AI {why}, so here are the official passages." if answer.error else None
         offline = bool(answer.error) or (not bot.available and not answer.blocked)
+        why = {INVENTED_FIGURE: "used a figure not in the documents", AI_BUSY: "has reached its limit for this hour",
+               None: "explainer is offline"}.get(answer.error, "service didn't respond")
+        note = f"The AI {why}, so here are the official passages." if offline else None  # the text itself is neutral
         return {"text": answer.text, "sources": source_view(answer.sources), "blocked": answer.blocked,
                 "offline": offline, "note": note}
 

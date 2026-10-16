@@ -80,6 +80,16 @@ def test_ask_offline_returns_official_passages(bot, index):
     reply = send("ask", {}, bot, index, q="How long is the HFE letter valid?", history=[])
     assert reply["offline"] is True and reply["sources"]
     assert all(s["url"].startswith("https://") for s in reply["sources"])
+    assert reply["note"] == "The AI explainer is offline, so here are the official passages."
+
+
+def test_fallback_text_does_not_contradict_the_note(bot, index, monkeypatch):
+    """Over the hourly cap the note says so; the answer text must not claim the AI is offline."""
+    import runway.llm as llm_mod
+
+    monkeypatch.setattr(bot, "answer", lambda *a, **k: llm_mod.Answer(llm_mod.offline_answer([]), [], error=llm_mod.AI_BUSY))
+    reply = send("ask", {}, bot, index, q="What is the HDB loan limit?")
+    assert "offline" not in reply["text"] and "limit for this hour" in reply["note"]
 
 
 def test_ask_blocks_nric(bot, index):

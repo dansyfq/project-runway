@@ -249,10 +249,7 @@ class LLM:
 def offline_answer(sources: list[Chunk]) -> str:
     if not sources:
         return "I couldn't find a matching passage in the official documents."
-    return (
-        "The AI explainer is offline, so here are the most relevant official passages. "
-        "The source list below links to each document."
-    )
+    return "Here are the most relevant official passages. The source list below links to each document."
 
 
 def template_explanation(facts: dict[str, str]) -> str:
