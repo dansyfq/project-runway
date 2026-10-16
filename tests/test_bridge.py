@@ -86,3 +86,17 @@ def test_why_uses_only_calculator_numbers(bot, index):
 def test_summary_offline(bot, index):
     history = [{"role": "user", "content": "Is my HDB loan cut too?"}, {"role": "assistant", "content": "Yes."}]
     assert send("summary", {"user": "demo"}, bot, index, history=history)["text"].startswith("You asked about")
+
+
+@pytest.mark.parametrize(("kind", "payload"), [
+    ("login", "not a dict"),
+    ("ask", [1, 2]),
+    ("ask", {"q": "What is the HDB loan limit?", "history": "abc"}),
+    ("ask", {"q": "What is the HDB loan limit?", "history": [1, None, {"role": "user"}]}),
+    ("summary", {"history": "abc"}),
+    ("summary", {"history": [3, {"role": "user"}, {"role": "user", "content": ["x"]}]}),
+])
+def test_malformed_payloads_get_a_reply_not_a_crash(bot, index, kind, payload):
+    """Everything from the browser is untrusted: wrong types must not raise."""
+    reply = handle({"id": "x", "type": kind, "payload": payload}, {"user": "demo"}, USERS, bot, index)
+    assert isinstance(reply, dict)

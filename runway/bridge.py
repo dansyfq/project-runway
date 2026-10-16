@@ -32,8 +32,17 @@ def source_view(chunks: list[Chunk]) -> list[dict]:
              "text": c.text[:600]} for c in chunks]
 
 
+def clean_history(raw, n: int) -> list[dict]:
+    """Chat turns sent by the browser: keep the last n well-formed user/assistant turns, trimmed."""
+    turns = raw[-n:] if isinstance(raw, list) else []
+    return [{"role": h["role"], "content": str(h.get("content", ""))[:2000]}
+            for h in turns if isinstance(h, dict) and h.get("role") in {"user", "assistant"}]
+
+
 def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, index: Retriever) -> dict:
-    kind, payload = msg.get("type"), msg.get("payload") or {}
+    kind, payload = msg.get("type"), msg.get("payload")
+    if not isinstance(payload, dict):  # the browser is untrusted
+        payload = {}
 
     if kind == "login":
         if not users:
@@ -73,8 +82,7 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
             text, used_llm = bot.explain(facts, sources)
             return {"text": text, "sources": source_view(sources), "offline": False,
                     "note": NUMBERS_NOTE if used_llm else NUMBERS_NOTE + " Written from a fixed template."}
-        history = [{"role": h.get("role"), "content": str(h.get("content", ""))[:2000]}
-                   for h in payload.get("history", [])[-6:] if h.get("role") in {"user", "assistant"}]
+        history = clean_history(payload.get("history"), 6)
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
         sources = index.search(f"{previous} {question}", k=5)
         answer = bot.answer(question, sources, history=history)
@@ -84,7 +92,6 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
                 "offline": offline, "note": note}
 
     if kind == "summary":
-        history = [h for h in payload.get("history", []) if h.get("role") in {"user", "assistant"}]
-        return {"text": bot.summarise(history)}
+        return {"text": bot.summarise(clean_history(payload.get("history"), 12))}
 
     return {"ok": False, "error": f"unknown message: {kind}"}
