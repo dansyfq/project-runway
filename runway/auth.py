@@ -18,7 +18,7 @@ ITERATIONS = 310_000
 
 def hash_password(password: str, salt: bytes | None = None, iterations: int = ITERATIONS) -> str:
     salt = salt or secrets.token_bytes(16)
-    digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, iterations)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8", "surrogatepass"), salt, iterations)
     b64 = lambda b: base64.b64encode(b).decode()  # noqa: E731
     return f"{ALGO}${iterations}${b64(salt)}${b64(digest)}"
 
@@ -31,7 +31,7 @@ def verify_password(password: str, stored: str) -> bool:
     if algo != ALGO:
         return False
     expected = base64.b64decode(digest_b64)
-    actual = hashlib.pbkdf2_hmac("sha256", password.encode(), base64.b64decode(salt_b64), int(iterations))
+    actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8", "surrogatepass"), base64.b64decode(salt_b64), int(iterations))
     return hmac.compare_digest(actual, expected)
 
 

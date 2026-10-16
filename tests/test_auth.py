@@ -70,3 +70,10 @@ def test_no_credentials_in_tracked_sources():
             text = path.read_text()
             assert "pbkdf2_sha256$" not in text.replace('f"{ALGO}$', "")
             assert "[accounts]" not in text
+
+
+def test_lone_surrogate_password_fails_cleanly():
+    """JSON from the browser can carry "\\ud800"; it must be a wrong password, not a crash."""
+    users = {"demo": hash_password("Pw12345678", iterations=1000)}
+    assert not check_login("demo", "\ud800", users)
+
