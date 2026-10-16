@@ -1,8 +1,9 @@
 """Runway: how much lease you have left.
 
 The interface (runway_game/index.html, built from the approved design) runs full-window as a
-Streamlit component. Python checks sign-in, sends the map data after sign-in, and answers
-questions from the official documents (runway/bridge.py).
+Streamlit component: landing page, map game, Ask and More. Visitors use it as guests; reviewers
+can log in for the full About Us and How it works. Python checks logins and answers questions
+from the official documents (runway/bridge.py).
 Run locally with:  streamlit run app.py
 """
 
@@ -64,8 +65,9 @@ def configured_users() -> dict[str, str]:
 state = st.session_state
 replies = state.setdefault("replies", [])
 handled = state.setdefault("handled", set())
-me = {"user": state["user"], "role": state["role"]} if state.get("user") else None
-data = game_data() if me and not state.get("data_sent") else None  # sent once per page load
+me = {"user": state.get("user"), "role": state.get("role", "brief")}
+# The landing page shows at once; the map data (2.5 MB) follows when the page asks for it.
+data = game_data() if state.get("want_data") and not state.get("data_sent") else None
 
 msg = runway_game(me=me, data=data, replies=replies[-5:], key="runway", default=None)
 

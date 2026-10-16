@@ -1,4 +1,9 @@
-<title>Runway Town Safari</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Runway</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap">
@@ -1024,7 +1029,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
 @media (min-width:1024px){
   .phone{display:grid;grid-template-columns:260px minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
   .phone>.screen{grid-column:2;grid-row:1}
-  #scrLogin,#scrOnb{grid-column:1/-1}
+  #scrLanding,#scrOnb{grid-column:1/-1}
   #sheetHost,#toastHost{grid-column:2;grid-row:1;position:relative;pointer-events:none}
   #sheetHost .sheet,#toastHost .toast{pointer-events:auto}
   .tabs{grid-column:1;grid-row:1;display:flex;flex-direction:column;gap:4px;border-top:0;border-right:1px solid var(--sand);padding:22px 14px;background:var(--paper)}
@@ -1049,28 +1054,228 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
 .noticelink{align-self:flex-start;background:rgba(255,255,255,.92);border:1px solid var(--sand);border-radius:999px;font:600 .72rem var(--ui);color:var(--slate);padding:4px 12px;min-height:32px;pointer-events:auto}
 .stampc.hasimg:not(.got) img{filter:grayscale(1);opacity:.35}
 .stampc.got img{filter:none;opacity:1}
+
+/* ---------- landing (Site Landing Page mockup) ---------- */
+#scrLanding{background:#fff;color:#1C1C1C;font-family:var(--ui);display:block}
+#scrLanding a{color:#7A2E1D}
+.lnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 clamp(20px,4vw,56px);height:72px;background:rgba(255,255,255,0);border-bottom:1px solid transparent;transition:background .5s,border-color .5s}
+.lnav.scrolled{background:rgba(255,255,255,.86);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border-bottom-color:#D9D4CC}
+.lbrand{display:flex;align-items:center;gap:10px;color:#7A2E1D;text-decoration:none;background:none;border:0;cursor:pointer;padding:0}
+.lbrand .lmark{width:28px;height:28px}
+.lbrand span{font:400 22px/1 var(--wordmark);letter-spacing:.04em;text-transform:uppercase;color:#111;padding-top:2px}
+.llinks{display:flex;align-items:center;gap:clamp(14px,2.4vw,34px);font:500 13.5px var(--ui)}
+.llinks a.lk,.llinks button.lk{color:#1C1C1C;text-decoration:none;padding:6px 0;border:0;border-bottom:1px solid transparent;background:none;font:inherit;cursor:pointer;white-space:nowrap}
+.llinks .lk:hover{border-bottom-color:#7A2E1D;color:#7A2E1D}
+.lbtn{display:inline-flex;align-items:center;gap:10px;font:600 14px var(--ui);background:#7A2E1D;color:#fff!important;text-decoration:none;border:1px solid #7A2E1D;border-radius:4px;padding:15px 22px;cursor:pointer;transition:background .25s,transform .25s,box-shadow .25s;box-shadow:0 12px 30px -12px rgba(122,46,29,.6)}
+.lbtn:hover{background:#5E2216;transform:translateY(-2px)}
+.lbtn.sm{padding:11px 18px;font-size:13.5px;box-shadow:none}
+.lbtn.ghost{background:rgba(255,255,255,.7);color:#7A2E1D!important;box-shadow:none}
+.lbtn.ghost:hover{background:#fff}
+.lbtn.login{background:transparent;color:#7A2E1D!important;box-shadow:none}
+.lbtn.login:hover{background:#F4E7E2}
+@media (max-width:900px){.llinks .lk{display:none}}
+.lhero{position:relative;min-height:calc(100dvh - 72px);display:flex;align-items:center;overflow:hidden;background:linear-gradient(180deg,#F6F3EE 0%,#FBF9F6 55%,#fff 100%);margin-top:-72px;padding-top:72px}
+.lhero .ph{position:absolute;inset:-4%;will-change:transform;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.lhero .ph img{width:100%;height:100%;object-fit:cover;object-position:70% 45%;display:block;animation:rwKen 28s ease-in-out infinite alternate;filter:saturate(.92) contrast(1.02);opacity:0;transition:opacity 1.2s}
+.lhero .wash{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(246,243,238,.96) 0%,rgba(246,243,238,.86) 34%,rgba(246,243,238,.25) 62%,rgba(246,243,238,0) 80%),linear-gradient(180deg,rgba(246,243,238,.35) 0%,rgba(255,255,255,0) 30%,rgba(255,255,255,0) 78%,#fff 100%)}
+.lhero .credit{position:absolute;right:16px;bottom:14px;z-index:5;font:400 11px var(--ui);color:rgba(255,255,255,.9);text-decoration:none;background:rgba(17,17,17,.35);padding:4px 8px;border-radius:3px}
+.lwrap{position:relative;z-index:4;width:100%;max-width:1280px;margin:0 auto;padding:clamp(70px,9vw,120px) clamp(20px,4vw,56px)}
+.lhero .lwrap{display:flex;flex-direction:column;gap:28px}
+.leyebrow{display:flex;align-items:center;gap:12px;font:600 12px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:#7A2E1D}
+.leyebrow i{display:block;width:28px;height:1px;background:#7A2E1D}
+.lhero h1{margin:0;max-width:14ch;font:700 clamp(44px,7vw,108px)/.98 var(--serif);letter-spacing:-.025em;color:#111}
+.lhero h1 em{font-style:italic;font-weight:400;color:#7A2E1D}
+.lhero p.lead2{margin:0;max-width:46ch;font:400 clamp(17px,1.4vw,21px)/1.55 var(--serif)}
+.lrow{display:flex;gap:12px;flex-wrap:wrap}
+.lstats{display:flex;gap:clamp(24px,4vw,64px);flex-wrap:wrap;padding-top:26px}
+.lstats div{display:flex;flex-direction:column;gap:4px}
+.lstats b{font:700 30px/1 var(--serif);color:#111;font-variant-numeric:tabular-nums}
+.lstats span{font:500 12px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:#3A3A3A}
+.lrise{animation:rwRise 1s cubic-bezier(.2,.7,.2,1) both}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:clamp(32px,5vw,80px);align-items:start}
+.lsec h2{margin:0;font:700 clamp(30px,3.6vw,54px)/1.08 var(--serif);letter-spacing:-.02em;color:#111}
+.lsec p.body{margin:0;font:400 18px/1.6 var(--serif);max-width:52ch}
+.lsec .col{display:flex;flex-direction:column;gap:22px}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.lcard{background:#F6F3EE;border-radius:8px;padding:clamp(24px,3vw,44px);display:flex;flex-direction:column;gap:22px}
+.lbuyers{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.lbuyers div{display:flex;flex-direction:column;gap:6px;padding:18px;background:#fff;border-radius:6px}
+.lbuyers div.alt{background:#7A2E1D;color:#fff}
+.lbuyers small{font:500 12px var(--ui)} .lbuyers b{font:700 44px/1 var(--serif)} .lbuyers span{font:400 14px/1.4 var(--serif)}
+.ltown img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:8px;background:#D9D4CC;box-shadow:0 40px 80px -30px rgba(17,17,17,.3);display:block}
+.ltown .cap{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap;margin-top:14px}
+.ltown .cap b{font:600 19px var(--serif);color:#111} .ltown .cap span{font:600 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:#3A3A3A}
+.ltown p{margin:10px 0 0;font:400 15px/1.55 var(--serif)} .ltown small{display:block;margin-top:6px;font:11px var(--ui);color:#666}
+.lrule{background:#111;color:#fff;position:relative;overflow:hidden}
+.lrule::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(122,46,29,.45),transparent 70%)}
+.lrule h2{color:#fff} .lrule p.body{color:rgba(255,255,255,.82)}
+.lstep{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.3);border-radius:4px;overflow:hidden}
+.lstep button{border:0;background:rgba(255,255,255,.06);color:#fff;width:44px;height:44px;font:20px var(--ui);cursor:pointer}
+.lstep button:hover{background:rgba(255,255,255,.14)}
+.lstep output{min-width:90px;text-align:center;font:600 18px var(--ui);font-variant-numeric:tabular-nums}
+.llbl{font:600 11.5px var(--ui);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.lverdict{display:flex;flex-direction:column;gap:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:clamp(24px,3vw,40px)}
+.lverdict .badge{font:600 11px var(--ui);letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:3px}
+.lverdict .vt{font:700 clamp(26px,2.6vw,38px)/1.15 var(--serif)}
+.lbar{position:relative;height:10px;background:rgba(255,255,255,.12);border-radius:5px;overflow:hidden}
+.lbar i{position:absolute;inset:0 auto 0 0;border-radius:5px;transition:width .6s cubic-bezier(.2,.7,.2,1),background .4s}
+.lbar b{position:absolute;top:-4px;bottom:-4px;width:2px;background:#fff}
+.lsrc{font:11.5px/1.5 var(--ui);color:rgba(255,255,255,.55);border-top:1px solid rgba(255,255,255,.12);padding-top:14px}
+.ltable .hd{display:grid;grid-template-columns:1fr auto;gap:12px;padding:0 0 12px;font:600 11.5px var(--ui);letter-spacing:.12em;text-transform:uppercase;color:#3A3A3A;border-bottom:1px solid #111}
+.ltable .tr{display:grid;grid-template-columns:minmax(110px,1fr) minmax(70px,2fr) auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid #D9D4CC}
+.ltable .tr:hover{background:#FBF9F6}
+.ltable .nm{font:600 17px var(--serif)} .ltable .pc{font:700 20px var(--serif);font-variant-numeric:tabular-nums;min-width:70px;text-align:right}
+.ltable .bar{height:8px;background:#F6F3EE;border-radius:4px;overflow:hidden} .ltable .bar i{display:block;height:100%;transform-origin:left;animation:rwLine 1.2s cubic-bezier(.2,.7,.2,1) both}
+.lask{background:#F6F3EE;border-top:1px solid #D9D4CC}
+.lchip{font:500 13.5px var(--ui);color:#1C1C1C;background:#fff;border:1px solid #D9D4CC;border-radius:999px;padding:10px 16px;cursor:pointer;transition:all .25s}
+.lchip:hover{border-color:#7A2E1D;color:#7A2E1D} .lchip.on{background:#7A2E1D;color:#fff;border-color:#7A2E1D}
+.lanswer{background:#fff;border:1px solid #D9D4CC;border-radius:8px;padding:clamp(24px,3vw,40px);display:flex;flex-direction:column;gap:18px;box-shadow:0 40px 80px -40px rgba(17,17,17,.25)}
+.lanswer .q{font:600 19px/1.35 var(--serif);color:#7A2E1D} .lanswer .a{margin:0;font:400 16.5px/1.6 var(--serif)}
+.lquote{background:#F6F3EE;border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.lquote small{font:600 11px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:#7A2E1D} .lquote span{font:italic 400 15px/1.5 var(--serif)}
+.lasky{display:flex;gap:8px}
+.lasky input{flex:1;min-width:0;font:400 15px var(--ui);border:1px solid #D9D4CC;border-radius:4px;padding:0 14px;height:48px;outline:none}
+.lasky input:focus{border-color:#7A2E1D;box-shadow:0 0 0 3px rgba(122,46,29,.12)}
+.lasky button{font:600 14px var(--ui);background:#7A2E1D;color:#fff;border:0;border-radius:4px;padding:0 18px;height:48px;cursor:pointer}
+.lnotice{background:#F6F3EE;border-top:1px solid #D9D4CC}
+.lnotice button.tog{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;background:none;border:0;padding:22px 0;cursor:pointer;text-align:left;color:#111}
+.lnotice .bang{width:30px;height:30px;border-radius:50%;background:#7A2E1D;color:#fff;display:flex;align-items:center;justify-content:center;font:700 15px var(--serif);flex:none}
+.lnotice .ttl{font:600 16px var(--serif)} .lnotice .lab{font:500 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:#7A2E1D;white-space:nowrap}
+.lnotice .txt{display:flex;flex-direction:column;gap:12px;padding:0 0 26px 44px;font:400 15px/1.65 var(--serif);max-width:80ch}
+.lfoot{background:#7A2E1D;color:#fff;--mk-bg:#7A2E1D}
+.lfoot .lmark{width:56px;height:56px;color:#fff}
+.lfoot .big{font:400 clamp(48px,6vw,84px)/1 var(--wordmark);letter-spacing:.04em;text-transform:uppercase}
+.lfoot .tg2{font:400 13px/1 var(--wordmark);letter-spacing:.16em;text-transform:uppercase;opacity:.9}
+.lfoot a,.lfoot button.fl{color:#fff!important;text-decoration:none;border:0;border-bottom:1px solid rgba(255,255,255,.4);background:none;font:500 13px var(--ui);cursor:pointer;padding:0}
+.lfoot .base{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.25);padding-top:18px;font:11.5px var(--ui);letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+@keyframes rwKen{from{transform:scale(1.06)}to{transform:scale(1.14) translate3d(-1.2%,-1%,0)}}
+@keyframes rwRise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes rwLine{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (max-width:700px){.lhero .wash{background:linear-gradient(180deg,rgba(246,243,238,.93) 0%,rgba(246,243,238,.86) 62%,rgba(255,255,255,.96) 100%)}}
+/* login overlay */
+.lover{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(17,17,17,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:fadeIn .2s ease}
+.lover[hidden]{display:none}
+.lover .card{position:relative;width:100%;max-width:420px;background:#fff;border-radius:16px;padding:28px 24px 24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 40px 80px -30px rgba(0,0,0,.45)}
+.lover .card h2{font:700 1.5rem var(--serif);color:#111;margin:0}
+.lover .card .lbrand{margin-bottom:4px}
+.lover .x{position:absolute;top:12px;right:12px;width:44px;height:44px;border:0;background:none;border-radius:50%;cursor:pointer;color:#3A3A3A}
+.lover .x:hover{background:#F6F3EE}
+@keyframes fadeIn{from{opacity:0}}
+#scrLanding{grid-column:1/-1}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
 <div class="stage">
   <div class="phone" id="phone">
 
-    <!-- LOGIN -->
-    <section class="screen" id="scrLogin">
-      <div class="login">
-        <div class="lockup">
-          <svg viewBox="0 0 100 100" aria-hidden="true"><g fill="#fff"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="#7A2E1D"/><path d="M31 52 38 48 38 73 31 66Z"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z"/><path d="M62 50 69 54 69 66 62 73Z"/></g></svg>
-          <span class="wm">RUNWAY</span><span class="tg">HOW MUCH LEASE YOU HAVE LEFT</span>
+    <!-- LANDING -->
+    <section class="screen" id="scrLanding">
+      <div class="lnav" id="lnav">
+        <button type="button" class="lbrand" data-go="top" aria-label="Runway home"><svg viewBox="0 0 100 100" aria-hidden="true" class="lmark"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="var(--mk-bg,#fff)"/><path d="M31 52 38 48 38 73 31 66Z" fill="currentColor"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/><path d="M62 50 69 54 69 66 62 73Z" fill="currentColor"/></svg><span>Runway</span></button>
+        <div class="llinks">
+          <a class="lk" href="#lidea">The idea</a><a class="lk" href="#lrule">The rule</a><a class="lk" href="#ltowns">By town</a><a class="lk" href="#lask">Ask Runway</a>
+          <button type="button" class="lk" data-go="about">About</button>
+          <button type="button" class="lbtn sm login" data-login id="lLoginBtn">Log in</button>
+          <button type="button" class="lbtn sm" data-go="map">Check a flat</button>
         </div>
-        <form class="card" id="loginForm" autocomplete="on">
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <label class="field"><span>Username</span><input class="inp" id="u" autocomplete="username" autocapitalize="none" required></label>
-            <label class="field"><span>Password</span><input class="inp" id="pw" type="password" autocomplete="current-password" required></label>
-            <p class="err" id="loginErr" role="alert" hidden>That username and password don't match.</p>
-            <button class="btn primary" type="submit" id="loginBtn">Sign in</button>
-          </div>
-        </form>
       </div>
+
+      <div class="lhero" id="ltop">
+        <div class="ph" id="lheroPh"><img alt="HDB flats along Punggol Waterway" id="lheroImg" src="https://commons.wikimedia.org/wiki/Special:FilePath/Panorama_view_HDB_at_Punggol_Waterway.jpg?width=2000"></div>
+        <div class="wash"></div>
+        <a class="credit" href="https://commons.wikimedia.org/wiki/File:Panorama_view_HDB_at_Punggol_Waterway.jpg" target="_blank" rel="noopener">Punggol Waterway · Wikimedia Commons · CC BY-SA</a>
+        <div class="lwrap">
+          <div class="leyebrow lrise"><i></i>For HDB resale buyers</div>
+          <h1 class="lrise" style="animation-delay:.1s">How much lease you have left, <em>and what it buys you.</em></h1>
+          <p class="lead2 lrise" style="animation-delay:.22s">The years left on a flat's lease, combined with your age, decide how much CPF you can use. Runway shows you the rule, what a shorter lease costs in your town, and the source for both.</p>
+          <div class="lrow lrise" style="animation-delay:.34s"><button type="button" class="lbtn" data-go="map">Check a flat<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a class="lbtn ghost" href="#lask">Ask a question</a></div>
+          <div class="lstats lrise" style="animation-delay:.46s">
+            <div><b>986,090</b><span>resale records</span></div>
+            <div><b>1990 – 2026</b><span>every HDB town</span></div>
+            <div><b>32 documents</b><span>CPF · HDB · MND</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lsec"><div class="lwrap lgrid" id="lidea">
+        <div class="col reveal"><div class="leyebrow">01 · The idea</div>
+          <h2>A runway is how far you can go before you run out of ground.</h2>
+          <p class="body">For an HDB buyer, the lease is the runway. Since 2019, how much CPF you can use depends on one question: will the flat's lease last until the youngest buyer turns 95? Most buyers only find out after they have paid the option fee.</p></div>
+        <div class="lcard reveal" style="transition-delay:.15s">
+          <div class="leyebrow" style="color:#3A3A3A">One flat, two buyers</div>
+          <div class="lbuyers"><div><small>Youngest buyer</small><b>35</b><span>needs 60 years of lease. This 58-year flat is 2 short.</span></div>
+            <div class="alt"><small>Youngest buyer</small><b>25</b><span>needs 70 years. The same flat is 12 short, and CPF use is cut.</span></div></div>
+          <p style="margin:0;font:italic 400 17px/1.5 var(--serif);border-top:1px solid #D9D4CC;padding-top:18px">The same flat can be fully financeable for one person and need extra cash from another, purely because of age.</p>
+        </div>
+      </div>
+      <div class="lwrap lgrid" style="padding-top:0">
+        <div class="ltown reveal"><img loading="lazy" alt="HDB flats along Woodlands Avenue 4" src="https://commons.wikimedia.org/wiki/Special:FilePath/HDB_flats_along_Woodlands_Avenue_4,_Singapore.jpg?width=1400">
+          <div class="cap"><b>Woodlands · newer estate</b><span>75 – 85 years of lease</span></div>
+          <p>Longer leases, so the age-95 test rarely bites. Prices here move little with lease, which is why Singapore-wide averages hide the pattern.</p>
+          <small>Woodlands Ave 4 · Slivester · CC BY-SA 2.5 · Wikimedia Commons</small></div>
+        <div class="ltown reveal" style="transition-delay:.15s"><img loading="lazy" alt="View from the tallest HDB flat in Toa Payoh" src="https://commons.wikimedia.org/wiki/Special:FilePath/View_from_the_tallest_HDB_flat_in_Singapore.jpg?width=1400">
+          <div class="cap"><b style="color:#7A2E1D">Toa Payoh · mature town</b><span style="color:#7A2E1D">55 – 60 years of lease</span></div>
+          <p>Central, well-loved and running short. Every missing year of lease knocks about 1.5% off the price per square metre, three times what it does in Yishun.</p>
+          <small>Toa Payoh · Wikimedia Commons · CC BY-SA 2.0</small></div>
+      </div></div>
+
+      <div class="lsec lrule" id="lrule"><div class="lwrap lgrid" style="align-items:center">
+        <div class="col reveal"><div class="leyebrow" style="color:#E8B4A5">02 · The age-95 rule</div>
+          <h2>Try it with your own numbers.</h2>
+          <p class="body">Move the lease and the age. The verdict follows the rule in MND's Annex A and CPF Board's worked example. Nothing here is estimated by AI.</p>
+          <div class="lrow" style="gap:14px">
+            <div style="display:flex;flex-direction:column;gap:8px"><span class="llbl">Lease left</span><span class="lstep"><button type="button" data-rule="lease" data-d="-1" aria-label="Less lease">−</button><output id="lLease"></output><button type="button" data-rule="lease" data-d="1" aria-label="More lease">+</button></span></div>
+            <div style="display:flex;flex-direction:column;gap:8px"><span class="llbl">Youngest buyer</span><span class="lstep"><button type="button" data-rule="age" data-d="-1" aria-label="Younger">−</button><output id="lAge"></output><button type="button" data-rule="age" data-d="1" aria-label="Older">+</button></span></div>
+          </div></div>
+        <div class="lverdict reveal" style="transition-delay:.15s">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span class="llbl">Your verdict</span><span class="badge" id="lBadge"></span></div>
+          <div class="vt" id="lTitle"></div>
+          <div class="lbar"><i id="lCover"></i><b id="lNeed"></b></div>
+          <div style="display:flex;justify-content:space-between;font:500 12px var(--ui);color:rgba(255,255,255,.7)"><span id="lCovers"></span><span id="lNeeds"></span></div>
+          <p style="margin:0;font:400 16px/1.55 var(--serif);color:rgba(255,255,255,.85)" id="lBody"></p>
+          <div class="lsrc">MND · Annex A, Updated Rules on CPF Usage and HDB Housing Loan · 9 May 2019. HDB loan limit from HDB, resale applications from 20 Aug 2024.</div>
+        </div>
+      </div></div>
+
+      <div class="lsec"><div class="lwrap lgrid" id="ltowns">
+        <div class="col reveal" style="position:sticky;top:96px"><div class="leyebrow">03 · Lease by town</div>
+          <h2>A shorter lease costs three times more in some towns.</h2>
+          <p class="body">Across Singapore, price per square metre barely moves with lease. That is an illusion, because long leases sit in new towns. Compare within a town and the pattern is clear.</p>
+          <div style="font:11.5px/1.5 var(--ui);color:#3A3A3A">4-room resale flats sold from 2024. A market pattern, not a guarantee.</div></div>
+        <div class="ltable reveal" style="transition-delay:.15s"><div class="hd"><span>Town</span><span>Per extra year of lease</span></div><div id="lTownRows"></div>
+          <div style="padding-top:18px;font:italic 400 16px/1.5 var(--serif)" id="lTownNote"></div></div>
+      </div></div>
+
+      <div class="lsec lask" id="lask"><div class="lwrap lgrid" style="align-items:center">
+        <div class="col reveal"><div class="leyebrow">04 · Ask Runway</div>
+          <h2>Follow-up questions, with the rule quoted each time.</h2>
+          <p class="body">Ask why your CPF is cut, what changes if your partner is the younger buyer, or what the 20-year minimum means. Runway reads the CPF, HDB and MND documents and shows the passage it relied on. The numbers are always calculated the ordinary way. The AI only explains.</p>
+          <div class="lrow" style="gap:8px" id="lSugg"></div></div>
+        <div class="lanswer reveal" style="transition-delay:.15s">
+          <div class="q" id="lAq"></div><p class="a" id="lAa"></p>
+          <div class="lquote"><small id="lAdoc"></small><span id="lAquote"></span></div>
+          <div class="lasky"><input id="lAskIn" placeholder="Ask about your situation…" aria-label="Your question"><button type="button" id="lAskBtn">Ask</button></div>
+        </div>
+      </div></div>
+
+      <div class="lnotice"><div class="lwrap" style="padding-top:0;padding-bottom:0">
+        <button type="button" class="tog" id="lNoticeTog" aria-expanded="true"><span style="display:flex;align-items:center;gap:14px"><span class="bang">!</span><span class="ttl">Important notice: educational prototype, not for real-world use</span></span><span class="lab" id="lNoticeLab">Collapse</span></button>
+        <div class="txt" id="lNoticeTxt"><p style="margin:0"><strong>IMPORTANT NOTICE:</strong> This web application is a prototype developed for <strong>educational purposes only.</strong> The information provided here is <strong>NOT intended for real-world usage</strong> and should not be relied upon for making any decisions, especially those related to financial, legal, or healthcare matters.</p>
+          <p style="margin:0"><strong>Furthermore, please be aware that the LLM may generate inaccurate or incorrect information. You assume full responsibility for how you use any generated output.</strong></p>
+          <p style="margin:0">Always consult with qualified professionals for accurate and personalised advice.</p></div>
+      </div></div>
+
+      <div class="lfoot"><div class="lwrap" style="display:flex;flex-direction:column;gap:clamp(36px,5vw,64px);padding-bottom:40px">
+        <div class="lgrid" style="align-items:end">
+          <div style="display:flex;flex-direction:column;gap:14px"><svg viewBox="0 0 100 100" aria-hidden="true" class="lmark"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="var(--mk-bg,#fff)"/><path d="M31 52 38 48 38 73 31 66Z" fill="currentColor"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/><path d="M62 50 69 54 69 66 62 73Z" fill="currentColor"/></svg><div class="big">Runway</div><div class="tg2">How much lease you have left</div></div>
+          <div style="display:flex;flex-direction:column;gap:14px;font:400 15px/1.6 var(--serif);max-width:48ch">
+            <p style="margin:0">Runway is a learning project, not financial advice. Confirm your position with CPF Board and your HDB eligibility letter.</p>
+            <div class="lrow" style="gap:20px"><button type="button" class="fl" data-go="about">About Us</button><button type="button" class="fl" data-go="method">Methodology</button><button type="button" class="fl" data-go="sources">Data sources</button></div>
+          </div>
+        </div>
+        <div class="base"><span>Team Runway · AI Bootcamp 2026</span><span>Data: HDB resale transactions, data.gov.sg</span></div>
+      </div></div>
     </section>
 
     <!-- ONBOARDING -->
@@ -1152,6 +1357,19 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
       <button type="button" class="side-prof" id="sideProf" data-st="st.sidebar profile"></button>
     </nav>
 
+    <!-- LOGIN OVERLAY -->
+    <div class="lover" id="loginOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <form class="card" id="loginForm" autocomplete="on">
+        <button type="button" class="x" id="loginClose" aria-label="Close"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        <div class="lbrand"><svg viewBox="0 0 100 100" aria-hidden="true" class="lmark"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="var(--mk-bg,#fff)"/><path d="M31 52 38 48 38 73 31 66Z" fill="currentColor"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/><path d="M62 50 69 54 69 66 62 73Z" fill="currentColor"/></svg><span>Runway</span></div>
+        <h2 id="loginTitle">Log in</h2>
+        <p class="small" style="margin:0">For reviewers. Everyone else can use Runway without an account.</p>
+        <label class="field"><span>Username</span><input class="inp" id="u" autocomplete="username" autocapitalize="none" required></label>
+        <label class="field"><span>Password</span><input class="inp" id="pw" type="password" autocomplete="current-password" required></label>
+        <p class="err" id="loginErr" role="alert" hidden>That username and password don't match.</p>
+        <button class="btn primary" type="submit" id="loginBtn">Log in</button>
+      </form>
+    </div>
     <div id="sheetHost"></div>
     <div id="toastHost"></div>
   </div>
@@ -1180,33 +1398,102 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
     clearTimeout(m.timer); delete RW.waiting[id]; RW.queue.shift(); RW.busy = false;
     err ? m.reject(err) : m.resolve(value); pump();
   }
+  RW.me = {user: null, role: 'brief'};
+  RW.enter = (target, arg) => { if(window.RWAPP) RWAPP.enter(target, arg); else RW.pendingEnter = {target, arg}; };
   window.addEventListener('message', ev => {
     const d = ev.data; if(!d || d.type !== 'streamlit:render') return;
     const a = d.args || {};
     (a.replies || []).forEach(r => finish(r.id, r.value));
-    if(a.me && !RW.booted){
-      if(a.data){ RW.booted = true; startRunway(a.data.M, a.data.PHOTOS, a.data.F, a.me); RW.send('booted'); }
+    if(a.me) RW.me = a.me;
+    if(!RW.booted){
+      if(a.data){ RW.booted = true; startRunway(a.data.M, a.data.PHOTOS, a.data.F, RW.me); RW.send('booted'); loginButtons(); }
       else if(!RW.asked){ RW.asked = true; RW.send('need_data'); }
     }
-    if(!a.me && RW.booted) location.reload();
     setHeight();
   });
+  const overlay = document.getElementById('loginOverlay');
+  function loginButtons(){ const b = document.getElementById('lLoginBtn'); if(b) b.textContent = RW.me.user ? 'Log out' : 'Log in'; }
+  RW.openLogin = () => { overlay.hidden = false; document.getElementById('loginErr').hidden = true; setTimeout(() => document.getElementById('u').focus(), 30); };
+  const closeLogin = () => { overlay.hidden = true; };
+  document.querySelectorAll('[data-login]').forEach(b => b.onclick = () => RW.me.user ? RW.logout() : RW.openLogin());
+  document.getElementById('loginClose').onclick = closeLogin;
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeLogin(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && !overlay.hidden) closeLogin(); });
   const form = document.getElementById('loginForm');
   form.addEventListener('submit', async e => {
     e.preventDefault();
     const err = document.getElementById('loginErr'), btn = document.getElementById('loginBtn');
-    err.hidden = true; btn.disabled = true; btn.textContent = 'Signing in…';
+    err.hidden = true; btn.disabled = true; btn.textContent = 'Logging in…';
     try{
       const r = await RW.send('login', {u: document.getElementById('u').value, p: document.getElementById('pw').value});
-      if(!r || !r.ok){ err.textContent = (r && r.error) || "That username and password don't match."; err.hidden = false; }
-      else { document.getElementById('pw').value = ''; btn.textContent = 'Loading your map…'; return; }
+      if(r && r.ok){
+        document.getElementById('pw').value = ''; closeLogin();
+        RW.me = {user: r.user, role: r.role}; loginButtons();
+        if(window.RWAPP) RWAPP.setUser(r.user, r.role);
+      } else { err.textContent = (r && r.error) || "That username and password don't match."; err.hidden = false; }
     }catch(x){ err.textContent = 'Runway did not respond. Try again.'; err.hidden = false; }
-    btn.disabled = false; btn.textContent = 'Sign in';
+    btn.disabled = false; btn.textContent = 'Log in';
   });
-  RW.logout = () => RW.send('logout').finally(() => location.reload());
+  RW.logout = () => RW.send('logout').then(() => { RW.me = {user: null, role: 'brief'}; loginButtons(); if(window.RWAPP) RWAPP.setUser(null, 'brief'); });
   window.addEventListener('resize', setHeight);
   post('streamlit:componentReady', {apiVersion: 1});
   setHeight();
+})();
+</script>
+<script>
+/* ---------- landing page (works before the map data arrives) ---------- */
+(function(){
+  const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+  const L = {age: 28, lease: 58, answer: 'partner', hover: 'Clementi', notice: true};
+  // Same rule as runway/cpf_rules.py (tested): share of the Valuation Limit CPF can pay.
+  function landingShare(age, lease){ if(lease <= 20) return 0; if(age + lease >= 95) return 1; return (lease - 20) / (95 - age - 20); }
+  window.landingShare = landingShare;
+  const ANSWERS = {
+    partner: {q: 'What if my partner is the younger buyer?', a: 'The rule looks only at the youngest owner. If your partner is younger than you, the lease has to last until they turn 95, so a younger partner makes the test harder, not easier.', doc: 'MND and MOM joint press release · 9 May 2019', quote: 'The rules will now focus on whether the remaining lease of the home can cover the youngest buyer until at least the age of 95.'},
+    cut: {q: 'How much is my CPF use cut by?', a: 'When the lease does not cover the youngest buyer to 95, the Valuation Limit is pro-rated. CPF Board\'s example: two 25-year-olds buying a $550,000 flat with 65 years left can use up to $495,000. The HDB loan limit, 75% today, is pro-rated the same way.', doc: 'MND · Annex A, 9 May 2019', quote: 'Valuation Limit pro-rated according to the extent that the remaining lease can cover the youngest buyer using CPF to the age of 95.'},
+    twenty: {q: 'What does the 20-year minimum lease mean?', a: 'The remaining lease at the point of purchase, which is the flat application date for HDB flats, must be more than 20 years, whatever your age. Below that, no CPF and no HDB loan.', doc: 'MND · Annex A, 9 May 2019', quote: 'Remaining lease at the point of purchase is more than 20 years. For HDB flats, the point of purchase refers to the flat application date.'}
+  };
+  const TOWNS = [['Yishun', .51], ['Hougang', .65], ['Choa Chu Kang / Bukit Batok', .84], ['Tampines', .92], ['Bedok / Bukit Merah', 1.27], ['Queenstown', 1.40], ['Ang Mo Kio', 1.49], ['Toa Payoh', 1.54], ['Clementi', 1.62]];
+  function renderRule(){
+    const need = 95 - L.age, gap = L.lease - need, ok = gap >= 0, share = landingShare(L.age, L.lease), span = Math.max(need, L.lease);
+    $('#lLease').textContent = L.lease + ' yrs'; $('#lAge').textContent = L.age;
+    const b = $('#lBadge'); b.textContent = L.lease <= 20 ? 'No CPF' : ok ? 'CPF up to Valuation Limit' : 'CPF pro-rated';
+    b.style.background = ok ? '#fff' : '#7A2E1D'; b.style.color = ok ? '#111' : '#fff';
+    $('#lTitle').textContent = L.lease <= 20 ? 'With 20 years or less left, CPF cannot be used.' : ok ? 'The lease covers your youngest buyer to 95.' : `The lease runs out ${-gap} year${gap === -1 ? '' : 's'} before your youngest buyer turns 95.`;
+    $('#lCover').style.width = Math.round(L.lease / span * 100) + '%'; $('#lCover').style.background = ok ? '#E8B4A5' : '#7A2E1D';
+    $('#lNeed').style.left = Math.min(99.5, need / span * 100) + '%';
+    $('#lCovers').textContent = `Lease covers ${L.lease} years`; $('#lNeeds').textContent = `Needs ${need} to reach 95`;
+    $('#lBody').textContent = L.lease <= 20 ? 'The flat would have to be paid in cash: no CPF and no HDB loan.'
+      : ok ? `This flat has ${L.lease} years left and needs ${need} to reach 95. It does, with ${gap} to spare, so CPF can be used up to the Valuation Limit and the HDB loan up to 75%.`
+      : `It needs ${need} years and falls ${-gap} short, so you can use about ${Math.round(share * 100)}% of the Valuation Limit: (${L.lease} − 20) ÷ (${need} − 20). The 75% HDB loan limit is cut the same way, to about ${Math.round(share * 75)}%.`;
+  }
+  $$('[data-rule]').forEach(btn => btn.onclick = () => {
+    const d = +btn.dataset.d;
+    if(btn.dataset.rule === 'lease') L.lease = Math.max(21, Math.min(99, L.lease + d)); else L.age = Math.max(21, Math.min(70, L.age + d));
+    renderRule();
+  });
+  function renderTowns(){
+    $('#lTownRows').innerHTML = TOWNS.map(([n, v]) => { const on = n === L.hover; return `<div class="tr" data-town="${n}"><span class="nm" style="color:${on ? '#7A2E1D' : '#111'}">${n}</span><span class="bar"><i style="width:${Math.round(v / 1.62 * 100)}%;background:${on ? '#7A2E1D' : '#D9D4CC'}"></i></span><span class="pc" style="color:${on ? '#7A2E1D' : '#111'}">${v.toFixed(2)}%</span></div>`; }).join('');
+    const t = TOWNS.find(x => x[0] === L.hover);
+    $('#lTownNote').textContent = `In ${t[0]}, a 58-year flat trades about ${Math.round((1 - Math.pow(1 + t[1] / 100, -12)) * 100)}% per sqm below a comparable 70-year one.`;
+    $$('#lTownRows .tr').forEach(r => r.onmouseenter = () => { if(L.hover !== r.dataset.town){ L.hover = r.dataset.town; renderTowns(); } });
+  }
+  function renderAsk(){
+    const a = ANSWERS[L.answer];
+    $('#lAq').textContent = a.q; $('#lAa').textContent = a.a; $('#lAdoc').textContent = a.doc; $('#lAquote').textContent = '“' + a.quote + '”';
+    $('#lSugg').innerHTML = Object.entries(ANSWERS).map(([k, v]) => `<button type="button" class="lchip ${k === L.answer ? 'on' : ''}" data-ans="${k}">${v.q}</button>`).join('');
+    $$('[data-ans]').forEach(c => c.onclick = () => { L.answer = c.dataset.ans; renderAsk(); });
+  }
+  const askTyped = () => { const q = $('#lAskIn').value.trim(); if(q){ $('#lAskIn').value = ''; RW.enter('ask', q); } };
+  $('#lAskBtn').onclick = askTyped; $('#lAskIn').onkeydown = e => { if(e.key === 'Enter') askTyped(); };
+  $('#lNoticeTog').onclick = () => { L.notice = !L.notice; $('#lNoticeTxt').hidden = !L.notice; $('#lNoticeLab').textContent = L.notice ? 'Collapse' : 'Read the notice'; $('#lNoticeTog').setAttribute('aria-expanded', L.notice); };
+  const scr = $('#scrLanding');
+  scr.addEventListener('scroll', () => { $('#lnav').classList.toggle('scrolled', scr.scrollTop > 40); const ph = $('#lheroPh'); if(ph) ph.style.transform = `translate3d(0,${Math.min(scr.scrollTop, 900) * .12}px,0)`; }, {passive: true});
+  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold: .18});
+  $$('.reveal').forEach(el => io.observe(el));
+  const img = $('#lheroImg'); img.onload = () => img.style.opacity = '1'; if(img.complete) img.style.opacity = '1';
+  $$('[data-go]').forEach(b => b.onclick = () => { const g = b.dataset.go; if(g === 'top'){ scr.scrollTo({top: 0, behavior: 'smooth'}); return; } RW.enter(g === 'map' ? 'map' : 'more', g === 'map' ? null : g); });
+  renderRule(); renderTowns(); renderAsk();
 })();
 </script>
 <script>
@@ -1271,8 +1558,8 @@ function meter(t){
 const meterHtml = n=>`<span class="meter" aria-hidden="true">${[1,2,3].map(i=>`<i class="${i<=n?'f':''}"></i>`).join('')}</span>`;
 
 /* ---------- navigation ---------- */
-const SCR=['scrLogin','scrOnb','scrMap','scrList','scrAsk','scrMore','scrSub'];
-function show(id){SCR.forEach(s=>$('#'+s).hidden = s!==id); $('#tabs').hidden = (id==='scrLogin'||id==='scrOnb');}
+const SCR=['scrLanding','scrOnb','scrMap','scrList','scrAsk','scrMore','scrSub'];
+function show(id){SCR.forEach(s=>$('#'+s).hidden = s!==id); $('#tabs').hidden = (id==='scrLanding'||id==='scrOnb');}
 function sideProf(){const b=$('#sideProf');if(!b)return;b.innerHTML=`<span class="label">Your details</span><b>Youngest buyer ${S.age}</b><span>Average age ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}</span>`;b.onclick=()=>{tab('more');sub('details');};}
 function tab(t){
   S.tab=t; S.sub=null; closeSheet(); sideProf();
@@ -1311,7 +1598,7 @@ function renderOnb(){
   }
   $('#nx').onclick=()=>{S.onb++; renderOnb(); $('#scrOnb').scrollTop=0;};
 }
-function finishOnb(){ needFit=true; tab('map'); }
+function finishOnb(){ needFit=true; S.onbDone=true; const a=S.after; S.after=null; if(a) go(a.target,a.arg); else tab('map'); }
 function townListHtml(){
   return REGIONS.map(([r,ids])=>`<div class="region"><span class="label">${r}</span>${ids.map(id=>{const t=TBY[id],m=meter(t);return `<button type="button" class="townrow" data-town="${id}" aria-pressed="${id===S.town}"><span><b>${esc(t.name)}</b><small>${t.low?'Lease effect: not enough data':`Lease matters: ${['','a little','quite a lot','a lot'][m.n]}`}</small></span><span style="display:flex;gap:8px;align-items:center">${S.stamps.has(id)?'<span class="stampmark">Visited</span>':''}${meterHtml(m.n)}</span></button>`;}).join('')}</div>`).join('');
 }
@@ -1717,7 +2004,7 @@ $('#askForm').addEventListener('submit',e=>{e.preventDefault();const v=$('#askIn
 /* ---------- more ---------- */
 function renderMore(){
   $('#moreBody').innerHTML=`
-    <div class="scr-h"><h1>More</h1><p class="ui" style="font-size:.9rem">Signed in as ${esc(S.user)}</p></div>
+    <div class="scr-h"><h1>More</h1><p class="ui" style="font-size:.9rem">${S.user?'Logged in as '+esc(S.user):'Browsing as a guest'}</p></div>
     <div class="list">
       <button data-sub="details"><span>Your details<small>Youngest ${S.age} · average ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}</small></span>${ICON.chev}</button>
       <button data-sub="size"><span>Text size<small>${document.documentElement.classList.contains('big')?'Large':'Normal'}</small></span>${ICON.chev}</button>
@@ -1726,10 +2013,13 @@ function renderMore(){
       <button data-sub="about"><span>About Us<small>What Runway is, notice, team</small></span>${ICON.chev}</button>
       <button data-sub="method"><span>How it works<small>Methodology and flowcharts</small></span>${ICON.chev}</button>
       <button data-sub="sources"><span>Sources and credits<small>Data, map, documents, photos</small></span>${ICON.chev}</button>
+      <button id="homeBtn"><span>Runway home page<small>The rule, lease by town, notice</small></span>${ICON.chev}</button>
     </div>
-    <button class="btn ghost" type="button" id="outBtn">Sign out</button>`;
+    ${S.user?'<button class="btn ghost" type="button" id="outBtn">Log out</button>':'<button class="btn" type="button" id="inBtn">Log in for the reviewer view</button>'}`;
   $$('[data-sub]').forEach(b=>b.onclick=()=>sub(b.dataset.sub));
-  $('#outBtn').onclick=signOut;
+  const ob=$('#outBtn'); if(ob) ob.onclick=signOut;
+  const ib=$('#inBtn'); if(ib) ib.onclick=()=>RW.openLogin();
+  $('#homeBtn').onclick=()=>show('scrLanding');
 }
 function signOut(){closeSheet();RW.logout();}
 function backBtn(){return `<button class="back" type="button" id="backBtn">${ICON.back}More</button>`;}
@@ -1872,7 +2162,15 @@ function methodHtml(){
 }
 window.addEventListener('resize',()=>{if(LM)LM.invalidateSize();});
 $('#noticeLink').onclick=()=>{tab('more');sub('about');requestAnimationFrame(()=>{const n=$('#notice');if(n)n.scrollIntoView();});};
-S.user=ME.user; S.role=ME.role; S.onb=1;
-show('scrOnb'); renderOnb();
+S.user=ME.user; S.role=ME.role||'brief'; S.onb=1; S.onbDone=false;
+function go(target,arg){ if(target==='ask'){tab('ask'); if(arg) ask(arg);} else if(target==='more'){tab('more'); if(arg) sub(arg);} else tab('map'); }
+window.RWAPP={
+  enter(target,arg){ if(target==='more'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=1; show('scrOnb'); renderOnb(); },
+  setUser(user,role){ S.user=user; S.role=role||'brief'; if(!$('#scrSub').hidden) renderSub(); else if(!$('#scrMore').hidden) renderMore(); }
+};
+const brand=$('.tabs .brand'); if(brand){ brand.style.cursor='pointer'; brand.onclick=()=>show('scrLanding'); }
+show('scrLanding');
+if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(p.target,p.arg); }
 }
+
 </script>

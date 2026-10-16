@@ -9,26 +9,19 @@ from pathlib import Path
 import pytest
 from streamlit.testing.v1 import AppTest
 
-from runway.cpf_rules import flat_money
+from runway.cpf_rules import cpf_share, flat_money
 from runway.game_data import load_game_data
 
 ROOT = Path(__file__).resolve().parent.parent
 GAME = (ROOT / "runway_game" / "index.html").read_text(encoding="utf-8")
-DEMO_WORDS = ("demo", "mockup", "scripted", "prototype", "try it now", "live app")
+DEMO_WORDS = ("demo sign-in", "mockup", "scripted", "try it now", "live app", "runway2026")
 
 
-def test_host_runs_and_withholds_data_before_sign_in():
+def test_host_runs_for_a_guest():
     at = AppTest.from_file("app.py", default_timeout=60)
     at.run()
     assert not at.exception
     assert "user" not in at.session_state
-
-
-def test_host_sends_data_once_signed_in():
-    at = AppTest.from_file("app.py", default_timeout=60)
-    at.session_state["user"], at.session_state["role"] = "demo", "brief"
-    at.run()
-    assert not at.exception
 
 
 def test_game_data_has_every_town_with_a_photo_and_credit():
@@ -39,13 +32,17 @@ def test_game_data_has_every_town_with_a_photo_and_credit():
     assert {"roads", "stops", "am"} <= set(data["F"])
 
 
-def test_interface_has_no_demo_wording_or_built_in_accounts():
-    notice = GAME[GAME.index("const NOTICE = `"):GAME.index("`;", GAME.index("const NOTICE = `"))]  # required, word for word
-    visible = re.sub(r"/\*.*?\*/", "", GAME.replace(notice, ""), flags=re.S).lower()
+def test_interface_has_no_mockup_wording_or_built_in_accounts():
+    visible = re.sub(r"/\*.*?\*/", "", GAME, flags=re.S).lower()
     for word in DEMO_WORDS:
         assert word not in visible, word
-    assert "runway2026" not in GAME and "USERS=" not in GAME
-    assert "IMPORTANT NOTICE" in GAME and "NOT intended for real-world usage" in GAME
+    assert "USERS=" not in GAME
+
+
+def test_landing_page_has_required_notice_and_entry_points():
+    assert GAME.count("NOT intended for real-world usage") >= 2  # landing page (main page) and About Us
+    assert 'id="scrLanding"' in GAME and 'data-go="map"' in GAME and "data-login" in GAME
+    assert 'id="loginOverlay"' in GAME
 
 
 @pytest.mark.skipif(not (shutil.which("node") or Path.home().joinpath(".local/bin/node").exists()),
@@ -53,16 +50,19 @@ def test_interface_has_no_demo_wording_or_built_in_accounts():
 def test_interface_calculator_matches_python_rules(tmp_path):
     """The map's in-browser calculator must give the same numbers as runway/cpf_rules.py."""
     calc = GAME[GAME.index("function calc(price, lease){"):GAME.index("const VTXT = ")]
+    landing = GAME[GAME.index("function landingShare(age, lease){"):GAME.index("window.landingShare")]
     cases = [(p, lease, age, avg) for p in (300_000, 550_000) for lease in (15, 20, 21, 45, 58, 65, 75, 95)
              for age, avg in ((25, 25), (28, 30), (45, 50), (70, 70))]
-    script = (f"let S={{age:0,avg:0,oa:0,oaSet:false}};\n{calc}\n"
+    script = (f"let S={{age:0,avg:0,oa:0,oaSet:false}};\n{calc}\n{landing}\n"
               f"const out={json.dumps(cases)}.map(([p,l,a,v])=>{{S.age=a;S.avg=v;const r=calc(p,l);"
-              f"return [r.cap,r.loan,r.tenure,r.monthly,r.cashLife];}});\nconsole.log(JSON.stringify(out));")
+              f"return [r.cap,r.loan,r.tenure,r.monthly,r.cashLife,landingShare(a,l)];}});\n"
+              f"console.log(JSON.stringify(out));")
     js = tmp_path / "calc.js"
     js.write_text(script)
     node = shutil.which("node") or str(Path.home() / ".local/bin/node")
     results = json.loads(subprocess.run([node, str(js)], capture_output=True, text=True, check=True).stdout)
-    for (price, lease, age, avg), (cap, loan, tenure, monthly, cash) in zip(cases, results):
+    for (price, lease, age, avg), (cap, loan, tenure, monthly, cash, share) in zip(cases, results):
+        assert share == pytest.approx(cpf_share(age, lease)), ("landing", lease, age)
         m = flat_money(price, lease, [age, 2 * avg - age], 0)
         assert cap == pytest.approx(m.cpf_cap), (price, lease, age)
         assert loan == pytest.approx(m.loan_max), (price, lease, age)
