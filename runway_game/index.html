@@ -2432,9 +2432,10 @@ if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(
     }
   }
 
-  function message(text, retry){
+  function message(text, retry, detail){
     const body = document.getElementById('trBody');
     body.replaceChildren(el('div', {class: 'scr-h'}, [el('h1', {text: 'Price trends'}), el('p', {class: 'ui', style: 'font-size:.9rem', text})]),
+      detail ? el('p', {class: 'small', text: 'Technical detail: ' + detail}) : null,
       retry ? el('button', {type: 'button', class: 'btn primary', text: 'Try again', onclick: render}) : null);
   }
 
@@ -2443,14 +2444,14 @@ if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(
     if(st.loading) return;
     st.loading = true; message('Loading price history…');
     window.RW.send('trends').then(r => {
-      if(!r || !r.ok || !r.data) throw new Error('bad reply');
+      if(!r || !r.ok || !r.data) throw new Error((r && r.error) || 'the server sent no data');
       st.data = r.data;
       const want = [st.data.all_towns, 'Punggol', 'Queenstown'].filter(n => n === st.data.all_towns || st.data.towns.includes(n));
       want.forEach((n, i) => { st.slots[i] = n; });
       if(st.data.types.indexOf(st.type) < 0) st.type = st.data.types[0];
-    }).catch(() => { st.failed = true; }).finally(() => {
+    }).catch(e => { st.failed = true; st.error = (e && e.message) || String(e); }).finally(() => {
       st.loading = false;
-      st.data ? build() : message('The price history did not load. Check your connection and try again.', true);
+      st.data ? build() : message('The price history did not load. Try again in a moment.', true, st.error);
     });
   }
   window.RWTRENDS = {render};

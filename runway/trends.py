@@ -3,6 +3,8 @@
 Everything comes from the full HDB resale history in data/resale.parquet (1990 to the latest month).
 Medians are shown only where a cell has at least MIN_SALES sales, so a thin town/flat-type/year is left
 blank instead of looking precise. Prices are nominal (not adjusted for inflation).
+
+Kept deliberately simple: four group-bys over the ~1M rows, then plain Python to lay the results out.
 """
 
 from __future__ import annotations
@@ -10,6 +12,7 @@ from __future__ import annotations
 import functools
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 PARQUET = Path(__file__).resolve().parent.parent / "data" / "resale.parquet"
@@ -18,40 +21,54 @@ FLAT_TYPES = ["3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE"]
 ALL_TOWNS = "All towns"
 MIN_SALES = 10
 RECENT_MONTHS = 24  # the lease chart looks at the latest two years of sales
-BAND_EDGES = [0, 50, 60, 70, 80, 90, 1000]
+BAND_STARTS = [50, 60, 70, 80, 90]  # lease bands: under 50, 50-59, ..., 90 or more
 BAND_LABELS = ["Under 50", "50 to 59", "60 to 69", "70 to 79", "80 to 89", "90 or more"]
 
 
-def _clean(values, step: int) -> list[int | None]:
-    return [None if pd.isna(v) else int(round(float(v) / step) * step) for v in values]
+def _aggregate(d: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
+    """Median price and price per sqm, plus the number of sales, for each group."""
+    return d.groupby(keys).agg(
+        price=("resale_price", "median"), psm=("price_psm", "median"), n=("resale_price", "size")
+    ).reset_index()
 
 
-def _pivot(d: pd.DataFrame, across: str, labels: list, col: str, step: int) -> dict[str, list[int | None]]:
-    """Median of `col` for each town (plus all towns) across `labels`; None where there are too few sales."""
-    enough = lambda s: s["median"].where(s["size"] >= MIN_SALES)  # noqa: E731
-    by_town = d.groupby(["town", across])[col].agg(["median", "size"])
-    by_all = d.groupby(across)[col].agg(["median", "size"])
-    wide = enough(by_town).unstack(across).reindex(columns=labels)
-    out = {str(town): _clean(row, step) for town, row in wide.iterrows()}
-    out[ALL_TOWNS] = _clean(enough(by_all).reindex(labels), step)
-    return out
+def _fill(agg: pd.DataFrame, by_town: bool, size: int, out: dict) -> None:
+    """Write each group's medians into out[metric][flat_type][place][position]; thin groups stay None."""
+    for row in agg.itertuples(index=False):
+        if int(row.n) < MIN_SALES:
+            continue
+        place = str(row.town) if by_town else ALL_TOWNS
+        for metric, value, step in (("price", row.price, 100), ("psm", row.psm, 1)):
+            cells = out[metric][str(row.flat_type)].setdefault(place, [None] * size)
+            cells[int(row.pos)] = int(round(float(value) / step) * step)
 
 
 def build_trends(df: pd.DataFrame) -> dict:
     df = df[COLUMNS].copy()
     df["town"] = df["town"].astype(str)
     df["flat_type"] = df["flat_type"].astype(str)
-    df["year"] = df["month"].dt.year
-    years = list(range(int(df["year"].min()), int(df["year"].max()) + 1))
-    last = df["month"].max()
+    df = df[df["flat_type"].isin(FLAT_TYPES)].copy()
+    month = pd.to_datetime(df["month"])
+    year = month.dt.year.to_numpy()
+    first, last_year = int(year.min()), int(year.max())
+    last = month.max()
     since = last - pd.DateOffset(months=RECENT_MONTHS - 1)
-    recent = df[df["month"] >= since].copy()
-    recent["band"] = pd.cut(recent["remaining_lease"], bins=BAND_EDGES, labels=BAND_LABELS, right=False)
-    recent = recent[recent["band"].notna()]
-    recent["band"] = recent["band"].astype(str)
 
-    out: dict = {
-        "years": years,
+    yearly = df.assign(pos=year - first)
+    recent = df[(month >= since).to_numpy()].copy()
+    recent["pos"] = np.searchsorted(BAND_STARTS, recent["remaining_lease"].to_numpy(dtype=float), side="right")
+
+    def empty() -> dict:
+        return {metric: {t: {} for t in FLAT_TYPES} for metric in ("price", "psm")}
+
+    by_year, by_band = empty(), empty()
+    n_years = last_year - first + 1
+    for frame, size, out in ((yearly, n_years, by_year), (recent, len(BAND_LABELS), by_band)):
+        _fill(_aggregate(frame, ["flat_type", "town", "pos"]), True, size, out)
+        _fill(_aggregate(frame, ["flat_type", "pos"]), False, size, out)
+
+    return {
+        "years": list(range(first, last_year + 1)),
         "towns": sorted(df["town"].unique().tolist()),
         "all_towns": ALL_TOWNS,
         "types": FLAT_TYPES,
@@ -59,18 +76,12 @@ def build_trends(df: pd.DataFrame) -> dict:
         "since_month": since.strftime("%Y-%m"),
         "min_sales": MIN_SALES,
         "bands": BAND_LABELS,
-        "price": {}, "psm": {}, "lease_price": {}, "lease_psm": {},
+        "price": by_year["price"], "psm": by_year["psm"],
+        "lease_price": by_band["price"], "lease_psm": by_band["psm"],
     }
-    for flat_type in FLAT_TYPES:
-        d, r = df[df["flat_type"] == flat_type], recent[recent["flat_type"] == flat_type]
-        out["price"][flat_type] = _pivot(d, "year", years, "resale_price", 100) if len(d) else {}
-        out["psm"][flat_type] = _pivot(d, "year", years, "price_psm", 1) if len(d) else {}
-        out["lease_price"][flat_type] = _pivot(r, "band", BAND_LABELS, "resale_price", 100) if len(r) else {}
-        out["lease_psm"][flat_type] = _pivot(r, "band", BAND_LABELS, "price_psm", 1) if len(r) else {}
-    return out
 
 
 @functools.lru_cache(maxsize=1)
 def load_trends() -> dict:
-    """Built once per server process (about a second for ~1M rows), then reused for every visitor."""
+    """Built once per server process, then reused for every visitor."""
     return build_trends(pd.read_parquet(PARQUET, columns=COLUMNS))
