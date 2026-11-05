@@ -2370,10 +2370,11 @@ if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(
       full: i => d.years[idx[i]] + (d.years[idx[i]] === last && partial ? ' (January to ' + MONTHS[lastMonth - 1] + ')' : ''),
       series: names.map(n => ({name: n, color: colorOf(n), values: idx.map(i => (d[st.metric][st.type][n] || [])[i] ?? null)})),
     };
+    const bandOrder = d.bands.map((_, i) => i).reverse();  // most lease on the left, running down to the least on the right
     const lease = {
-      x: d.bands, xTitle: 'Years of lease left', axisTitle: 'Years of lease left (more lease is further right)', fmt: M.fmt, short: M.short, tickWidth: 28,
-      tick: i => SHORT_BAND[i], full: i => d.bands[i] + ' years of lease left',
-      series: names.map(n => ({name: n, color: colorOf(n), values: (d['lease_' + st.metric][st.type][n] || d.bands.map(() => null))})),
+      x: bandOrder.map(i => d.bands[i]), xTitle: 'Years of lease left', axisTitle: 'Years of lease left (less lease is further right)', fmt: M.fmt, short: M.short, tickWidth: 28,
+      tick: i => SHORT_BAND[bandOrder[i]], full: i => d.bands[bandOrder[i]] + ' years of lease left',
+      series: names.map(n => ({name: n, color: colorOf(n), values: bandOrder.map(i => (d['lease_' + st.metric][st.type][n] || d.bands.map(() => null))[i])})),
     };
     return {yearly, lease, last, partial, lastMonth};
   }
