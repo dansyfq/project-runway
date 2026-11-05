@@ -14,6 +14,7 @@ from collections.abc import MutableMapping
 from runway.auth import check_login
 from runway.llm import AI_BUSY, INVENTED_FIGURE, LLM, screen_question
 from runway.rag import Chunk, Retriever
+from runway.trends import load_trends
 
 MAX_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
@@ -108,6 +109,9 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
         note = f"The AI {why}, so here are the official pages." if offline else None  # the text itself is neutral
         return {"text": answer.text, "sources": source_view(answer.sources), "blocked": answer.blocked,
                 "offline": offline, "note": note}
+
+    if kind == "trends":  # public price history: no login, no personal details
+        return {"ok": True, "data": load_trends()}
 
     if kind == "summary":
         return {"text": bot.summarise(clean_history(payload.get("history"), 12))}

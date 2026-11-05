@@ -20,6 +20,7 @@ The interface in `runway_game/index.html` is the approved design hand-off, runni
 | **Setup** | Youngest buyer's age, rough CPF, first town. No names or NRIC. |
 | **Map** (use case 1) | Town Safari: every HDB block, MRT lines and the flats sold in Jul–Sep 2026. Tap a diamond for the verdict, runway bar, CPF you can use and cash you need. Keep, Why?, Next flat. |
 | **Shortlist** | Kept flats recalculated for your details, CSV download, and 26 town stamps with Wikimedia Commons photos. |
+| **Trends** | Public price charts, no login or setup needed. Compare median resale price or price per sqm by town since 1990 (up to 5 places, by flat type and period), and what remaining lease does to price. Numbers are built from `data/resale.parquet` by `runway/trends.py`; each chart has a table view. |
 | **Ask** (use case 2) | Answers from 32 official documents with sources, "Why?" for a flat, chat summary, read-aloud, and document upload that suggests towns. |
 | **More** | Your details, text size, About Us (with the required notice), How it works (flowcharts), Sources and credits. Visitors browse as guests and see short versions; logging in as `reviewer` shows the full ones. |
 
