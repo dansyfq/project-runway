@@ -2288,18 +2288,22 @@ if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(
       svg.append(sv('text', {x: X(i), y: m.t + ph + 18, 'text-anchor': 'middle', fill: '#666', 'font-size': 11, text: spec.tick(i)}));
     if(spec.axisTitle) svg.append(sv('text', {x: m.l + pw / 2, y: h - 6, 'text-anchor': 'middle', fill: '#444', 'font-size': 11, 'font-weight': 600, text: spec.axisTitle}));
 
-    const ends = [];
+    const ends = [], segs = [];  // segs: every drawn line piece, so a label can find a spot that touches none
     spec.series.forEach(s => {
       let d = '', pen = false, last = -1;
       s.values.forEach((v, i) => {
         if(v == null){ pen = false; return; }
         d += (pen ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); pen = true; last = i;
+        if(i > 0 && s.values[i - 1] != null) segs.push([X(i - 1), Y(s.values[i - 1]), X(i), Y(v)]);
       });
       // A faint dashed bridge across any gap (too few sales), so a point after a gap is visibly part of the same line.
       let bridge = '', before = -1;
       s.values.forEach((v, i) => {
         if(v == null) return;
-        if(before >= 0 && i - before > 1) bridge += 'M' + X(before).toFixed(1) + ' ' + Y(s.values[before]).toFixed(1) + 'L' + X(i).toFixed(1) + ' ' + Y(v).toFixed(1);
+        if(before >= 0 && i - before > 1){
+          bridge += 'M' + X(before).toFixed(1) + ' ' + Y(s.values[before]).toFixed(1) + 'L' + X(i).toFixed(1) + ' ' + Y(v).toFixed(1);
+          segs.push([X(before), Y(s.values[before]), X(i), Y(v)]);
+        }
         before = i;
       });
       if(bridge) svg.append(sv('path', {d: bridge, fill: 'none', stroke: s.color, 'stroke-width': 1.5, 'stroke-dasharray': '3 4', 'stroke-linecap': 'round', opacity: 0.8}));
@@ -2317,9 +2321,28 @@ if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(
       let prev = -Infinity; edge.forEach(o => { o.ly = Math.max(o.y, prev + 13); prev = o.ly; });
       const over = edge.length ? edge[edge.length - 1].ly - (m.t + ph) : 0; if(over > 0) edge.forEach(o => { o.ly -= over; });
       edge.forEach(o => svg.append(sv('text', {x: m.l + pw + 9, y: o.ly + 4, fill: '#111', 'font-size': 11, 'font-weight': 600, text: name(o)})));
-      // Lines that stop early (too few sales after that): the name sits at the dot where the line really ends.
-      ends.filter(o => o.last < n - 1).forEach(o => svg.append(sv('text', {x: o.x + 8, y: o.y - 9, fill: '#111', 'font-size': 11, 'font-weight': 600,
-        stroke: '#fff', 'stroke-width': 3, 'stroke-linejoin': 'round', 'paint-order': 'stroke', text: name(o)})));
+      // Lines that stop early (too few sales after that): the name sits by the dot where the line really ends,
+      // on the first side (right/left, above/below) where its box touches no line.
+      const touches = (bx, by, bw, bh) => segs.some(([x1, y1, x2, y2]) => {
+        const steps = Math.max(1, Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 3));
+        for(let k = 0; k <= steps; k++){
+          const px = x1 + (x2 - x1) * k / steps, py = y1 + (y2 - y1) * k / steps;
+          if(px >= bx - 2 && px <= bx + bw + 2 && py >= by - 2 && py <= by + bh + 2) return true;
+        }
+        return false;
+      });
+      ends.filter(o => o.last < n - 1).forEach(o => {
+        const label = name(o), tw = label.length * 6.4 + 4;
+        const spots = [  // [text x, baseline y, anchor, box left]
+          [o.x + 8, o.y - 9, 'start', o.x + 8], [o.x + 8, o.y + 17, 'start', o.x + 8],
+          [o.x - 8, o.y - 9, 'end', o.x - 8 - tw], [o.x - 8, o.y + 17, 'end', o.x - 8 - tw],
+          [o.x, o.y - 14, 'middle', o.x - tw / 2],
+        ];
+        const fits = ([, ty, , bl]) => bl >= 2 && bl + tw <= w - 2 && ty - 10 >= 0 && ty <= h - 24 && !touches(bl, ty - 10, tw, 14);
+        const [tx, ty, anchor] = spots.find(fits) || spots[0];
+        svg.append(sv('text', {x: tx, y: ty, 'text-anchor': anchor, fill: '#111', 'font-size': 11, 'font-weight': 600,
+          stroke: '#fff', 'stroke-width': 3, 'stroke-linejoin': 'round', 'paint-order': 'stroke', text: label}));
+      });
     }
 
     const cross = sv('line', {y1: m.t, y2: m.t + ph, stroke: '#898781', 'stroke-width': 1, visibility: 'hidden'});
