@@ -2271,7 +2271,7 @@ if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(
   function lineChart(host, spec){
     host.replaceChildren();
     const n = spec.x.length, w = Math.max(280, Math.floor(host.clientWidth) || 320), small = w < 520, h = (small ? 250 : 300) + (spec.axisTitle ? 20 : 0);
-    const direct = spec.series.length <= 4;
+    const direct = true;  // name every line (at most 5); the names are nudged apart, so they fit
     const m = {t: 14, r: direct ? (small ? 84 : 118) : 18, b: spec.axisTitle ? 52 : 32, l: small ? 46 : 56};
     const pw = w - m.l - m.r, ph = h - m.t - m.b;
     const all = spec.series.flatMap(s => s.values).filter(v => v != null);
