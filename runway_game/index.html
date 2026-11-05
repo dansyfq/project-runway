@@ -726,7 +726,7 @@ button{cursor:pointer}
 /* screens */
 .screen{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;position:relative}
 .pad{padding:20px 20px 28px;display:flex;flex-direction:column;gap:18px}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--sand);background:var(--white);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--sand);background:var(--white);padding-bottom:env(safe-area-inset-bottom,0px)}
 .tabs button{border:0;background:none;padding:8px 2px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;font:600 .74rem var(--ui);color:var(--stone);position:relative;min-height:62px}
 .tabs button svg{width:26px;height:26px}
 .tabs button[aria-current="page"]{color:var(--rust)}
@@ -1003,6 +1003,33 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
 .br>div{display:flex;flex-direction:column}
 .br .bl{font:700 .68rem var(--ui);color:var(--slate);text-align:center;padding:3px 0}
 
+/* ---- Trends (public price charts) ---- */
+.tr .card{background:var(--white);border:1px solid var(--sand);border-radius:14px;padding:16px 16px 12px;display:flex;flex-direction:column;gap:10px}
+.tr .card h2{font:700 1.05rem/1.3 var(--ui);margin:0;color:var(--ink)}
+.tr .card p{margin:0}
+.tr .card .small{color:var(--slate)}
+.trf{display:flex;flex-wrap:wrap;gap:8px}
+.trf .chip{min-height:44px;padding:6px 14px;font-size:.9rem}
+.trk{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--sand);border-radius:999px;padding:4px 4px 4px 12px;font:600 .88rem var(--ui);color:var(--ink);background:var(--white);min-height:44px}
+.trk i{width:16px;height:3px;border-radius:2px;display:inline-block}
+.trk button{border:0;background:none;width:34px;height:34px;border-radius:50%;font:700 1.1rem var(--ui);color:var(--slate);cursor:pointer}
+.trk button:hover{background:var(--no-soft)}
+.trsel{min-height:44px;border:2px solid var(--sand);border-radius:10px;padding:0 10px;font:600 .9rem var(--ui);background:var(--white);color:var(--ink)}
+.trc{position:relative;width:100%;min-height:250px}
+.trc svg{display:block;width:100%;height:auto;overflow:visible;font-family:var(--ui)}
+.trc svg:focus-visible{outline:2px solid var(--rust);outline-offset:2px;border-radius:6px}
+.trtip{position:absolute;pointer-events:none;background:var(--white);border:1px solid var(--sand);border-radius:8px;padding:8px 10px;box-shadow:0 6px 18px rgba(0,0,0,.12);font:500 .8rem var(--ui);color:var(--slate);min-width:150px;z-index:3}
+.trtip b.h{display:block;color:var(--ink);margin-bottom:4px}
+.trtip .row{display:flex;align-items:center;gap:8px;margin-top:2px}
+.trtip .row i{width:12px;height:2px;flex:none}
+.trtip .row strong{color:var(--ink);font-weight:700}
+.trtbl{max-height:360px;overflow:auto;border:1px solid var(--sand);border-radius:10px}
+.trtbl table{width:100%;border-collapse:collapse;font:500 .85rem var(--ui);font-variant-numeric:tabular-nums}
+.trtbl th,.trtbl td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--sand);white-space:nowrap}
+.trtbl th:first-child,.trtbl td:first-child{text-align:left;position:sticky;left:0;background:var(--white)}
+.trtbl thead th{position:sticky;top:0;background:var(--paper);color:var(--ink)}
+.trtog{align-self:flex-start;border:0;background:none;color:var(--rust);font:600 .85rem var(--ui);padding:6px 0;text-decoration:underline;cursor:pointer;min-height:36px}
+
 /* ---- responsive: tablet and desktop ---- */
 .tabs .brand,.tabs .side-prof{display:none}
 @media (min-width:700px){
@@ -1165,6 +1192,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
         <button type="button" class="lbrand" data-go="top" aria-label="Runway home"><svg viewBox="0 0 100 100" aria-hidden="true" class="lmark"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="var(--mk-bg,#fff)"/><path d="M31 52 38 48 38 73 31 66Z" fill="currentColor"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/><path d="M62 50 69 54 69 66 62 73Z" fill="currentColor"/></svg><span>Runway</span></button>
         <div class="llinks">
           <a class="lk" href="#lask">Ask Runway</a>
+          <button type="button" class="lk" data-go="trends">Price trends</button>
           <button type="button" class="lk" data-go="about">About</button>
           <button type="button" class="lbtn sm login" data-login id="lLoginBtn">Log in</button>
           <button type="button" class="lbtn sm" data-go="map">Check a flat</button>
@@ -1179,7 +1207,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
           <div class="leyebrow lrise"><i></i>For HDB resale buyers</div>
           <h1 class="lrise" style="animation-delay:.1s">How much lease you have left, <em>and what it buys you.</em></h1>
           <p class="lead2 lrise" style="animation-delay:.22s">The years left on a flat's lease, combined with your age, decide how much CPF you can use. Runway shows you the rule and what a shorter lease costs in your town.</p>
-          <div class="lrow lrise" style="animation-delay:.34s"><button type="button" class="lbtn" data-go="map">Check a flat<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a class="lbtn ghost" href="#lask">Ask a question</a></div>
+          <div class="lrow lrise" style="animation-delay:.34s"><button type="button" class="lbtn" data-go="map">Check a flat<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a class="lbtn ghost" href="#lask">Ask a question</a><button type="button" class="lbtn ghost" data-go="trends">See price trends</button></div>
           <div class="lstats lrise" style="animation-delay:.46s">
             <div><b>986,090</b><span>resale records</span></div>
             <div><b>1990 – 2026</b><span>every HDB town</span></div>
@@ -1319,6 +1347,9 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
       </form>
     </section>
 
+    <!-- TRENDS (public) -->
+    <section class="screen" id="scrTrends" hidden><div class="pad tr" id="trBody"></div></section>
+
     <!-- MORE -->
     <section class="screen" id="scrMore" hidden><div class="pad" id="moreBody"></div></section>
 
@@ -1330,6 +1361,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
       <div class="brand"><svg viewBox="0 0 100 100" aria-hidden="true"><g fill="#7A2E1D"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="#7A2E1D" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="#F6F3EE"/><path d="M31 52 38 48 38 73 31 66Z"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z"/><path d="M62 50 69 54 69 66 62 73Z"/></g></svg><span><span class="wm">RUNWAY</span><span class="tg">HOW MUCH LEASE YOU HAVE LEFT</span></span></div>
       <button data-tab="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Map</button>
       <button data-tab="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 22 12 12 22 2 12Z"/><path d="M8 12l3 3 5-6"/></svg>Shortlist<span class="count" id="listCount" hidden>0</span></button>
+      <button data-tab="trends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M4 16l5-5 4 3 7-8"/><path d="M15 6h5v5"/></svg>Trends</button>
       <button data-tab="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4z"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.4"/></svg>Ask</button>
       <button data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>More</button>
       <button type="button" class="side-prof" id="sideProf" data-st="st.sidebar profile"></button>
@@ -1469,7 +1501,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
   const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }), {threshold: .18});
   $$('.reveal').forEach(el => io.observe(el));
   const img = $('#lheroImg'); img.onload = () => img.style.opacity = '1'; if(img.complete) img.style.opacity = '1';
-  $$('[data-go]').forEach(b => b.onclick = () => { const g = b.dataset.go; if(g === 'top'){ scr.scrollTo({top: 0, behavior: 'smooth'}); return; } RW.enter(g === 'map' ? 'map' : 'more', g === 'map' ? null : g); });
+  $$('[data-go]').forEach(b => b.onclick = () => { const g = b.dataset.go; if(g === 'top'){ scr.scrollTo({top: 0, behavior: 'smooth'}); return; } if(g === 'trends'){ RW.enter('trends'); return; } RW.enter(g === 'map' ? 'map' : 'more', g === 'map' ? null : g); });
   renderRule(); renderAsk();
 })();
 </script>
@@ -1537,7 +1569,7 @@ function meter(t){
 const meterHtml = n=>`<span class="meter" aria-hidden="true">${[1,2,3].map(i=>`<i class="${i<=n?'f':''}"></i>`).join('')}</span>`;
 
 /* ---------- navigation ---------- */
-const SCR=['scrLanding','scrOnb','scrMap','scrList','scrAsk','scrMore','scrSub'];
+const SCR=['scrLanding','scrOnb','scrMap','scrList','scrAsk','scrTrends','scrMore','scrSub'];
 function show(id){SCR.forEach(s=>$('#'+s).hidden = s!==id); $('#tabs').hidden = (id==='scrLanding'||id==='scrOnb');}
 function sideProf(){const b=$('#sideProf');if(!b)return;b.innerHTML=`<span class="label">Your details</span><b>Youngest buyer ${S.age}</b><span>Average age ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}</span>`;b.onclick=()=>{tab('more');sub('details');};}
 function tab(t){
@@ -1546,6 +1578,7 @@ function tab(t){
   if(t==='map'){show('scrMap'); drawMap();}
   if(t==='list'){show('scrList'); renderList();}
   if(t==='ask'){show('scrAsk'); renderChat();}
+  if(t==='trends'){show('scrTrends'); window.RWTRENDS.render();}
   if(t==='more'){show('scrMore'); renderMore();}
 }
 $$('.tabs [data-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
@@ -2180,9 +2213,9 @@ function methodHtml(){
 window.addEventListener('resize',()=>{if(LM)LM.invalidateSize();});
 $('#noticeLink').onclick=()=>{tab('more');sub('about');requestAnimationFrame(()=>{const n=$('#notice');if(n)n.scrollIntoView();});};
 S.user=ME.user; S.role=ME.role||'brief'; S.onb=1; S.onbDone=false;
-function go(target,arg){ if(target==='ask'){tab('ask'); if(arg) ask(arg);} else if(target==='more'){tab('more'); if(arg) sub(arg);} else tab('map'); }
+function go(target,arg){ if(target==='trends'){tab('trends');} else if(target==='ask'){tab('ask'); if(arg) ask(arg);} else if(target==='more'){tab('more'); if(arg) sub(arg);} else tab('map'); }
 window.RWAPP={
-  enter(target,arg){ if(window.RWLANDINGAGE){ S.age=window.RWLANDINGAGE; S.ageSet=true; syncAvg(); S.dirty=true; window.RWLANDINGAGE=null; } if(target==='more'||target==='ask'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=1; show('scrOnb'); renderOnb(); },
+  enter(target,arg){ if(window.RWLANDINGAGE){ S.age=window.RWLANDINGAGE; S.ageSet=true; syncAvg(); S.dirty=true; window.RWLANDINGAGE=null; } if(target==='more'||target==='ask'||target==='trends'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=1; show('scrOnb'); renderOnb(); },
   setUser(user,role){ S.user=user; S.role=role||'brief'; if(!$('#scrSub').hidden) renderSub(); else if(!$('#scrMore').hidden) renderMore(); }
 };
 const brand=$('.tabs .brand'); if(brand){ brand.style.cursor='pointer'; brand.onclick=()=>show('scrLanding'); }
@@ -2190,4 +2223,236 @@ show('scrLanding');
 if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(p.target,p.arg); }
 }
 
+</script>
+<script>
+/* Public price trends: median resale price (or price per sqm) by town since 1990, and what remaining lease does
+   to price. Numbers come from Python (runway/trends.py) as one small message; the charts are drawn here as SVG. */
+(function(){
+  const NS = 'http://www.w3.org/2000/svg';
+  // Categorical slots 1-5 of the dataviz reference palette, in order (validated: adjacent colours stay distinct).
+  const COLORS = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4'];
+  const MAX = COLORS.length;
+  const TYPE = {'3 ROOM': '3-room', '4 ROOM': '4-room', '5 ROOM': '5-room', 'EXECUTIVE': 'Executive'};
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const SHORT_BAND = ['<50', '50s', '60s', '70s', '80s', '90+'];
+  const PERIODS = [['all', 'All years'], ['10', 'Last 10 years'], ['5', 'Last 5 years']];
+  const money = v => '$' + Math.round(v).toLocaleString('en-SG');
+  const shortMoney = v => v >= 1e6 ? '$' + (+(v / 1e6).toFixed(2)) + 'M' : '$' + Math.round(v / 1000) + 'k';
+  const METRICS = {
+    price: {label: 'Median price', title: 'Median resale price', fmt: money, short: shortMoney},
+    psm: {label: 'Price per sqm', title: 'Median price per square metre', fmt: money, short: v => '$' + Math.round(v).toLocaleString('en-SG')}
+  };
+  const st = {data: null, loading: false, failed: false, metric: 'price', type: '4 ROOM', period: '10',
+    slots: [null, null, null, null, null], tbl: {a: false, b: false}};
+  let hosts = [], observed = false;
+
+  function setAttrs(n, a){
+    for(const k in a || {}){
+      const v = a[k]; if(v == null || v === false) continue;
+      if(k === 'text') n.textContent = v;
+      else if(k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v === true ? '' : v);
+    }
+    return n;
+  }
+  function append(n, kids){ [].concat(kids || []).forEach(c => { if(c != null && c !== false) n.append(c.nodeType ? c : document.createTextNode(c)); }); return n; }
+  const el = (tag, a, kids) => append(setAttrs(document.createElement(tag), a), kids);
+  const sv = (tag, a, kids) => append(setAttrs(document.createElementNS(NS, tag), a), kids);
+  const trunc = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
+
+  function niceScale(max){
+    const rough = max / 4, p = Math.pow(10, Math.floor(Math.log10(rough))), f = rough / p;
+    const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p, top = Math.ceil(max / step) * step, ticks = [];
+    for(let t = 0; t <= top + step / 2; t += step) ticks.push(t);
+    return {top, ticks};
+  }
+
+  /* One line chart: crosshair + tooltip listing every series, keyboard arrows, direct labels (4 or fewer series). */
+  function lineChart(host, spec){
+    host.replaceChildren();
+    const n = spec.x.length, w = Math.max(280, Math.floor(host.clientWidth) || 320), small = w < 520, h = small ? 250 : 300;
+    const direct = spec.series.length <= 4;
+    const m = {t: 14, r: direct ? (small ? 84 : 118) : 18, b: 32, l: small ? 46 : 56};
+    const pw = w - m.l - m.r, ph = h - m.t - m.b;
+    const all = spec.series.flatMap(s => s.values).filter(v => v != null);
+    if(!all.length){ host.append(el('p', {class: 'small', text: 'No sales to chart for this choice.'})); return; }
+    const {top, ticks} = niceScale(Math.max(...all));
+    const X = i => m.l + (n < 2 ? pw / 2 : i * pw / (n - 1)), Y = v => m.t + ph - (v / top) * ph;
+    const svg = sv('svg', {viewBox: '0 0 ' + w + ' ' + h, width: w, height: h, role: 'img', 'aria-label': spec.aria, tabindex: 0});
+
+    ticks.forEach(t => svg.append(
+      sv('line', {x1: m.l, x2: m.l + pw, y1: Y(t), y2: Y(t), stroke: t === 0 ? '#c3c2b7' : '#e1e0d9', 'stroke-width': 1}),
+      sv('text', {x: m.l - 8, y: Y(t) + 4, 'text-anchor': 'end', fill: '#666', 'font-size': 11, text: spec.short(t)})));
+    const perLabel = Math.max(2, Math.floor(pw / spec.tickWidth)), every = Math.ceil(n / perLabel);
+    for(let i = n - 1; i >= 0; i -= every)
+      svg.append(sv('text', {x: X(i), y: h - 10, 'text-anchor': 'middle', fill: '#666', 'font-size': 11, text: spec.tick(i)}));
+
+    const ends = [];
+    spec.series.forEach(s => {
+      let d = '', pen = false, last = -1;
+      s.values.forEach((v, i) => {
+        if(v == null){ pen = false; return; }
+        d += (pen ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); pen = true; last = i;
+      });
+      svg.append(sv('path', {d, fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round'}));
+      s.values.forEach((v, i) => { if(v != null && s.values[i - 1] == null && s.values[i + 1] == null) svg.append(sv('circle', {cx: X(i), cy: Y(v), r: 3, fill: s.color})); });
+      if(last >= 0){
+        svg.append(sv('circle', {cx: X(last), cy: Y(s.values[last]), r: 4, fill: s.color, stroke: '#fff', 'stroke-width': 2}));
+        ends.push({s, y: Y(s.values[last])});
+      }
+    });
+    if(direct && ends.length){  // names at the line ends, nudged apart so they never overlap
+      ends.sort((a, b) => a.y - b.y);
+      let prev = -Infinity; ends.forEach(o => { o.ly = Math.max(o.y, prev + 13); prev = o.ly; });
+      const over = ends[ends.length - 1].ly - (m.t + ph); if(over > 0) ends.forEach(o => { o.ly -= over; });
+      ends.forEach(o => svg.append(sv('text', {x: m.l + pw + 9, y: o.ly + 4, fill: '#111', 'font-size': 11, 'font-weight': 600, text: trunc(o.s.name, small ? 11 : 17)})));
+    }
+
+    const cross = sv('line', {y1: m.t, y2: m.t + ph, stroke: '#898781', 'stroke-width': 1, visibility: 'hidden'});
+    const dots = spec.series.map(s => sv('circle', {r: 4.5, fill: s.color, stroke: '#fff', 'stroke-width': 2, visibility: 'hidden'}));
+    const overlay = sv('rect', {x: m.l, y: m.t, width: pw, height: ph, fill: 'transparent', style: 'touch-action:pan-y'});
+    svg.append(cross, ...dots, overlay);
+    const tip = el('div', {class: 'trtip', hidden: true, 'aria-hidden': 'true'});
+    let cur = -1;
+    function showAt(i){
+      cur = i; const x = X(i);
+      cross.setAttribute('x1', x); cross.setAttribute('x2', x); cross.setAttribute('visibility', 'visible');
+      tip.replaceChildren(el('b', {class: 'h', text: spec.full(i)}), ...spec.series.map((s, k) => {
+        const v = s.values[i], dot = dots[k];
+        if(v == null) dot.setAttribute('visibility', 'hidden');
+        else { dot.setAttribute('cx', x); dot.setAttribute('cy', Y(v)); dot.setAttribute('visibility', 'visible'); }
+        return el('div', {class: 'row'}, [el('i', {style: 'background:' + s.color}), el('strong', {text: v == null ? 'Too few sales' : spec.fmt(v)}), el('span', {text: s.name})]);
+      }));
+      tip.hidden = false;
+      const left = x + 14 + tip.offsetWidth > w ? x - 14 - tip.offsetWidth : x + 14;
+      tip.style.left = Math.max(0, left) + 'px'; tip.style.top = m.t + 'px';
+      spec.announce && spec.announce(spec.full(i) + ': ' + spec.series.map(s => s.name + ' ' + (s.values[i] == null ? 'too few sales' : spec.fmt(s.values[i]))).join(', '));
+    }
+    function hide(){ cur = -1; cross.setAttribute('visibility', 'hidden'); dots.forEach(d => d.setAttribute('visibility', 'hidden')); tip.hidden = true; }
+    overlay.addEventListener('pointermove', e => {
+      const r = svg.getBoundingClientRect(), px = (e.clientX - r.left) * (w / r.width);
+      showAt(Math.max(0, Math.min(n - 1, n < 2 ? 0 : Math.round((px - m.l) / (pw / (n - 1))))));
+    });
+    overlay.addEventListener('pointerleave', hide);
+    svg.addEventListener('keydown', e => {
+      if(e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ e.preventDefault(); showAt(Math.max(0, Math.min(n - 1, (cur < 0 ? n - 1 : cur) + (e.key === 'ArrowRight' ? 1 : -1)))); }
+      else if(e.key === 'Escape') hide();
+    });
+    svg.addEventListener('focus', () => { if(cur < 0) showAt(n - 1); });
+    svg.addEventListener('blur', hide);
+    host.append(svg, tip);
+  }
+
+  function tableView(host, spec, caption){
+    host.replaceChildren(el('div', {class: 'trtbl'}, el('table', null, [
+      el('caption', {text: caption, style: 'position:absolute;left:-9999px'}),
+      el('thead', null, el('tr', null, [el('th', {scope: 'col', text: spec.xTitle})].concat(spec.series.map(s => el('th', {scope: 'col', text: s.name}))))),
+      el('tbody', null, spec.x.map((_, i) => el('tr', null, [el('th', {scope: 'row', text: spec.full(i), style: 'font-weight:600;text-align:left'})]
+        .concat(spec.series.map(s => el('td', {text: s.values[i] == null ? 'Too few sales' : spec.fmt(s.values[i])}))))))
+    ])));
+  }
+
+  const selected = () => st.slots.filter(Boolean);
+  const colorOf = name => COLORS[Math.max(0, st.slots.indexOf(name))];  // a town keeps its colour while it stays selected
+  function addTown(name){ const i = st.slots.indexOf(null); if(name && i >= 0 && !st.slots.includes(name)){ st.slots[i] = name; build(); } }
+  function removeTown(name){ const i = st.slots.indexOf(name); if(i >= 0 && selected().length > 1){ st.slots[i] = null; build(); } }
+
+  function specs(){
+    const d = st.data, M = METRICS[st.metric], last = d.years[d.years.length - 1];
+    const lastMonth = +d.last_month.slice(5), partial = lastMonth < 12;
+    const first = st.period === 'all' ? d.years[0] : last - (+st.period) + 1;
+    const idx = d.years.map((y, i) => i).filter(i => d.years[i] >= first);
+    const names = selected();
+    const yearly = {
+      x: idx, xTitle: 'Year', fmt: M.fmt, short: M.short, tickWidth: 46,
+      tick: i => String(d.years[idx[i]]),
+      full: i => d.years[idx[i]] + (d.years[idx[i]] === last && partial ? ' (January to ' + MONTHS[lastMonth - 1] + ')' : ''),
+      series: names.map(n => ({name: n, color: colorOf(n), values: idx.map(i => (d[st.metric][st.type][n] || [])[i] ?? null)})),
+    };
+    const lease = {
+      x: d.bands, xTitle: 'Years of lease left', fmt: M.fmt, short: M.short, tickWidth: 28,
+      tick: i => SHORT_BAND[i], full: i => d.bands[i] + ' years of lease left',
+      series: names.map(n => ({name: n, color: colorOf(n), values: (d['lease_' + st.metric][st.type][n] || d.bands.map(() => null))})),
+    };
+    return {yearly, lease, last, partial, lastMonth};
+  }
+
+  const monthName = ym => MONTHS[+ym.slice(5) - 1] + ' ' + ym.slice(0, 4);
+
+  function drawCharts(){
+    if(!st.data || !hosts.length) return;
+    const {yearly, lease} = specs(), M = METRICS[st.metric], ty = TYPE[st.type];
+    const live = document.getElementById('trLive');
+    const announce = t => { if(live) live.textContent = t; };
+    [[hosts[0], yearly, 'a', M.title + ' for ' + ty + ' flats by year'], [hosts[1], lease, 'b', M.title + ' for ' + ty + ' flats by years of lease left']].forEach(([host, spec, key, aria]) => {
+      spec.aria = aria + '. Use the left and right arrow keys to read each point, or switch to the table.'; spec.announce = announce;
+      st.tbl[key] ? tableView(host, spec, aria) : lineChart(host, spec);
+    });
+  }
+
+  function chartCard(key, title, sub){
+    const host = el('div', {class: 'trc'});
+    hosts[key === 'a' ? 0 : 1] = host;
+    return el('div', {class: 'card'}, [
+      el('h2', {text: title}), el('p', {class: 'small', text: sub}), host,
+      el('button', {type: 'button', class: 'trtog', text: st.tbl[key] ? 'Show the chart' : 'Show as a table', onclick: () => { st.tbl[key] = !st.tbl[key]; build(); }}),
+    ]);
+  }
+
+  function build(){
+    const body = document.getElementById('trBody'); if(!body) return;
+    const d = st.data, M = METRICS[st.metric], ty = TYPE[st.type];
+    hosts = [];
+    const seg = (items, cur, on) => el('div', {class: 'trf', role: 'group'}, items.map(([k, label]) =>
+      el('button', {type: 'button', class: 'chip', 'aria-pressed': String(k === cur), text: label, onclick: () => on(k)})));
+    const legend = el('div', {class: 'trf', role: 'list', 'aria-label': 'Towns being compared'}, selected().map(n =>
+      el('span', {class: 'trk', role: 'listitem'}, [
+        el('i', {style: 'background:' + colorOf(n), 'aria-hidden': 'true'}), n,
+        selected().length > 1 ? el('button', {type: 'button', 'aria-label': 'Remove ' + n, text: '×', onclick: () => removeTown(n)}) : el('span', {style: 'width:8px'}),
+      ])));
+    const options = [d.all_towns].concat(d.towns).filter(n => !st.slots.includes(n));
+    const picker = selected().length >= MAX
+      ? el('p', {class: 'small', text: 'You can compare up to ' + MAX + ' places. Remove one to add another.'})
+      : el('select', {class: 'trsel', 'aria-label': 'Add a town to compare', onchange: e => addTown(e.target.value)},
+          [el('option', {value: '', text: 'Add a town…'})].concat(options.map(n => el('option', {value: n, text: n}))));
+    body.replaceChildren(
+      el('div', {class: 'scr-h'}, [el('h1', {text: 'Price trends'}), el('p', {class: 'ui', style: 'font-size:.9rem', text: 'How HDB resale prices have moved since ' + d.years[0] + '. Open to everyone, no login needed.'})]),
+      seg(Object.entries(METRICS).map(([k, v]) => [k, v.label]), st.metric, k => { st.metric = k; build(); }),
+      seg(Object.entries(TYPE), st.type, k => { st.type = k; build(); }),
+      seg(PERIODS, st.period, k => { st.period = k; build(); }),
+      el('div', {class: 'trf', style: 'align-items:center'}, [legend, picker]),
+      chartCard('a', M.title + ', ' + ty + ' flats', 'Median of all resale sales in each year, to ' + monthName(d.last_month) + '. Prices are as sold and are not adjusted for inflation. Years with fewer than ' + d.min_sales + ' sales are left blank.'),
+      chartCard('b', 'What lease left does to price', M.title + ' for ' + ty + ' flats sold ' + monthName(d.since_month) + ' to ' + monthName(d.last_month) + ', by years of lease left. This is the gap the age-95 rule is about.'),
+      el('p', {class: 'small', text: 'Source: HDB resale flat prices, data.gov.sg (Singapore Open Data Licence). Educational prototype: not financial advice.'}),
+      el('p', {id: 'trLive', 'aria-live': 'polite', style: 'position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)'}));
+    drawCharts();
+    if(!observed && window.ResizeObserver){
+      observed = true; let w0 = body.clientWidth;
+      new ResizeObserver(() => { const w = body.clientWidth; if(w && Math.abs(w - w0) > 2){ w0 = w; drawCharts(); } }).observe(body);
+    }
+  }
+
+  function message(text, retry){
+    const body = document.getElementById('trBody');
+    body.replaceChildren(el('div', {class: 'scr-h'}, [el('h1', {text: 'Price trends'}), el('p', {class: 'ui', style: 'font-size:.9rem', text})]),
+      retry ? el('button', {type: 'button', class: 'btn primary', text: 'Try again', onclick: render}) : null);
+  }
+
+  function render(){
+    if(st.data){ build(); return; }
+    if(st.loading) return;
+    st.loading = true; message('Loading price history…');
+    window.RW.send('trends').then(r => {
+      if(!r || !r.ok || !r.data) throw new Error('bad reply');
+      st.data = r.data;
+      const want = [st.data.all_towns, 'Punggol', 'Queenstown'].filter(n => n === st.data.all_towns || st.data.towns.includes(n));
+      want.forEach((n, i) => { st.slots[i] = n; });
+      if(st.data.types.indexOf(st.type) < 0) st.type = st.data.types[0];
+    }).catch(() => { st.failed = true; }).finally(() => {
+      st.loading = false;
+      st.data ? build() : message('The price history did not load. Check your connection and try again.', true);
+    });
+  }
+  window.RWTRENDS = {render};
+})();
 </script>
