@@ -178,3 +178,18 @@ def test_logout_forgets_previous_answers(bot, index):
     state = {"user": "reviewer", "role": "full", "replies": replies}
     send("logout", state, bot, index)
     assert state["replies"] is replies and replies == []
+
+
+def test_ask_passes_the_known_age_to_the_ai(bot, index, monkeypatch):
+    seen = {}
+
+    def fake(self, question, sources, history=None, situation=""):
+        seen["situation"] = situation
+        return Answer(text="ok", sources=sources)
+
+    monkeypatch.setattr(LLM, "answer", fake)
+    send("ask", {}, bot, index, q="How much CPF can I use?", age=34)
+    assert seen["situation"] == "Youngest buyer age: 34"
+    for bad in (None, "34", True, 5, 200):  # the browser is untrusted
+        send("ask", {}, bot, index, q="How much CPF can I use?", age=bad)
+        assert seen["situation"] == ""

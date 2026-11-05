@@ -1452,7 +1452,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .78rem/1.4 var(--ui)}
   }
   $$('[data-rule]').forEach(btn => btn.onclick = () => {
     const d = +btn.dataset.d;
-    if(btn.dataset.rule === 'lease') L.lease = Math.max(21, Math.min(99, L.lease + d)); else L.age = Math.max(21, Math.min(70, L.age + d));
+    if(btn.dataset.rule === 'lease') L.lease = Math.max(21, Math.min(99, L.lease + d)); else { L.age = Math.max(21, Math.min(70, L.age + d)); window.RWLANDINGAGE = L.age; /* the app adopts it when the user leaves this page */ }
     renderRule();
   });
   function renderAsk(){
@@ -1862,7 +1862,7 @@ async function ask(q, ctx){
   S.chat.push(typing); renderChat();
   let b;
   try{
-    const r = await RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior});
+    const r = await RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior, age: (S.onbDone||S.ageSet) ? S.age : null});
     b = {html: md(r.text) + (r.note ? `<p class="small">${esc(r.note)}</p>` : ''), src: r.sources, open: !!r.offline, warn: r.blocked === 'personal', skip: !!r.blocked}; if(r.blocked) mine.skip = true;
   }catch(e){ b = {warn:true, html:'<p>Runway could not reach its documents just now. Try again in a moment.</p>'}; }
   S.chat.splice(S.chat.indexOf(typing), 1);
@@ -2182,7 +2182,7 @@ $('#noticeLink').onclick=()=>{tab('more');sub('about');requestAnimationFrame(()=
 S.user=ME.user; S.role=ME.role||'brief'; S.onb=1; S.onbDone=false;
 function go(target,arg){ if(target==='ask'){tab('ask'); if(arg) ask(arg);} else if(target==='more'){tab('more'); if(arg) sub(arg);} else tab('map'); }
 window.RWAPP={
-  enter(target,arg){ if(target==='more'||target==='ask'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=1; show('scrOnb'); renderOnb(); },
+  enter(target,arg){ if(window.RWLANDINGAGE){ S.age=window.RWLANDINGAGE; S.ageSet=true; syncAvg(); S.dirty=true; window.RWLANDINGAGE=null; } if(target==='more'||target==='ask'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=1; show('scrOnb'); renderOnb(); },
   setUser(user,role){ S.user=user; S.role=role||'brief'; if(!$('#scrSub').hidden) renderSub(); else if(!$('#scrMore').hidden) renderMore(); }
 };
 const brand=$('.tabs .brand'); if(brand){ brand.style.cursor='pointer'; brand.onclick=()=>show('scrLanding'); }

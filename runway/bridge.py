@@ -45,6 +45,13 @@ def clean_history(raw, n: int) -> list[dict]:
     return [h for h in turns if screen_question(h["content"]) not in {"personal", "injection"}]
 
 
+def situation_from(age) -> str:
+    """The youngest buyer's age the user already gave the interface, so the AI needn't ask again."""
+    if isinstance(age, int) and not isinstance(age, bool) and 21 <= age <= 85:
+        return f"Youngest buyer age: {age}"
+    return ""
+
+
 def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, index: Retriever) -> dict:
     kind, payload = msg.get("type"), msg.get("payload")
     if not isinstance(payload, dict):  # the browser is untrusted
@@ -94,7 +101,7 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
         history = clean_history(payload.get("history"), 6)
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
         sources = index.search(f"{previous} {question}", k=5)
-        answer = bot.answer(question, sources, history=history)
+        answer = bot.answer(question, sources, history=history, situation=situation_from(payload.get("age")))
         offline = bool(answer.error) or (not bot.available and not answer.blocked)
         why = {INVENTED_FIGURE: "used a figure not in the documents", AI_BUSY: "has reached its limit for this hour",
                None: "explainer is offline"}.get(answer.error, "service didn't respond")
