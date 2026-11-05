@@ -9,6 +9,7 @@ documents stay server-side.
 from __future__ import annotations
 
 import time
+import traceback
 from collections.abc import MutableMapping
 
 from runway.auth import check_login
@@ -111,7 +112,11 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
                 "offline": offline, "note": note}
 
     if kind == "trends":  # public price history: no login, no personal details
-        return {"ok": True, "data": load_trends()}
+        try:
+            return {"ok": True, "data": load_trends()}
+        except Exception as exc:  # say what failed, in the log and on the page, so it can be fixed fast
+            traceback.print_exc()
+            return {"ok": False, "error": f"{type(exc).__name__}: {exc}"[:200]}
 
     if kind == "summary":
         return {"text": bot.summarise(clean_history(payload.get("history"), 12))}

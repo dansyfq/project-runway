@@ -60,3 +60,14 @@ def test_trends_message_returns_the_data(monkeypatch):
     monkeypatch.setattr(bridge, "load_trends", lambda: {"years": [2020]})
     reply = bridge.handle({"id": "x", "type": "trends", "payload": {}}, {}, {}, None, None)  # needs no AI or documents
     assert reply == {"ok": True, "data": {"years": [2020]}}
+
+
+def test_trends_message_reports_a_failure_instead_of_crashing(monkeypatch):
+    import runway.bridge as bridge
+
+    def boom():
+        raise ValueError("bad data")
+
+    monkeypatch.setattr(bridge, "load_trends", boom)
+    reply = bridge.handle({"id": "x", "type": "trends", "payload": {}}, {}, {}, None, None)
+    assert reply == {"ok": False, "error": "ValueError: bad data"}
