@@ -449,11 +449,18 @@ def test_home_numbers_reach_the_app_only_on_purpose():
 
 def test_home_calculator_and_your_town_section_are_linked():
     # the calculator's town picker opens that town's card, and the town section repeats the calculator's numbers
-    assert "sel.onchange = () => { if(sel.value) gotoTown(sel.value); else syncHeart(); };" in GAME
+    assert "sel.onchange = () => { if(sel.value) gotoTown(sel.value); else { syncHeart(); syncCompare(); } };" in GAME
     assert "async function gotoTown(id)" in GAME and "T.list.findIndex(t => t.id === id)" in GAME
     assert "if(window.RWYours) RWYours();" in GAME and "window.RWYours = syncYours;" in GAME
     assert 'id="lYours"' in GAME and "Your numbers from the calculator:" in GAME
     assert "landingVerdict(L.age, L.lease)" in GAME[GAME.index("function syncYours()"):GAME.index("window.RWYours = syncYours;")]
+    # the two cards under the town on show compare the other towns with it, and the page says so
+    assert 'id="lCmpHead"' in GAME and 'id="lCmpA"' in GAME and 'id="lCmpB"' in GAME
+    assert "function syncCompare()" in GAME and "Compared with <b>${esc(cur.name)}</b>" in GAME
+    assert "vs ${esc(cur.name)}" in GAME and "the town you picked" in GAME
+    assert "syncHeart(); syncYours(); syncCompare();" in GAME
+    # the written cards stay as the fallback until the towns load
+    assert "<h3 class=\"lh3\">Woodlands</h3>" in GAME and "<h3 class=\"lh3\">Sembawang</h3>" in GAME
     # the stand-in used until the towns load is Toa Payoh's value in the data
     assert "{name: 'Toa Payoh', pct: 1.5, low: false}" in GAME
 
