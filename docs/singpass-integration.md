@@ -66,12 +66,12 @@ log it. Runway's current promise (no NRIC, no names) would need rewording in the
 
 ## What the demo does
 
-- **Reviewers only.** The "Skip the typing?" card appears only after logging in as a reviewer (and not in the
-  "public version" view), so the public site carries no demo wording.
+- **Open to everyone.** The "Skip the typing?" card appears for every visitor, with or without a reviewer login. It is a
+  labelled mock-up ("Demonstration only", made-up people, nothing sent anywhere).
 - It appears on the age step and on **More > Your details**.
 - Three made-up people (A, B and C). The visitor picks one, sees a consent screen with a tick box for each item, and
   taps "Share selected details". Runway fills in only the ticked items.
-- It never contacts Singpass, shows no Singpass branding, asks for no password and stores nothing.
+- It never contacts Singpass, shows no Singpass branding, asks for no password and sends nothing. What it fills in is kept only in the open tab (session storage), like anything else typed into Your details, and is forgotten when the tab closes.
 - Filled-in values flow through the same calculators: verdicts, income cap, grants, shortlist, Ask.
 - "Reset my details" clears everything the demo filled in.
 

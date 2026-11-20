@@ -84,11 +84,10 @@ def test_the_demo_says_it_is_not_singpass():
     assert "not connected to it" in GAME and "It is not connected to Singpass." in GAME
 
 
-def test_the_demo_is_for_reviewers_only():
-    """The public site carries no demo wording: the entry card is empty unless FULL() (a logged-in reviewer's version)."""
+def test_the_demo_is_open_to_everyone():
+    """Anyone can use the labelled mock-up: the entry card does not depend on the reviewer login (FULL())."""
     card = GAME[GAME.index("const spdCard="):GAME.index("function spdAge(")]
-    assert "!FULL()?''" in card
-    assert "const FULL = () => REV() && !S.asPublic" in GAME
-    # the two screens that show the card must cope with it being absent
+    assert "FULL()" not in card
+    # the two screens that show the card still cope with it being absent
     assert "if(spd) spd.onclick=openSingpassDemo" in GAME
-    assert "else if(!$('#scrOnb').hidden) renderOnb();" in GAME  # logging in on the age step shows the card at once
+    assert "else if(!$('#scrOnb').hidden) renderOnb();" in GAME  # logging in on the age step refreshes the card

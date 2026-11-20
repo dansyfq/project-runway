@@ -1889,6 +1889,17 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
     document.head.appendChild(s);
   }));
   // The map data (~3 MB) is fetched on the first click into the app, not for landing-page readers.
+  /* Your details for this visit: kept in this tab's session storage (cleared when the tab closes, never sent to the
+     server) so they survive a page switch or a reload. If storage is off they last until the page reloads. */
+  RW.prof = (() => {
+    let mem = {};
+    try { mem = JSON.parse(sessionStorage.getItem('runway-details') || '{}') || {}; } catch(e) { mem = {}; }
+    if(typeof mem !== 'object' || Array.isArray(mem)) mem = {};
+    return {
+      get: () => mem,
+      set: o => { Object.assign(mem, o); try { sessionStorage.setItem('runway-details', JSON.stringify(mem)); } catch(e) { /* storage off */ } }
+    };
+  })();
   /* Callers (the home page's ask box, typed or spoken; the FAQ's "Ask Runway instead") may call this twice for one question.
      A question already on its way is not asked again, and while the data loads a repeat without one (a second Enter on
      the emptied box, the send button after Enter) keeps the question waiting instead of replacing it. */
@@ -2369,6 +2380,7 @@ function faqFilter(faq, text){
 
   /* ---------- the age-95 rule ---------- */
   const L = {age: 52, lease: 55};
+  { const d = RW.prof.get(); if(d.ageSet && d.age >= 21 && d.age <= 85) L.age = Math.round(d.age); }  // the age you gave earlier
   // Same rule as runway/cpf_rules.py (tested): share of the Valuation Limit CPF can pay.
   function landingShare(age, lease){ if(lease <= 20) return 0; if(age + lease >= 95) return 1; return (lease - 20) / (95 - age - 20); }
   window.landingShare = landingShare;
@@ -2400,6 +2412,7 @@ function faqFilter(faq, text){
   function setRule(k, v){
     L[k] = k === 'age' ? Math.max(21, Math.min(85, v)) : Math.max(1, Math.min(99, v));
     renderRule();
+    if(k === 'age'){ RW.prof.set({age: L.age, ageSet: true}); if(window.RWAPP) RWAPP.setAge(L.age); }  // the Map starts from it
   }
   // the two sliders hold the numbers; Reset moves them
   $('#lRange').oninput = e => setRule('lease', +e.target.value);
@@ -2626,8 +2639,8 @@ document.addEventListener('input',e=>{
 const SCR=['scrLanding','scrOnb','scrMap','scrList','scrAsk','scrTrends','scrMore','scrSub'];
 // every screen change comes through here, so the nav and the address bar follow it (RW.shown takes an RW.PATHS value)
 const SHOWN={scrLanding:'home',scrOnb:'map',scrMap:'map',scrList:'list',scrAsk:'ask',scrTrends:'trends',scrMore:'more'};
-function show(id){SCR.forEach(s=>$('#'+s).hidden = s!==id); RW.shown(id==='scrSub' ? 'more '+S.sub : SHOWN[id]);}
-function sideProf(){const b=$('#sideProf');if(!b)return;b.hidden=!(S.onbDone||S.ageSet);b.innerHTML=`<span class="label">Your details</span><b>Youngest buyer ${S.age}</b><span>Average age ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}</span>`;b.onclick=()=>{tab('more');sub('details');};}
+function show(id){SCR.forEach(s=>$('#'+s).hidden = s!==id); saveDetails(); RW.shown(id==='scrSub' ? 'more '+S.sub : SHOWN[id]);}
+function sideProf(){saveDetails();const b=$('#sideProf');if(!b)return;b.hidden=!(S.onbDone||S.ageSet);b.innerHTML=`<span class="label">Your details</span><b>Youngest buyer ${S.age}</b><span>Average age ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}</span>`;b.onclick=()=>{tab('more');sub('details');};}
 function tab(t){
   S.tab=t; S.sub=null; closeSheet(); sideProf();
   if(t==='map'){show('scrMap'); drawMap();}
@@ -2871,8 +2884,8 @@ const SPD_ITEMS=[
   {k:'marital',t:'Marital status',use:'Whether you buy as a couple or as a single.'},
   {k:'hdb',t:'HDB flat ownership history',use:'Whether you count as a first-timer.'},
   {k:'cit',t:'Citizenship',use:'Grant rules that depend on citizenship.'}];
-// Reviewers only (logged in, reviewer version): the public site carries no demo wording. FULL() is the page's own reviewer check.
-const spdCard=()=>!FULL()?'':`<div class="spdcard"><div><b>Skip the typing?</b><span class="small">Try the Singpass demo. It shows how Runway could fill in your age, CPF and income for you, with your consent. It is not connected to Singpass.</span></div><button type="button" class="btn ghost sm" id="spdOpen">Try the demo</button></div>`;
+// Open to everyone: it is a labelled mock-up (made-up people, nothing sent anywhere), so it needs no reviewer login.
+const spdCard=()=>`<div class="spdcard"><div><b>Skip the typing?</b><span class="small">Try the Singpass demo. It shows how Runway could fill in your age, CPF and income for you, with your consent. It is not connected to Singpass.</span></div><button type="button" class="btn ghost sm" id="spdOpen">Try the demo</button></div>`;
 function spdAge(dob,today){
   const t=today||new Date(), b=new Date(dob+'T00:00:00');  // dob is "YYYY-MM-DD"
   let a=t.getFullYear()-b.getFullYear();
@@ -2899,7 +2912,7 @@ function spdApply(p,keys){
   return got;
 }
 function spdMarkup(name,person,keys,got){
-  const bar='<p class="demobar"><b>Demonstration only.</b> This is not Singpass and is not connected to it. The people shown are made up, and nothing here is sent or stored.</p>';
+  const bar='<p class="demobar"><b>Demonstration only.</b> This is not Singpass and is not connected to it. The people shown are made up. Nothing here is sent to anyone, and what it fills in is forgotten when you close the tab.</p>';
   if(name==='pick') return `<h2 style="font-size:1.6rem">Singpass demo</h2>${bar}
     <p class="small">Pick a made-up person to sign in as. A real version would ask you to approve this in the Singpass app instead.</p>
     ${SPD.map(p=>`<button type="button" class="who" data-p="${p.id}"><b>${p.label}</b><span>${p.blurb} · born ${new Date(p.dob+'T00:00:00').toLocaleDateString('en-SG',{month:'long',year:'numeric'})} · ${p.cit}</span></button>`).join('')}`;
@@ -3748,7 +3761,7 @@ function privacyHtml(){
     <li>Your session, in memory, while the page is open: the replies sent to you, whether you are logged in and whether the map data was sent. The session is never put in a database; it is gone when you reload or close the page. The database keeps only answer votes (above) and the reviewers' page edits and uploaded documents.</li>
     <li>Runway's code writes to the server log when something fails (the kind of request and the error) and when you vote on an answer (the line described under Answer feedback). It does not write your other questions or your files to the log.</li></ul>
   <h2>Cookies and browser storage</h2><ul>
-    <li>Runway's own code sets no cookies and keeps exactly one thing in your browser's local storage: your Dark mode choice, under the name runway-theme, which never leaves your device. Your details, shortlist and chat live only in the open page and are lost on reload, so there is no cookie banner.</li>
+    <li>Runway's own code sets no cookies and keeps two things in your browser, neither of which leaves your device: your Dark mode choice in local storage, under the name runway-theme, and your details for this visit (youngest buyer's age, CPF amount, first town and whether you finished the first questions) in session storage, under the name runway-details, which your browser clears when you close the tab. Your shortlist, chat, income and household entries live only in the open page and are lost on reload, so there is no cookie banner.</li>
     <li>The optional household income, grant details and bank rate you enter are used only for the sums in your browser. They are never sent to Runway's server or to Anthropic, not even with a question.</li>
     <li>Streamlit, the framework Runway runs on, may set its own cookie to protect requests to the server. Its usage statistics are switched off in Runway's settings.</li></ul>
   <h2>Other services</h2><ul>
@@ -3817,6 +3830,21 @@ window.addEventListener('resize',()=>{if(LM)LM.invalidateSize();});
 document.addEventListener('rwtheme',()=>{if(!LM)return;const c=LM.getCenter(),z=LM.getZoom();LM.remove();LM=null;needFit=true;if(!$('#scrMap').hidden){drawMap();LM.setView(c,z,{animate:false});}});
 $('#noticeLink').onclick=()=>{tab('more');sub('about');requestAnimationFrame(()=>{const n=$('#notice');if(n)n.scrollIntoView();});};
 S.user=ME.user; S.role=ME.role||'brief'; S.onb=1; S.onbDone=false;
+var detailsRestored=false;
+(function restoreDetails(){
+  const d=RW.prof.get(), num=(v,lo,hi)=>typeof v==='number'&&isFinite(v)&&v>=lo&&v<=hi;
+  if(d.ageSet===true&&num(d.age,21,85)){S.age=Math.round(d.age);S.ageSet=true;}
+  if(num(d.avgSet,0,85)) S.avgSet=Math.round(d.avgSet);
+  if(d.oaSet===true&&num(d.oa,0,2000000)){S.oa=d.oa;S.oaSet=true;}
+  if(typeof d.town==='string'&&TBY[d.town]) S.town=d.town;
+  if(d.onbDone===true) S.onbDone=true;
+  syncAvg(); detailsRestored=true;
+})();
+function saveDetails(){  // called on every screen change and when the page is hidden
+  if(!detailsRestored) return;
+  RW.prof.set({age:S.age,ageSet:!!S.ageSet,avgSet:S.avgSet||0,oa:S.oa,oaSet:!!S.oaSet,town:S.town,onbDone:!!S.onbDone});
+}
+window.addEventListener('pagehide',saveDetails);
 function go(target,arg){ if(target==='home'){closeSheet(); show('scrLanding');} else if(target==='trends'||target==='list'){tab(target);} else if(target==='ask'){tab('ask'); if(arg) ask(arg);} else if(target==='more'){tab('more'); if(arg) sub(arg);} else tab('map'); }
 window.RWAPP={
   enter(target,arg){  // the home calculator's numbers arrive only through "See flats that pass" (arg below)
@@ -3824,7 +3852,8 @@ window.RWAPP={
       S.landTown=!!(arg&&TBY[arg.town]);
       if(arg){ if(arg.age){ S.age=arg.age; S.ageSet=true; syncAvg(); S.dirty=true; } if(S.landTown) S.town=arg.town; S.match=arg.ft?{ft:arg.ft,max:Infinity}:null; needFit=true; }
     }
-    if(target!=='map'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=1; show('scrOnb'); renderOnb(); },
+    if(target!=='map'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=S.ageSet?2:1; show('scrOnb'); renderOnb(); },  // an age given on Home isn't asked again
+  setAge(a){ S.age=a; S.ageSet=true; syncAvg(); S.dirty=true; sideProf(); },  // the Home age slider, once the app is loaded
   setUser(user,role){ S.user=user; S.role=role||'brief'; if(!$('#scrSub').hidden) renderSub(); else if(!$('#scrMore').hidden) renderMore(); else if(!$('#scrOnb').hidden) renderOnb(); }
 };
 if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(p.target,p.arg); } else show('scrLanding');

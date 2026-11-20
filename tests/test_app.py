@@ -434,12 +434,17 @@ def test_home_numbers_reach_the_app_only_on_purpose():
     assert "RWLANDINGAGE" not in GAME  # no implicit hand-over; "See flats that pass" sends {town, ft, age}
     assert "RW.enter('map', {town: $('#lTown').value || null, ft: $('#lType').value, age: L.age})" in GAME
     assert 'id="lReset"' in GAME and 'id="dReset"' in GAME
-    # the browser keeps one thing: the Dark mode choice, under one key, and the Privacy Policy says so
-    assert not re.search(r"sessionStorage|indexedDB|document\.cookie", GAME)
+    # the browser keeps two things, each under one key, and the Privacy Policy says so: Dark mode (local storage) and
+    # this visit's details (session storage: age, CPF, town; never income or household)
+    assert not re.search(r"indexedDB|document\.cookie", GAME)
     uses = re.findall(r"localStorage\.(\w+)\('([^']*)'", GAME)
     assert len(uses) == GAME.count("localStorage") == 2
     assert {k for _, k in uses} == {"runway-theme"} and {m for m, _ in uses} == {"getItem", "setItem"}
-    assert "keeps exactly one thing in your browser's local storage" in GAME and "under the name runway-theme" in GAME
+    suses = re.findall(r"sessionStorage\.(\w+)\('([^']*)'", GAME)
+    assert len(suses) == GAME.count("sessionStorage") == 2
+    assert {k for _, k in suses} == {"runway-details"} and {m for m, _ in suses} == {"getItem", "setItem"}
+    assert "keeps two things in your browser" in GAME
+    assert "under the name runway-theme" in GAME and "under the name runway-details" in GAME
 
 
 def test_one_h1_on_the_home_page_and_described_ratings():
