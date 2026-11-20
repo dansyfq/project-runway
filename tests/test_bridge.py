@@ -238,7 +238,7 @@ def test_public_data_failure_is_reported_not_raised(bot, index, monkeypatch):
 
 
 SCREEN_PATHS = ["", "map", "shortlist", "trends", "ask", "more", "details", "text-size", "about", "how-it-works", "sources",
-                "privacy", "terms", "faq", "case-study", "timeline"]
+                "privacy", "terms", "faq", "case-study", "timeline", "lease-explorer", "insights"]
 
 
 def test_pages_are_the_agreed_paths():

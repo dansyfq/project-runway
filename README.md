@@ -22,7 +22,9 @@ The interface in `runway_game/index.html` is the approved design hand-off, runni
 | **Flat result** | Opened from a diamond. A price check against similar recent sales (same town and flat type, lease within 5 years, last 12 months, from `runway/price_check.py`); Buyer's Stamp Duty, HDB fees and the grants you may get once you add income and household details; an HDB loan beside a bank loan at a rate you type, with the 30% income cap; and what the lease means for whoever buys from you in 5 to 20 years. Every figure names its document in `data/corpus/`. |
 | **Shortlist** | Kept flats recalculated for your details, two or three of them side by side in a table, a printable summary, CSV download, and 26 town stamps with Wikimedia Commons photos. |
 | **Trends** | Public price charts, no login or setup needed. Compare median resale price or price per sqm by town since 1990 (up to 5 places, by flat type and period), and what remaining lease does to price. Numbers are built from `data/resale.parquet` by `runway/trends.py`; each chart has a table view. |
-| **Ask** (use case 2) | Answers from 32 official documents with sources, "Why?" for a flat, chat summary, read-aloud, and document upload that suggests towns. Answers, read-aloud and voice input in English, Chinese, Malay or Tamil (official quotes and figures stay in English; the rest of the interface is English). Helpful / Not helpful under each AI answer: a vote writes one line to the server log and to `data/feedback.jsonl` where the disk is writable, with the question kept only if it has no personal details. |
+| **Ask** (use case 2) | Answers from 32 official documents with sources, "Why?" for a flat, chat summary, chat download (a text file with each answer's sources), read-aloud, and document upload that suggests towns. A question that gives an age, a lease or a price is worked out with Runway's calculator tools (`runway/agent.py`: lease check, HDB loan length, Buyer's Stamp Duty), which Claude calls instead of doing sums; every figure in the answer must come from the passages, the question or a tool result. Answers, read-aloud and voice input in English, Chinese, Malay or Tamil (official quotes and figures stay in English; the rest of the interface is English). Helpful / Not helpful under each AI answer: a vote writes one line to the server log and to `data/feedback.jsonl` where the disk is writable, with the question kept only if it has no personal details. |
+| **Lease explorer** (use case 3, `/lease-explorer`) | CPF use for every age of the youngest buyer and every lease left, as one chart, with sliders for your own case: CPF share, HDB loan limit and the lease needed for full CPF. Worked out in the browser (tested against `runway/cpf_rules.py`); "Ask Runway about this flat" sends the case to Ask. |
+| **Insights** (reviewers, `/insights`) | Answer votes and the questions marked Not helpful, the latest eval run including retrieval by search mode, every document and its passage count, and AI calls against the hourly cap (`runway/insights.py`). The server checks the login again. |
 | **More** | Your details (with a reset), text size, About Us (with the required notice), How it works (flowcharts), Sources and credits, an FAQ whose answers each cite one document in `data/corpus/`, a buying timeline (`/timeline`) from the HFE letter to completion with a source for every step, a case study worked out live from the Trends data, the Privacy Policy and the Terms. Visitors browse as guests and see short versions; logging in as `reviewer` shows the full About Us and How it works. |
 
 Python (`runway/bridge.py`) checks the reviewer login, sends the map data after the home page loads, and answers questions
@@ -46,7 +48,11 @@ Runway shows the matching official passages instead of an AI answer.
 Ask Runway uses Claude through the Anthropic API: `claude-opus-5-5` by default, or the model named in
 `ANTHROPIC_MODEL` (for example `claude-haiku-5-5`, which costs far less per answer). The key comes from
 [console.anthropic.com](https://console.anthropic.com); a Claude subscription does not include one. Documents are found by
-keyword search, and a question in Chinese, Malay or Tamil is put into English by the model first.
+hybrid search: BM25 keywords and a TF-IDF vector store (cosine similarity), merged by weighted reciprocal rank fusion.
+A question in Chinese, Malay or Tamil is put into English by the model first. `python eval/run_eval.py` compares the
+three search modes on the same questions (keywords / vectors / hybrid, right document first: 15 / 15 / 15 of 19; in the
+top 3: 18 / 16 / 19). The vectors are term vectors, not neural embeddings: Anthropic has no embeddings service and a
+local embedding model is too large for Streamlit Community Cloud.
 
 ## Logins
 
@@ -116,8 +122,10 @@ runway/bridge.py       sign-in, ask, why, summary, trends, towns, town_photo and
 runway/cpf_rules.py    age-95 rule, CPF share, HDB loan limit, loan tenure (Python reference)
 runway/costs.py        stamp duty, HDB fees, grants, HDB and bank loan under the income cap
 runway/price_check.py  one flat's price per sqm against similar recent sales
-runway/rag.py          chunking and BM25 keyword search
-runway/llm.py          prompts, question screening, number guard, Claude calls (Anthropic API)
+runway/rag.py          chunking and hybrid search (BM25 keywords + TF-IDF vector store, reciprocal rank fusion)
+runway/llm.py          prompts, question screening, number guard, Claude calls and the tool loop (Anthropic API)
+runway/agent.py        the calculator tools Ask's AI can call (lease check, loan length, stamp duty)
+runway/insights.py     the reviewer Insights page: votes, eval by search mode, documents, AI use
 runway/auth.py         password hashing and checks
 runway/game_data.py    map data and town photos; town list and one photo at a time for the home page
 runway/trends.py       price trends by town and by lease left, built from resale.parquet (Trends tab)

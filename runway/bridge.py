@@ -24,8 +24,9 @@ from runway.rag import Chunk, Retriever
 PAGES = {"": "Runway — HDB CPF age-95 checker", "map": "Map", "shortlist": "Shortlist", "trends": "Trends", "ask": "Ask",
          "more": "More", "details": "Your details", "text-size": "Text size", "about": "About Us",
          "how-it-works": "How it works", "sources": "Sources and credits", "privacy": "Privacy Policy", "terms": "Terms",
-         "faq": "FAQ", "case-study": "Case study", "timeline": "Buying timeline"}
-REVIEWER_ONLY = {"docs", "upload_doc", "save_page", "save_faq"}  # runway/content.py
+         "faq": "FAQ", "case-study": "Case study", "timeline": "Buying timeline", "lease-explorer": "Lease explorer",
+         "insights": "Insights"}
+REVIEWER_ONLY = {"docs", "upload_doc", "save_page", "save_faq", "insights"}  # runway/content.py, runway/insights.py
 MAX_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
 # username -> (failed attempts, locked until). Module-level, so a page reload (a new session) can't reset it.
@@ -111,6 +112,12 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
             return {"ok": False, "error": "Log in as a reviewer first."}
         from runway import content
 
+        if kind == "insights":
+            from runway import insights
+            from runway.llm import AI_CALLS_PER_HOUR, calls_last_hour
+
+            return {"ok": True, "data": insights.build(index.chunks, FEEDBACK_FILE, calls_last_hour(), AI_CALLS_PER_HOUR,
+                                                       bot.chat_model, bot.available, index.mode)}
         if kind == "docs":
             return {"ok": True, "docs": content.list_docs()}
         if kind == "upload_doc":

@@ -67,8 +67,19 @@ def main() -> None:
         rows.append(row)
 
     s["total"] = len(cases)
+    # The same retrieval questions under each search mode, so the hybrid search is measured against its two halves.
+    retrieval = [c for c in cases if c["type"] == "retrieval"]
+    by_mode = {}
+    for mode in ("keyword", "vector", "hybrid"):
+        firsts = [index.search(c["question"], k=5, mode=mode) for c in retrieval]
+        by_mode[mode] = {
+            "top1": sum(bool(top) and top[0].doc in c["expect_docs"] for top, c in zip(firsts, retrieval)),
+            "top3": sum(any(x.doc in c["expect_docs"] for x in top[:3]) for top, c in zip(firsts, retrieval)),
+            "top5": sum(any(x.doc in c["expect_docs"] for x in top) for top, c in zip(firsts, retrieval)),
+            "total": len(retrieval),
+        }
     out = {"run_at": dt.datetime.now().strftime("%d %b %Y %H:%M"), "retrieval_mode": index.mode,
-           "summary": s, "cases": rows}
+           "summary": s, "by_mode": by_mode, "cases": rows}
     (ROOT / "data" / "eval_results.json").write_text(json.dumps(out, indent=2))
     print(json.dumps(s, indent=2))
     failed = [r for r in rows if r["Result"] != "pass"]

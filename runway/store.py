@@ -74,6 +74,12 @@ def add_vote(vote: dict) -> None:
         conn.execute("insert into runway_feedback (vote) values (%s::jsonb)", (json.dumps(vote, ensure_ascii=False),))
 
 
+def recent_votes(limit: int = 2000) -> list[dict]:
+    with _db() as conn:
+        rows = conn.execute("select vote from runway_feedback order by id desc limit %s", (limit,)).fetchall()
+    return [r[0] if isinstance(r[0], dict) else json.loads(r[0]) for r in rows]
+
+
 def _r2():
     import boto3
 

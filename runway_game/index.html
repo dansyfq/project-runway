@@ -1126,6 +1126,17 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .ar.jn{background:linear-gradient(90deg,transparent calc(25% - 3px),var(--ink-2) 0 calc(75% + 3px),transparent 0) top/100% 2px no-repeat}
 .ar.jr{background:linear-gradient(90deg,transparent calc(50% - 1px),var(--ink-2) 0 calc(75% + 3px),transparent 0) top/100% 2px no-repeat}
 
+/* ---- lease explorer and reviewer insights ---- */
+.exout{background:var(--beige-2);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.exout b{font-size:1.1rem}
+.extbl th,.extbl td{text-align:center;padding:6px 4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.extbl td.full{background:var(--ok-soft);color:var(--ok)}
+.extbl td.part{background:var(--part-soft);color:var(--part)}
+.extbl td.none{background:var(--no-soft);color:var(--no)}
+.extbl td.on{outline:3px solid var(--ink);outline-offset:-3px;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{background:var(--beige-2);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.stat b{font-size:1.5rem;letter-spacing:var(--track-title);font-variant-numeric:tabular-nums}
 /* ---- buying timeline ---- */
 .tl{margin:0;padding:0;list-style:none;counter-reset:tl;display:flex;flex-direction:column;gap:10px}
 .tl>li{counter-increment:tl;position:relative;padding:16px 18px 16px 62px;border-radius:16px;background:var(--beige-2);display:flex;flex-direction:column;gap:8px}
@@ -1926,7 +1937,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
      Python checks the same paths (runway/bridge.py PAGES). Value: what RW.enter opens. */
   RW.PATHS = {'': 'home', 'map': 'map', 'shortlist': 'list', 'trends': 'trends', 'ask': 'ask', 'more': 'more',
     'details': 'more details', 'text-size': 'more size', 'about': 'more about', 'how-it-works': 'more method', 'sources': 'more sources',
-    'privacy': 'more privacy', 'terms': 'more terms', 'faq': 'more faq', 'case-study': 'more case', 'timeline': 'more timeline'};
+    'privacy': 'more privacy', 'terms': 'more terms', 'faq': 'more faq', 'case-study': 'more case', 'timeline': 'more timeline',
+    'lease-explorer': 'more explorer', 'insights': 'more insights'};
   RW.go = path => {
     if(!Object.hasOwn(RW.PATHS, path)) return;
     const [target, sub] = RW.PATHS[path].split(' ');
@@ -1966,7 +1978,9 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
     ['sources', 'Sources and credits', 'data licences photos credits'], ['privacy', 'Privacy Policy', 'personal data cookies storage anthropic claude'],
     ['terms', 'Terms', 'terms of use licence warranty advice'], ['faq', 'FAQ', 'questions answers'],
     ['case-study', 'Case study', 'example toa payoh yishun lease price'],
-    ['timeline', 'Buying timeline', 'steps process hfe letter option to purchase otp request for value resale application completion deadline']];
+    ['timeline', 'Buying timeline', 'steps process hfe letter option to purchase otp request for value resale application completion deadline'],
+    ['lease-explorer', 'Lease explorer', 'age lease cpf share chart heatmap 95 rule what if'],
+    ['insights', 'Insights', 'reviewer feedback votes quality eval documents ai usage']];
   const q = document.getElementById('navQ'), qr = document.getElementById('navQr'), qn = document.getElementById('navQn');
   function clearSearch(){ q.value = ''; qr.replaceChildren(); qn.textContent = ''; }
   function runSearch(){
@@ -3248,13 +3262,30 @@ function renderChat(){
     b.parentElement.querySelectorAll('[data-fb]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
     RW.send('feedback',{rating:m.fb.v, lang:m.lang||'en', q:m.fb.q.length<=300?m.fb.q:''}).catch(()=>{});});  // never calls the AI
   const hasSum=S.chat.some(m=>m.me);
-  $('#sugg').innerHTML = suggestions().map(s=>`<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('') + (hasSum?`<button class="chip" type="button" id="sumBtn" data-st="summarise chain">Sum up this chat</button>`:'');
+  $('#sugg').innerHTML = suggestions().map(s=>`<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('') + (hasSum?`<button class="chip" type="button" id="sumBtn" data-st="summarise chain">Sum up this chat</button><button class="chip" type="button" id="chatDl">Download chat</button>`:'');
   $$('#sugg [data-q]').forEach(c=>c.onclick=()=>ask(c.dataset.q));
+  const dl=$('#chatDl'); if(dl) dl.onclick=downloadChat;
   const sb=$('#sumBtn'); if(sb) sb.onclick=async()=>{sb.disabled=true; try{const r=await RW.send('summary',{history:history(40)}); pushBot({html:'<p><b>In short:</b></p>'+md(r.text)});}catch(e){sb.disabled=false;}};
   const sc=$('#scrAsk'); requestAnimationFrame(()=>sc.scrollTop=sc.scrollHeight);
 }
 $('#autoRead').onchange=e=>{ if(!e.target.checked){stopSpeak();return;} const btns=$$('[data-say]'); if(btns.length) btns[btns.length-1].click(); };
 function fbHtml(m,i){return `<div class="fb" role="group" aria-label="Was this answer helpful?">${[['up','Helpful','M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3'],['down','Not helpful','M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17']].map(([v,t,d])=>`<button type="button" class="chip" data-fb="${i}" data-v="${v}" aria-pressed="${m.fb.v===v}" aria-label="${t}" title="${t}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;margin:auto"><path d="${d}"/></svg></button>`).join('')}<p class="small">A vote keeps this question, unless it has personal details, to improve Runway.</p></div>`;}
+// The chat as a text file, made in the browser: questions, answers and each answer's official sources, plus the notice.
+function chatText(){
+  const lines=['Runway: Ask Runway chat', new Date().toLocaleString('en-SG'), ''];
+  S.chat.forEach(m=>{
+    lines.push((m.me?'You: ':'Runway: ')+plain(m.html));
+    (m.src||[]).forEach((s,i)=>lines.push(`  [${i+1}] ${s.title} (${s.publisher})${s.url?' '+s.url:''}`));
+    lines.push('');
+  });
+  lines.push(plain(NOTICE));
+  return lines.join('\n');
+}
+function downloadChat(){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([chatText()],{type:'text/plain;charset=utf-8'}));
+  a.download='runway_chat.txt'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast('Chat saved as runway_chat.txt');
+}
 function pushBot(b){S.chat.push(b);renderChat();$('#chatLive').textContent=plain(b.html);if(!b.warn)prefetchPack(plain(b.html),b.lang);if($('#autoRead').checked&&!MIC){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1],b.lang);}}
 function plain(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.small').forEach(x=>x.remove());return d.textContent.replace(/\s+/g,' ').trim();}
 
@@ -3425,9 +3456,9 @@ function renderMore(){
   $('#moreBody').innerHTML=`${crumbs('More')}
     <div class="scr-h"><h1>More</h1></div>
     ${REV()?`<div class="revcard" role="status"><b>Logged in as ${esc(S.user)}: reviewer view is on</b><span class="small">About Us and How it works show the full versions. You can upload Ask documents and edit the pages below.</span></div>
-    ${group('rev','Reviewer tools',[`<button type="button" data-rev="upload"><span>Upload Ask documents<small>Add or replace an official document that Ask Runway searches</small></span>${ICON.chev}</button>`,row('about','Edit About Us','Open the page, then choose Edit this page'),row('method','Edit How it works','Reviewer and public versions'),row('faq','Edit the FAQ','Add, change or remove questions')])}`:''}
+    ${group('rev','Reviewer tools',[`<button type="button" data-rev="upload"><span>Upload Ask documents<small>Add or replace an official document that Ask Runway searches</small></span>${ICON.chev}</button>`,row('about','Edit About Us','Open the page, then choose Edit this page'),row('method','Edit How it works','Reviewer and public versions'),row('faq','Edit the FAQ','Add, change or remove questions'),row('insights','Insights','Answer feedback, documents, quality checks and AI use')])}`:''}
     ${group('you','Your settings',[row('details','Your details',`Youngest ${S.age} · average ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}`),row('size','Text size',`${textPx()} px`)])}
-    ${group('guides','Guides',[row('faq','FAQ','Common questions, each with its official source'),row('timeline','Buying timeline','The steps from HFE letter to keys, each with its official source'),row('case','Case study','One flat type, two towns, two leases, from real sales')])}
+    ${group('guides','Guides',[row('explorer','Lease explorer','CPF use for every age and lease, in one chart'),row('faq','FAQ','Common questions, each with its official source'),row('timeline','Buying timeline','The steps from HFE letter to keys, each with its official source'),row('case','Case study','One flat type, two towns, two leases, from real sales')])}
     ${group('about','About Runway',[row('about','About Us','What Runway is, notice, team'),row('method','How it works','Methodology and flowcharts'),row('sources','Sources and credits','Data, map, documents, photos')])}
     ${group('legal','Legal',[row('privacy','Privacy Policy','What happens to what you type or upload'),row('terms','Terms','Educational use, no advice, licences')])}
     ${S.user?'<button class="btn ghost" type="button" id="outBtn">Log out</button>':'<button class="btn" type="button" id="inBtn">Log in for the reviewer view</button>'}`;
@@ -3437,7 +3468,7 @@ function renderMore(){
   const ib=$('#inBtn'); if(ib) ib.onclick=()=>RW.openLogin();
 }
 function signOut(){closeSheet();RW.logout();}
-const SUBNAME={details:'Your details',size:'Text size',about:'About Us',method:'How it works',sources:'Sources and credits',privacy:'Privacy Policy',terms:'Terms',faq:'FAQ',case:'Case study',timeline:'Buying timeline'};
+const SUBNAME={details:'Your details',size:'Text size',about:'About Us',method:'How it works',sources:'Sources and credits',privacy:'Privacy Policy',terms:'Terms',faq:'FAQ',case:'Case study',timeline:'Buying timeline',explorer:'Lease explorer',insights:'Insights'};
 function renderSub(){
   S.editing=false;  // a fresh page is never mid-edit
   const b=$('#subBody'), s=S.sub, top=crumbs(['more','More'],SUBNAME[s]);
@@ -3489,6 +3520,8 @@ function renderSub(){
   }
   else if(s==='case') caseStudy(b,top);
   else if(s==='timeline'){ b.innerHTML=top+timelineHtml(); }
+  else if(s==='explorer') leaseExplorer(b,top);
+  else if(s==='insights') insightsPage(b,top);
 }
 // normal text (.944rem) in px; 17 unless the Text size slider changed it
 const textPx=()=>Math.round(parseFloat(getComputedStyle(document.documentElement).fontSize)*.944);
@@ -3657,7 +3690,7 @@ function aboutHtml(){
   <p>A runway is how far you can go before you run out of ground. For an HDB buyer, the lease is the runway.</p>
   <h2>Scope</h2><p>Buying an HDB flat in the resale market: how the lease left and the youngest buyer's age decide how much CPF and HDB loan you can use, and what a shorter lease costs in each town.</p>
   <h2>Objectives</h2><ul><li>Bring together the rules from CPF Board, HDB and the Ministry of National Development.</li><li>Personalise with generic details only: ages, a rough CPF figure and a town. No names or NRIC.</li><li>Explain, not just calculate, with the source shown.</li><li>Present it as a map, verdict cards, a shortlist, a file and a chat.</li></ul>
-  <h2>Features</h2><ul><li><b>Map (Town Safari)</b>: every HDB block, MRT lines and the flats sold in ${SPAN} at their real addresses. Check each one for your age, keep the ones you like and collect town stamps.</li><li><b>Ask Runway</b>: questions answered from 32 official documents with sources, "Why?" for any flat, a chat summary, read-aloud, and document upload that suggests towns.</li><li><b>Safeguards</b>: numbers come from Runway's calculator, never the AI. An AI explanation with a number the calculator didn't produce is replaced by a plain one. NRIC and phone numbers are blocked or removed.</li></ul>
+  <h2>Features</h2><ul><li><b>Map (Town Safari)</b>: every HDB block, MRT lines and the flats sold in ${SPAN} at their real addresses. Check each one for your age, keep the ones you like and collect town stamps.</li><li><b>Ask Runway</b>: questions answered from 32 official documents with sources, "Why?" for any flat, a chat summary, chat download, read-aloud, and document upload that suggests towns. Questions with your own age, lease or price are worked out with Runway's calculator tools.</li><li><b>Lease explorer</b>: CPF use for every age and lease in one chart, with sliders for your own case.</li><li><b>Reviewer tools</b>: upload Ask documents, edit pages and the FAQ, and Insights on answer feedback, search quality and AI use.</li><li><b>Safeguards</b>: numbers come from Runway's calculator, never the AI. An AI explanation with a number the calculator didn't produce is replaced by a plain one. NRIC and phone numbers are blocked or removed.</li></ul>
   <h2>Data sources</h2>
   <div class="scroll"><table class="tbl"><thead><tr><th>Source</th><th>Used for</th></tr></thead><tbody>
     <tr><td>HDB resale flat prices, 1990 – Sep 2026 (986,090 sales, data.gov.sg)</td><td>Flats on the map, town lease effect</td></tr>
@@ -3689,10 +3722,24 @@ const FLOW_ASK = `<h2>Flowchart · Use case 2: Ask Runway</h2>
     <div class="fn d">Document uploaded?</div><div class="sp"></div>
     <div class="br"><div><div class="bl"><span>Yes</span></div><div class="fn">Remove personal data, read age, budget, CPF, flat type</div><div class="ar"></div><div class="fn t">Rank towns from recent sales</div></div><div><div class="bl"><span>No</span></div><div class="fn o">Question</div><div class="ln"></div></div></div><div class="ar jr"></div>
     <div class="fn d">NRIC, phone, advice or off-topic?</div><div class="sp"></div>
-    <div class="br"><div><div class="bl"><span>Yes</span></div><div class="fn o">Polite decline</div></div><div><div class="bl"><span>No</span></div><div class="fn">Search 32 official documents</div><div class="ln"></div></div></div>
+    <div class="br"><div><div class="bl"><span>Yes</span></div><div class="fn o">Polite decline</div></div><div><div class="bl"><span>No</span></div><div class="fn">Hybrid search (keywords + vectors) of 32 official documents</div><div class="ln"></div></div></div>
     <div class="ar jr"></div>
-    <div class="fn">AI answers only from the passages, with numbered sources</div><div class="ar"></div>
-    <div class="fn t">Answer + "Where this comes from" + Listen</div>
+    <div class="fn d">Question gives an age, a lease or a price?</div><div class="sp"></div>
+    <div class="br"><div><div class="bl"><span>Yes</span></div><div class="fn">AI calls Runway's calculator tools</div><div class="ln"></div></div><div><div class="bl"><span>No</span></div><div class="fn o">Passages only</div><div class="ln"></div></div></div>
+    <div class="ar jn"></div>
+    <div class="fn">AI answers from the passages and calculator results, with numbered sources</div><div class="ar"></div>
+    <div class="fn d">Any figure from neither?</div><div class="sp"></div>
+    <div class="br"><div><div class="bl"><span>Yes</span></div><div class="fn o">Show the official pages instead</div></div><div><div class="bl"><span>No</span></div><div class="fn t">Answer + "Where this comes from" + Listen</div></div></div>
+  </div>`;
+const FLOW_EXPLORER = `<h2>Flowchart · Use case 3: Lease explorer</h2>
+  <div class="flow">
+    <div class="fn t">Pick the youngest buyer's age and the lease left</div><div class="ar"></div>
+    <div class="fn d">Lease left more than 20 years?</div><div class="sp"></div>
+    <div class="br"><div><div class="bl"><span>No</span></div><div class="fn o">CPF: none</div><div class="ln"></div></div><div><div class="bl"><span>Yes</span></div><div class="fn d">Lease reaches age 95?</div><div class="sp"></div>
+      <div class="br"><div><div class="bl"><span>Yes</span></div><div class="fn o">CPF: full use</div><div class="ln"></div></div><div><div class="bl"><span>No</span></div><div class="fn o">CPF: (lease − 20) ÷ (95 − age − 20)</div><div class="ln"></div></div></div><div class="ln jn"></div></div></div>
+    <div class="ar jn"></div>
+    <div class="fn">CPF share, HDB loan limit, lease needed for full CPF; nearest cell outlined in the age × lease chart</div><div class="ar"></div>
+    <div class="fn t">Ask Runway about this flat (calculator tool + official sources)</div>
   </div>`;
 function methodHtml(){
   if(!FULL()) return `<div class="doctext">
@@ -3702,16 +3749,16 @@ function methodHtml(){
     <tr><td>Lease reaches age 95</td><td>Full CPF</td></tr>
     <tr><td>Lease ends earlier</td><td>CPF share = (lease − 20) ÷ (95 − age − 20)</td></tr>
     <tr><td>20 years or less left</td><td>No CPF, no HDB loan</td></tr></tbody></table></div>
-  ${FLOW_MAP}${FLOW_ASK}</div>`;
+  ${FLOW_MAP}${FLOW_ASK}${FLOW_EXPLORER}</div>`;
   const t1=(()=>{const a=S.age,v=S.avg;S.age=25;S.avg=25;const r=calc(550000,65);S.age=a;S.avg=v;return r;})();
-  const req=[['Information from several official sources','32 documents + HDB sales data + OneMap'],['Personalised with non-identifying inputs','Ages, rough CPF, town; NRIC and phone blocked'],['Explanations and follow-up questions','Ask Runway, Why?, chat summary'],['Text, tables, charts and forms','Map, verdict card, shortlist, file export'],['At least two use cases','Map (Town Safari) and Ask Runway'],['About Us and Methodology pages','More → About Us, How it works'],['One flowchart per use case','Below'],['Deployed with a password','Streamlit Community Cloud; reviewer log-in with hashed passwords in secrets (guests get the short view)'],['Required disclaimer','About Us → Notice, linked from the map']];
+  const req=[['Information from several official sources','32 documents + HDB sales data + OneMap'],['Personalised with non-identifying inputs','Ages, rough CPF, town; NRIC and phone blocked'],['Explanations and follow-up questions','Ask Runway, Why?, chat summary'],['Text, tables, charts and forms','Map, verdict card, shortlist, lease explorer chart, file and chat export'],['At least two use cases','Map (Town Safari), Ask Runway and Lease explorer'],['Agents with tools, RAG with a vector store','Ask Runway calls 3 calculator tools; hybrid search: BM25 keywords + TF-IDF vector store'],['Document management and evaluation','Reviewer upload and editing; Insights: feedback, eval by search mode, AI use'],['About Us and Methodology pages','More → About Us, How it works'],['One flowchart per use case','Below'],['Deployed with a password','Streamlit Community Cloud; reviewer log-in with hashed passwords in secrets (guests get the short view)'],['Required disclaimer','About Us → Notice, linked from the map']];
   return `<div class="doctext">
   <h1>How it works</h1>
   <p>Every number comes from plain arithmetic on HDB's transaction records and the published rules. The AI only explains. It never calculates.</p>
   <h2>Requirements checklist</h2>
   <div class="scroll"><table class="tbl"><thead><tr><th>Requirement</th><th>Where</th></tr></thead><tbody>${req.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</tbody></table></div>
   <h2>Data flow</h2>
-  <ul><li><b>Offline:</b> pandas combines HDB's 5 resale files (986,090 sales), works out each town's lease effect from Jan 2024 – Sep 2026 sales, and geocodes every block with OneMap addresses.</li><li><b>Map:</b> town outlines, roads, MRT and the ${SPAN} sales are drawn with Leaflet. The calculator runs in the app for your age.</li><li><b>Ask:</b> 32 official documents are split into 349 passages. Keyword (BM25) search picks the top 5 passages (a question in another language is put into English first), they go to the AI, Claude, with strict rules, and the answer shows its sources.</li></ul>
+  <ul><li><b>Offline:</b> pandas combines HDB's 5 resale files (986,090 sales), works out each town's lease effect from Jan 2024 – Sep 2026 sales, and geocodes every block with OneMap addresses.</li><li><b>Map:</b> town outlines, roads, MRT and the ${SPAN} sales are drawn with Leaflet. The calculator runs in the app for your age.</li><li><b>Ask:</b> 32 official documents are split into 349 passages. Hybrid search picks the top 5: keyword (BM25) and vector (TF-IDF, cosine similarity) rankings merged by reciprocal rank fusion (a question in another language is put into English first). The passages go to the AI, Claude, with strict rules. When the question gives an age, a lease or a price, Claude calls Runway's calculator tools (lease check, loan length, stamp duty) rather than doing sums, and every figure in the answer must come from the passages, the question or a tool result.</li><li><b>Lease explorer:</b> the same rule worked out in the browser for every age and lease, with nothing sent to the server.</li><li><b>Insights (reviewers):</b> answer votes, the eval run by search mode, documents and AI use, read from what Runway already keeps.</li></ul>
   <h2>The rule</h2>
   <div class="scroll"><table class="tbl"><tbody>
     <tr><td>Lease needed</td><td>95 − youngest buyer's age</td></tr>
@@ -3731,7 +3778,7 @@ function methodHtml(){
     <tr><td>Chat with an NRIC, advice or prompt injection</td><td>Declined</td><td class="ok">Pass</td></tr>
     <tr><td>AI explanation with an invented figure</td><td>Replaced by template</td><td class="ok">Pass</td></tr></tbody></table></div>
   <p class="small">The rows above are covered by the project's automated tests (pytest) and 28 evaluation questions.</p>
-  ${FLOW_MAP}${FLOW_ASK}
+  ${FLOW_MAP}${FLOW_ASK}${FLOW_EXPLORER}
 </div>`;
 }
 /* ---------- FAQ, Privacy Policy, Terms, Case study ---------- */
@@ -3819,6 +3866,69 @@ function caseNumbers(d){
     const psm=bands.map(i=>cell('lease_psm',town,i)), price=bands.map(i=>cell('lease_price',town,i));
     return {town, psm, price, gap: psm[0]!=null&&psm[1]!=null ? Math.round((psm[0]-psm[1])/psm[0]*100) : null};
   });
+}
+/* ---------- Lease explorer (use case 3): the age-95 rule for every age and lease, worked out in this page ----------
+   The same rule as calc() and runway/cpf_rules.py cpf_share (tests check the three agree). Nothing is sent anywhere. */
+const EX_AGES=[25,30,35,40,45,50,55,60,65], EX_LEASES=[25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
+function cpfPct(age,lease){ if(lease<=20) return 0; if(age+lease>=95) return 100; return Math.round((lease-20)/(95-age-20)*1000)/10; }
+const pctText=p=>p>=100?'Full':p>0?Math.round(p)+'%':'None';
+function leaseExplorer(b,top){
+  const st=S.ex||(S.ex={age:S.age,lease:60});
+  b.innerHTML=`${top}<div class="doctext"><h1>Lease explorer</h1>
+    <p>How much of a flat's Valuation Limit CPF can pay, for each age of the youngest buyer and each lease left. Worked out in this page with the official rule. Nothing is sent anywhere.</p>
+    <span class="label">Try your own</span>
+    ${sliderHtml('exA',"Youngest buyer's age",21,85,st.age)}
+    ${sliderHtml('exL','Lease left',1,99,st.lease,' years')}
+    <div id="exOut" class="exout" role="status" aria-live="polite"></div>
+    <button type="button" class="btn ghost sm" id="exAsk">Ask Runway about this flat</button>
+    <h2>Every age and lease</h2>
+    <p class="small">Rows: youngest buyer's age. Columns: years of lease left. Full: CPF can be used in full. A percentage: the share of the Valuation Limit CPF can pay. None: 20 years or less left. The outlined cell is the nearest to your choice above.</p>
+    <div class="scroll"><table class="tbl extbl"><caption class="lsr">CPF usable as a share of the Valuation Limit, by youngest buyer's age (rows) and years of lease left (columns)</caption>
+      <thead><tr><th scope="col">Age</th>${EX_LEASES.map(l=>`<th scope="col">${l}</th>`).join('')}</tr></thead>
+      <tbody>${EX_AGES.map(a=>`<tr><th scope="row">${a}</th>${EX_LEASES.map(l=>{const p=cpfPct(a,l);return `<td class="${p>=100?'full':p>0?'part':'none'}" data-a="${a}" data-l="${l}">${pctText(p)}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>
+    <p class="small">The rule: CPF can be used in full when the lease lasts until the youngest buyer is 95. Otherwise the share is (lease − 20) ÷ (95 − age − 20), and none at 20 years or less. The HDB loan limit of 75% is scaled by the same share. Sources: MND's May 2019 announcement (Annex A) and CPF Board's FAQ, listed in Sources and credits.</p></div>`;
+  const near=(list,v)=>list.reduce((x,y)=>Math.abs(y-v)<Math.abs(x-v)?y:x);
+  const out=()=>{
+    const a=st.age, l=st.lease, p=cpfPct(a,l), ends=a+l, loan=Math.round(75*p/10)/10;
+    $('#exOut').innerHTML=`<b>${p>=100?'CPF: full use':p>0?`CPF: ${p}% of the Valuation Limit`:'CPF: none'}</b>
+      <span>The lease ends when the youngest buyer is ${ends}${ends>=95?', so it covers them to 95.':`, ${95-ends} year${95-ends===1?'':'s'} short of 95.`}</span>
+      <span>HDB loan limit: ${loan}% of the price or value${p>=100?'':' (75% scaled by the CPF share)'}.</span>
+      <span>For full CPF at this age, the flat needs ${95-a} years of lease or more.</span>`;
+    const ca=near(EX_AGES,a), cl=near(EX_LEASES,l);
+    $$('.extbl td').forEach(td=>td.classList.toggle('on',+td.dataset.a===ca&&+td.dataset.l===cl));
+  };
+  bindSlider('exA',v=>{st.age=v;out();}); bindSlider('exL',v=>{st.lease=v;out();});
+  // Ask Runway works the same figures out with its calculator tool (runway/agent.py), then explains the rule
+  $('#exAsk').onclick=()=>RW.enter('ask',`I'm ${st.age} and the flat has ${st.lease} years of lease left. How much CPF can I use?`);
+  out();
+}
+/* ---------- Insights (reviewer only; the server checks the login again): runway/insights.py ---------- */
+function insightsPage(b,top){
+  if(!REV()){ b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1><p>Insights is for reviewers. Log in to see how Ask Runway is doing.</p><button class="btn" type="button" id="insIn">Log in</button></div>`; $('#insIn').onclick=()=>RW.openLogin(); return; }
+  b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1><p role="status">Loading…</p></div>`;
+  RW.send('insights').then(r=>{
+    if(S.sub!=='insights') return;
+    if(!r||!r.ok){ b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1><p>${esc((r&&r.error)||'Insights could not load.')}</p></div>`; return; }
+    const d=r.data, f=d.feedback, c=d.corpus, e=d.eval, ai=d.ai;
+    const stat=(v,l)=>`<div class="stat"><b>${esc(v)}</b><span class="small">${esc(l)}</span></div>`;
+    const modes=e&&e.by_mode?Object.entries(e.by_mode):[];
+    b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1>
+      <p>How Ask Runway is doing, from what Runway already keeps. Updated ${esc(d.generated)}.</p>
+      <div class="stats">${stat(c.docs,'official documents')}${stat(c.passages,'passages searched')}${stat(f.helpful_pct==null?'–':f.helpful_pct+'%',`helpful (${f.total} vote${f.total===1?'':'s'})`)}${stat(ai.calls_last_hour+' / '+ai.cap,'AI calls in the last hour')}</div>
+      <h2>Answers people marked Not helpful</h2>
+      ${f.low_rated.length?`<ul>${f.low_rated.map(x=>`<li>${esc(x.q)} <span class="small">${esc(x.date)}</span></li>`).join('')}</ul><p class="small">A question here may need a document Ask doesn't have yet: add it with Upload Ask documents. Only questions with no NRIC, phone number or email are ever kept.</p>`:'<p>None yet.</p>'}
+      <p class="small">Votes: ${f.up} helpful, ${f.down} not helpful${Object.keys(f.by_lang).length?' · by answer language: '+Object.entries(f.by_lang).map(([k,n])=>`${esc((LANGS[k]||{name:k}).name)} ${n}`).join(', '):''}. Read from ${esc(f.from)}.</p>
+      <h2>Quality checks</h2>
+      ${e?`<div class="scroll"><table class="tbl"><thead><tr><th>Check</th><th>Passed</th></tr></thead><tbody>${e.checks.filter(x=>x[2]).map(x=>`<tr><td>${esc(x[0])}</td><td>${x[1]} of ${x[2]}</td></tr>`).join('')}</tbody></table></div>
+        ${modes.length?`<p>Search compared by mode, on the same ${modes[0][1].total} questions: is the right document first, in the top 3, in the top 5?</p>
+        <div class="scroll"><table class="tbl"><thead><tr><th>Search</th><th>First</th><th>Top 3</th><th>Top 5</th></tr></thead><tbody>${modes.map(([m,v])=>`<tr><td>${esc({keyword:'Keywords (BM25)',vector:'Vectors (TF-IDF)',hybrid:'Hybrid, in use'}[m]||m)}</td><td>${v.top1}</td><td>${v.top3}</td><td>${v.top5}</td></tr>`).join('')}</tbody></table></div>`:''}
+        <p class="small">From the last run of eval/run_eval.py, ${esc(e.run_at||'')}. Search in use: ${esc(c.mode)}.</p>`:'<p>No quality run saved yet. Run python eval/run_eval.py.</p>'}
+      <h2>AI</h2>
+      <p>${ai.on?`On: ${esc(ai.model)}, with Runway's calculator tools for questions that give an age, a lease or a price.`:'Off: no API key is set, so Ask shows the matching official passages instead of an AI answer.'} The cap of ${ai.cap} calls an hour is shared by every visitor.</p>
+      <h2>Documents</h2>
+      <div class="scroll"><table class="tbl"><thead><tr><th>Document</th><th>Publisher</th><th>Passages</th></tr></thead><tbody>${c.list.map(x=>`<tr><td>${esc(x.title)}${x.uploaded?' <span class="small">(uploaded)</span>':''}</td><td>${esc(x.publisher)}</td><td>${x.passages}</td></tr>`).join('')}</tbody></table></div>
+      <p class="small">${c.uploaded} uploaded by reviewers since the last deploy or kept in the database.</p></div>`;
+  }).catch(()=>{ if(S.sub==='insights') b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1><p>Runway did not respond. Try again.</p></div>`; });
 }
 function caseStudy(b,top){
   b.innerHTML=`${top}<div class="doctext"><h1>Case study</h1><p role="status">Loading the sales figures…</p></div>`;

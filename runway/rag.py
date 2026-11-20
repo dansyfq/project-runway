@@ -1,8 +1,9 @@
 """Retrieval over the fixed library of official CPF, HDB and MND documents.
 
-Keyword search (BM25) with a few everyday synonyms, so exact terms ("Valuation Limit",
-"HFE") and common paraphrases ("deposit") both find the right passage. A question in
-another language is put into English first (runway.llm.LLM.search_query).
+Hybrid search: keyword search (BM25) with a few everyday synonyms, so exact terms ("Valuation Limit", "HFE") and
+common paraphrases ("deposit") find the right passage, merged with a TF-IDF vector store (cosine similarity) by
+weighted reciprocal rank fusion. A question in another language is put into English first
+(runway.llm.LLM.search_query).
 """
 
 from __future__ import annotations
@@ -116,16 +117,97 @@ def expand_query(query: str) -> str:
     return " ".join([query, *extra])
 
 
+RRF_K = 60  # reciprocal rank fusion constant; 60 is the value from the original paper
+POOL = 20  # how deep each ranking is read before the two are merged
+# Function words carry no meaning in a term vector: without them "How long can my loan be?" matched
+# "How long is an HFE letter valid?" on "how long" instead of HDB's loan page.
+STOPWORDS = set(
+    "a an the is are was were be been being am i me my we our you your he she it its they them their this that these "
+    "those of to in on at by for with from as or and but if so than then there here what which who whom whose when "
+    "where why how can could do does did will would shall should may might must have has had not no yes any all some "
+    "more most much many very just also into about up out over".split()
+)
+
+
+class VectorIndex:
+    """A small vector store: every passage is a TF-IDF vector (L2-normalised) and a query is matched by cosine similarity.
+
+    shortcut: sparse term vectors, not neural embeddings (Anthropic has no embeddings service, and a local embedding
+    model is too big for Streamlit Community Cloud); swap `embed` for an embedding call to upgrade.
+    """
+
+    def __init__(self, texts: list[str]):
+        docs = [self.words(t) for t in texts]
+        df: dict[str, int] = {}
+        for words in docs:
+            for w in set(words):
+                df[w] = df.get(w, 0) + 1
+        self.vocab = {w: i for i, w in enumerate(sorted(df))}
+        n = len(docs)
+        self.idf = np.array([np.log((1 + n) / (1 + df[w])) + 1 for w in self.vocab], dtype=np.float32)
+        self.matrix = np.vstack([self.embed(words) for words in docs]) if docs else np.zeros((0, len(self.vocab)), np.float32)
+
+    def embed(self, words: list[str]) -> np.ndarray:
+        vec = np.zeros(len(self.vocab), dtype=np.float32)
+        for w in words:
+            if w in self.vocab:
+                vec[self.vocab[w]] += 1
+        vec = (1 + np.log(np.maximum(vec, 1))) * (vec > 0) * self.idf  # sublinear term frequency x idf
+        norm = float(np.linalg.norm(vec))
+        return vec / norm if norm else vec
+
+    @staticmethod
+    def words(text: str) -> list[str]:
+        return [w for w in tokenize(text) if w not in STOPWORDS]
+
+    def scores(self, query: str) -> np.ndarray:
+        return self.matrix @ self.embed(self.words(query))
+
+
+# eval/questions.json (python eval/run_eval.py): at 0.3 hybrid matches BM25 at top 1 (15/19) and beats it at top 3
+# (19 vs 18); at 1.0 top 1 fell to 13. Re-run the eval after changing it.
+VECTOR_WEIGHT = 0.3
+
+
+def fuse(rankings: list[list[int]], weights: list[float] | None = None, k: int = RRF_K) -> list[int]:
+    """Weighted reciprocal rank fusion: a passage ranked high by both lists comes first."""
+    total: dict[int, float] = {}
+    for ranking, weight in zip(rankings, weights or [1.0] * len(rankings)):
+        for rank, idx in enumerate(ranking):
+            total[idx] = total.get(idx, 0.0) + weight / (k + rank + 1)
+    return sorted(total, key=lambda i: (-total[i], i))
+
+
 class Retriever:
-    mode = "keyword (BM25)"
+    mode = "hybrid (BM25 keywords + TF-IDF vector store)"
 
     def __init__(self, chunks: list[Chunk]):
         self.chunks = chunks
-        self.bm25 = BM25Okapi([tokenize(f"{c.title} {c.heading} {c.text}") for c in chunks])
+        texts = [f"{c.title} {c.heading} {c.text}" for c in chunks]
+        self.bm25 = BM25Okapi([tokenize(t) for t in texts])
+        self.vectors = VectorIndex(texts)
 
-    def search(self, query: str, k: int = 5) -> list[Chunk]:
-        scores = self.bm25.get_scores(tokenize(expand_query(query)))
-        return [self.chunks[int(i)] for i in np.argsort(-scores)[:k]]
+    def rankings(self, query: str) -> tuple[list[int], list[int]]:
+        """(BM25 order, vector order) of passage numbers for one query, best first. A passage that scores 0 is not a match."""
+        expanded = expand_query(query)
+        keyword = self.bm25.get_scores(tokenize(expanded))
+        vector = self.vectors.scores(expanded)
+        return (
+            [int(i) for i in np.argsort(-keyword)[:POOL] if keyword[i] > 0],
+            [int(i) for i in np.argsort(-vector)[:POOL] if vector[i] > 0],
+        )
+
+    def search(self, query: str, k: int = 5, mode: str = "hybrid") -> list[Chunk]:
+        keyword, vector = self.rankings(query)
+        if mode == "keyword":
+            order = keyword
+        elif mode == "vector":
+            order = vector
+        elif mode == "hybrid":
+            order = fuse([keyword, vector], [1.0, VECTOR_WEIGHT])
+        else:
+            raise ValueError(f"unknown search mode: {mode}")
+        return [self.chunks[i] for i in order[:k]]
 
 
 def format_context(chunks: list[Chunk]) -> str:
