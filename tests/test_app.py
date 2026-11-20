@@ -718,3 +718,22 @@ RW.send('need_data'); RW.send('nav', {page: 'ask'}); RW.send('tts', {});
 console.log(JSON.stringify({queue: RW.queue.map(m => m.type), sent: sent()}));""")
     assert got["queue"] == ["tts", "nav", "ask", "need_data", "tts", "feedback", "tts"]
     assert got["sent"] == ["tts"]
+
+
+@needs_node
+def test_lease_explorer_matches_python_rules(tmp_path):
+    """Lease explorer: every age 21-85 and lease 1-99 gives runway/cpf_rules.py's CPF share (to 0.1 of a percent)."""
+    code = GAME[GAME.index("function cpfPct(age,lease){"):GAME.index("const pctText=")]
+    cases = [(age, lease) for age in range(21, 86) for lease in range(1, 100)]
+    got = node_json(tmp_path, f"{code}\nconsole.log(JSON.stringify({json.dumps(cases)}.map(([a,l])=>cpfPct(a,l))));")
+    for (age, lease), pct in zip(cases, got):
+        assert pct == pytest.approx(cpf_share(age, lease) * 100, abs=0.0501), (age, lease)  # shown to 0.1, halves up
+
+
+def test_lease_explorer_and_insights_are_wired_in():
+    assert "'lease-explorer': 'more explorer'" in GAME and "'insights': 'more insights'" in GAME
+    assert "row('explorer','Lease explorer'," in GAME and "row('insights','Insights'," in GAME
+    assert "else if(s==='explorer') leaseExplorer(b,top);" in GAME and "else if(s==='insights') insightsPage(b,top);" in GAME
+    assert "if(!REV())" in GAME[GAME.index("function insightsPage"):GAME.index("function caseStudy")]  # reviewers only
+    assert GAME.count("${FLOW_EXPLORER}") == 2  # How it works, short and full versions: one flowchart per use case
+    assert "id=\"chatDl\"" in GAME and "function downloadChat" in GAME

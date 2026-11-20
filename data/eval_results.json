@@ -1,6 +1,6 @@
 {
-  "run_at": "16 Oct 2026 22:20",
-  "retrieval_mode": "keyword (BM25)",
+  "run_at": "20 Nov 2026 15:36",
+  "retrieval_mode": "hybrid (BM25 keywords + TF-IDF vector store)",
   "summary": {
     "retrieval_hits": 19,
     "retrieval_total": 19,
@@ -11,6 +11,26 @@
     "llm_pass": 0,
     "llm_total": 0,
     "total": 28
+  },
+  "by_mode": {
+    "keyword": {
+      "top1": 15,
+      "top3": 18,
+      "top5": 19,
+      "total": 19
+    },
+    "vector": {
+      "top1": 15,
+      "top3": 16,
+      "top5": 18,
+      "total": 19
+    },
+    "hybrid": {
+      "top1": 15,
+      "top3": 19,
+      "top5": 19,
+      "total": 19
+    }
   },
   "cases": [
     {
