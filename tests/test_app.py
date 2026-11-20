@@ -480,7 +480,7 @@ def test_privacy_policy_matches_the_code():
     assert bridge.MAX_ATTEMPTS == 5 and bridge.LOCKOUT_SECONDS == 60 and "for one minute after five" in GAME
     assert "clean_history(payload.get(\"history\"), 6)" in (ROOT / "runway" / "bridge.py").read_text() and "up to six recent turns" in GAME
     assert "m.timer = setTimeout(() => finish(m.id, null, new Error('timeout')), 90000);" in GAME
-    assert GAME.count("Last updated: ${LEGAL_DATE}") == 2 and "const LEGAL_DATE='14 November 2026';" in GAME
+    assert GAME.count("Last updated: ${LEGAL_DATE}") == 2 and "const LEGAL_DATE='20 November 2026';" in GAME
     assert "@" not in GAME[GAME.index("function privacyHtml"):GAME.index("// Case study:")]  # no contact address invented
 
 

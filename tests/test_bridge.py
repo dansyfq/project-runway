@@ -37,8 +37,8 @@ def send(kind, state, bot, index, **payload):
 def test_reviewer_login_gives_full_view(bot, index):
     state = {}
     assert send("login", state, bot, index, u=" Reviewer ", p="Review-pass-1") == {
-        "ok": True, "user": "reviewer", "role": "full"}
-    assert state["user"] == "reviewer" and state["role"] == "full"
+        "ok": True, "user": "reviewer", "role": "admin"}  # a secrets entry that is only a hash is an admin
+    assert state["user"] == "reviewer" and state["role"] == "admin"
 
 
 def test_wrong_password_and_lockout(bot, index):
@@ -67,7 +67,7 @@ def test_guests_can_ask_without_logging_in(bot, index):
 
 
 def test_data_flags_and_logout(bot, index):
-    state = {"user": "reviewer", "role": "full"}
+    state = {"user": "reviewer", "role": "admin"}
     send("booted", state, bot, index)
     assert state["data_sent"] is True
     send("need_data", state, bot, index)
@@ -175,7 +175,7 @@ def test_logout_forgets_previous_answers(bot, index):
     """The Streamlit session (and its replies list) outlives sign-out, so the host would keep sending
     the last user's answers. The list is cleared in place: app.py appends to it."""
     replies = [{"id": "a", "value": {"text": "an answer for the last user"}}]
-    state = {"user": "reviewer", "role": "full", "replies": replies}
+    state = {"user": "reviewer", "role": "admin", "replies": replies}
     send("logout", state, bot, index)
     assert state["replies"] is replies and replies == []
 

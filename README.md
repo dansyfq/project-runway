@@ -24,10 +24,10 @@ The interface in `runway_game/index.html` is the approved design hand-off, runni
 | **Trends** | Public price charts, no login or setup needed. Compare median resale price or price per sqm by town since 1990 (up to 5 places, by flat type and period), and what remaining lease does to price. Numbers are built from `data/resale.parquet` by `runway/trends.py`; each chart has a table view. |
 | **Ask** (use case 2) | Answers from 32 official documents with sources, "Why?" for a flat, chat summary, chat download (a text file with each answer's sources), read-aloud, and document upload that suggests towns. A question that gives an age, a lease or a price is worked out with Runway's calculator tools (`runway/agent.py`: lease check, HDB loan length, Buyer's Stamp Duty), which Claude calls instead of doing sums; every figure in the answer must come from the passages, the question or a tool result. Answers, read-aloud and voice input in English, Chinese, Malay or Tamil (official quotes and figures stay in English; the rest of the interface is English). Helpful / Not helpful under each AI answer: a vote writes one line to the server log and to `data/feedback.jsonl` where the disk is writable, with the question kept only if it has no personal details. |
 | **Lease explorer** (use case 3, `/lease-explorer`) | CPF use for every age of the youngest buyer and every lease left, as one chart, with sliders for your own case: CPF share, HDB loan limit and the lease needed for full CPF. Worked out in the browser (tested against `runway/cpf_rules.py`); "Ask Runway about this flat" sends the case to Ask. |
-| **Insights** (reviewers, `/insights`) | Answer votes and the questions marked Not helpful, the latest eval run including retrieval by search mode, every document and its passage count, and AI calls against the hourly cap (`runway/insights.py`). The server checks the login again. |
-| **More** | Your details (with a reset), text size, About Us (with the required notice), How it works (flowcharts), Sources and credits, an FAQ whose answers each cite one document in `data/corpus/`, a buying timeline (`/timeline`) from the HFE letter to completion with a source for every step, a case study worked out live from the Trends data, the Privacy Policy and the Terms. Visitors browse as guests and see short versions; logging in as `reviewer` shows the full About Us and How it works. |
+| **Insights** (admin only, `/insights`) | Answer votes and the questions marked Not helpful, the latest eval run including retrieval by search mode, every document and its passage count, and AI calls against the hourly cap (`runway/insights.py`). The server checks the admin role again, so a `user` or guest is refused. |
+| **More** | Your details (with a reset), text size, About Us (with the required notice), How it works (flowcharts), Sources and credits, an FAQ whose answers each cite one document in `data/corpus/`, a buying timeline (`/timeline`) from the HFE letter to completion with a source for every step, a case study worked out live from the Trends data, the Privacy Policy and the Terms. Visitors browse as guests and see short versions; logging in as `user` or `admin` shows the full About Us and How it works. |
 
-Python (`runway/bridge.py`) checks the reviewer login, sends the map data after the home page loads, and answers questions
+Python (`runway/bridge.py`) checks logins and roles, sends the map data after the home page loads, and answers questions
 (`runway/rag.py` + `runway/llm.py`). The map's calculator runs in the browser and is tested against
 `runway/cpf_rules.py` so both give the same numbers. The AI never calculates; an explanation with a number
 the calculator didn't produce is replaced by a plain template.
@@ -38,7 +38,7 @@ the calculator didn't produce is replaced by a plain template.
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .streamlit/secrets.toml.example .streamlit/secrets.toml   # then add your ANTHROPIC_API_KEY
-python scripts/seed_users.py                                  # creates demo logins (see below)
+python scripts/seed_users.py                                  # optional: more logins (see below)
 streamlit run app.py
 ```
 
@@ -54,10 +54,31 @@ three search modes on the same questions (keywords / vectors / hybrid, right doc
 top 3: 18 / 16 / 19). The vectors are term vectors, not neural embeddings: Anthropic has no embeddings service and a
 local embedding model is too large for Streamlit Community Cloud.
 
-## Logins
+## Accounts and roles
 
-Anyone can use Runway without an account. One `reviewer` login unlocks the full About Us and How it works.
-No passwords are stored in this repository. `scripts/seed_users.py` creates the account from, in order:
+Anyone can use Runway as a guest, without an account. Two accounts are built in:
+
+| Account | Role | What it can do |
+|---|---|---|
+| `admin` | admin | Everything `user` can, plus the admin tools: upload or replace Ask documents; edit About Us, How it works, the Privacy Policy, Terms and the FAQ; and the Insights page (`/insights`) |
+| `user` | user | Ask questions and use everything a guest can, and read the full About Us and How it works. No admin tools, and no Insights |
+
+Only salted PBKDF2 hashes (600,000 rounds) of their passwords are in the repo, in `BUILTIN_USERS` in
+`runway/auth.py`. The passwords are long random strings handed over separately; they are not in the repo.
+The server keeps the role in the session at login and checks it for every admin message (`runway/bridge.py`), so
+`user` is refused an upload, an edit or the Insights data even if the browser sends the message. Five wrong passwords pause a username for a minute.
+
+Accounts in Secrets (`[auth.users]`) work as before and win over a built-in account of the same name:
+
+```toml
+BUILTIN_ACCOUNTS = "admin,user"   # the default; "user" turns the built-in admin off, "" turns both off
+[auth.users]
+reviewer = "pbkdf2_sha256$..."                          # just a hash: admin (for admin or user, that account's role)
+alice = { hash = "pbkdf2_sha256$...", role = "user" }   # role "admin" or "user"
+```
+
+So the existing `reviewer` login keeps the admin tools, and a hash under `admin` gives the built-in admin a new
+password. `scripts/seed_users.py` writes the hashes; it takes the accounts from, in order:
 
 1. the `RUNWAY_DEMO_USERS` environment variable (`name:password`), or
 2. `demo_accounts.local.toml` (gitignored), or
@@ -66,16 +87,19 @@ No passwords are stored in this repository. `scripts/seed_users.py` creates the 
 It writes only a salted PBKDF2 hash to `.streamlit/secrets.toml` (also gitignored). For a deployed app, paste that
 file's contents into **Streamlit Community Cloud > App settings > Secrets**. Use `--rotate` for a new password.
 
-### Reviewer tools
+### Admin tools
 
-A logged-in reviewer sees a green **Reviewer view** pill on every screen, and a **Reviewer tools** group in More:
+A logged-in account sees a green **Admin view** or **User view** pill on every screen. Admin also gets an
+**Admin tools** group in More:
 
 - **Upload Ask documents**: a PDF, web page (HTML), Markdown or text file (up to 6 MB) becomes a document in
   `data/corpus/`, added or replacing one, and Ask Runway searches it from the next question.
-- **Edit pages**: About Us and How it works (reviewer and public versions), Privacy Policy and Terms have an
+- **Edit pages**: About Us and How it works (full and public versions), Privacy Policy and Terms have an
   *Edit this page* button; the FAQ has an editor to add, change or remove questions. *Restore* puts back the built text.
+- **Insights** (`/insights`): answer votes and the questions marked Not helpful, the latest eval run, every document
+  and its passage count, and AI calls this hour (`runway/insights.py`). A guest or `user` who opens it is asked to log in as admin.
 
-The server checks the reviewer login for every change (`runway/content.py`) and cleans edited page HTML to plain
+The server checks the admin role for every change (`runway/bridge.py`) and cleans edited page HTML to plain
 formatting and links. A change takes effect at once. Streamlit Community Cloud wipes the app's disk on every redeploy,
 so Runway keeps changes elsewhere (`runway/store.py`), in this order:
 
@@ -125,8 +149,8 @@ runway/price_check.py  one flat's price per sqm against similar recent sales
 runway/rag.py          chunking and hybrid search (BM25 keywords + TF-IDF vector store, reciprocal rank fusion)
 runway/llm.py          prompts, question screening, number guard, Claude calls and the tool loop (Anthropic API)
 runway/agent.py        the calculator tools Ask's AI can call (lease check, loan length, stamp duty)
-runway/insights.py     the reviewer Insights page: votes, eval by search mode, documents, AI use
-runway/auth.py         password hashing and checks
+runway/insights.py     the admin-only Insights page: votes, eval by search mode, documents, AI use
+runway/auth.py         built-in accounts, roles, password hashing and checks
 runway/game_data.py    map data and town photos; town list and one photo at a time for the home page
 runway/trends.py       price trends by town and by lease left, built from resale.parquet (Trends tab)
 runway/content.py      reviewer edits to page text and the FAQ, and uploaded Ask documents
