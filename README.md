@@ -42,17 +42,24 @@ python scripts/seed_users.py                                  # creates demo log
 streamlit run app.py
 ```
 
-Without an `ANTHROPIC_API_KEY` the app still works: calculations, charts and keyword search run as normal, and Ask
+Without an `ANTHROPIC_API_KEY` the app still works: calculations, charts and document search run as normal, and Ask
 Runway shows the matching official passages instead of an AI answer.
 
 Ask Runway uses Claude through the Anthropic API: `claude-opus-5-5` by default, or the model named in
 `ANTHROPIC_MODEL` (for example `claude-haiku-5-5`, which costs far less per answer). The key comes from
 [console.anthropic.com](https://console.anthropic.com); a Claude subscription does not include one. Documents are found by
-hybrid search: BM25 keywords and a TF-IDF vector store (cosine similarity), merged by weighted reciprocal rank fusion.
-A question in Chinese, Malay or Tamil is put into English by the model first. `python eval/run_eval.py` compares the
-three search modes on the same questions (keywords / vectors / hybrid, right document first: 15 / 15 / 15 of 19; in the
-top 3: 18 / 16 / 19). The vectors are term vectors, not neural embeddings: Anthropic has no embeddings service and a
-local embedding model is too large for Streamlit Community Cloud.
+hybrid search: BM25 keywords and a FAISS vector store (cosine similarity over `BAAI/bge-small-en-v1.5` embeddings, run
+locally with fastembed), merged by weighted reciprocal rank fusion (k = 60). A question in Chinese, Malay or Tamil is put
+into English by the model first. `python eval/run_eval.py` compares the three search modes on the same questions
+(keywords / vectors / hybrid, right document first: 15 / 18 / 17 of 19; in the top 3: 18 / 19 / 19). The pipeline is
+built on LangChain's core interfaces (`runway/chain.py`): the search is a LangChain retriever returning Documents, and
+every prompt is a `ChatPromptTemplate`; the model call stays on the Anthropic SDK for its tool loop and beta options.
+
+The FAISS index for the committed documents is in `data/index/` (about 0.5 MB; rebuild it with
+`python -m runway.vector` after changing `data/corpus/`). An uploaded or changed document is embedded when the
+search is rebuilt and saved to `data/runtime/index/`. The embedding model (about 65 MB) downloads from Hugging Face on
+the first start and adds about 180 MB of memory. Until it is ready, or if it can't load, the vectors fall back to TF-IDF term
+vectors, and setting `VECTOR_BACKEND = "tfidf"` (Secrets or environment) keeps them there and skips the model.
 
 ## Logins
 
@@ -122,7 +129,9 @@ runway/bridge.py       sign-in, ask, why, summary, trends, towns, town_photo and
 runway/cpf_rules.py    age-95 rule, CPF share, HDB loan limit, loan tenure (Python reference)
 runway/costs.py        stamp duty, HDB fees, grants, HDB and bank loan under the income cap
 runway/price_check.py  one flat's price per sqm against similar recent sales
-runway/rag.py          chunking and hybrid search (BM25 keywords + TF-IDF vector store, reciprocal rank fusion)
+runway/rag.py          chunking and hybrid search (BM25 keywords + vector store, reciprocal rank fusion)
+runway/vector.py       the FAISS vector store: bge-small embeddings, saved in data/index/ (TF-IDF fallback in rag.py)
+runway/chain.py        LangChain layer: the search as a retriever (Documents), prompt templates to Anthropic messages
 runway/llm.py          prompts, question screening, number guard, Claude calls and the tool loop (Anthropic API)
 runway/agent.py        the calculator tools Ask's AI can call (lease check, loan length, stamp duty)
 runway/insights.py     the reviewer Insights page: votes, eval by search mode, documents, AI use
@@ -138,6 +147,7 @@ scripts/               build_dataset, refresh_data (monthly), fetch_town_photos,
 data/game/             towns, Jul-Sep 2026 sales, blocks, roads, MRT, amenities
 data/photos/           26 town photos + credits (scripts/fetch_town_photos.py)
 data/corpus/           32 official documents with source URLs
+data/index/            FAISS index of their passages (python -m runway.vector)
 data/resale.parquet    HDB resale transactions since 1990 (Trends and the price check; refreshed monthly)
 eval/, tests/          evaluation questions and the pytest suite
 ```

@@ -9,3 +9,6 @@ beautifulsoup4>=4.12  # reviewer uploads: text from HTML pages
 psycopg[binary]>=3.2  # Neon (Postgres): reviewer edits, uploads and votes survive redeploys (runway/store.py)
 boto3>=1.35  # Cloudflare R2: the original file of each upload
 edge-tts>=7  # Singapore voice pack for read-aloud (runway/voicepack.py); free, no key
+fastembed>=0.9,<0.10  # vector search: bge-small embeddings on the CPU (ONNX); the model downloads once, ~65 MB (runway/vector.py)
+faiss-cpu>=1.9,<2  # vector search: the FAISS index of passage embeddings (data/index/)
+langchain-core>=1.0,<2  # the RAG pipeline's retriever and prompt templates (runway/chain.py); not the full langchain

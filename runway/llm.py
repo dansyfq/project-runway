@@ -16,6 +16,9 @@ import unicodedata
 from collections import deque
 from dataclasses import dataclass
 
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+from runway.chain import literal, to_anthropic
 from runway.config import DEFAULT_CHAT_MODEL, get_setting
 from runway.rag import Chunk, format_context
 
@@ -128,6 +131,19 @@ Rules:
 1. Use ONLY the numbers given in FACTS. Copy them exactly as written. Do not round, add, subtract, multiply or derive any new number.
 2. Explain why the result happens, citing the rule passages by number, e.g. [1].
 3. 4 to 7 sentences. No advice on whether to buy. End with a reminder to confirm with their HFE letter and CPF Board's calculator."""
+
+# The prompts as LangChain templates (runway/chain.py turns a formatted one into the Anthropic call's system and turns).
+ANSWER_PROMPT = ChatPromptTemplate.from_messages([
+    ("system", literal(ANSWER_SYSTEM) + "{language_rule}"),
+    MessagesPlaceholder("history", optional=True),  # the last 3 exchanges, for follow-up questions
+    ("human", "PASSAGES:\n{passages}\n\nQUESTION: {question}"),
+])
+EXPLAIN_PROMPT = ChatPromptTemplate.from_messages([
+    ("system", literal(EXPLAIN_SYSTEM) + "{language_rule}"),
+    ("human", "FACTS:\n{facts}\n\nRULE PASSAGES:\n{passages}"),
+])
+SUMMARY_PROMPT = ChatPromptTemplate.from_messages([("system", literal(SUMMARY_SYSTEM)), ("human", "{transcript}")])
+SEARCH_PROMPT = ChatPromptTemplate.from_messages([("system", literal(SEARCH_SYSTEM)), ("human", "{text}")])
 
 
 @dataclass
@@ -288,7 +304,7 @@ class LLM:
         if not (foreign and self.available and text.strip()):
             return text
         try:
-            return self._chat(SEARCH_SYSTEM, [{"role": "user", "content": text}])
+            return self._chat(*to_anthropic(SEARCH_PROMPT.invoke({"text": text})))
         except Exception as exc:  # budget, network, a decline: search with the words as typed
             print(f"[runway] search translation failed, using the question as typed: {type(exc).__name__}: {exc}")
             return text
@@ -303,12 +319,14 @@ class LLM:
             return Answer(text=offline_answer(sources), sources=sources)
         if situation:
             question = f"{question}\n\n(My situation, computed by Runway: {situation})"
-        prompt = f"PASSAGES:\n{format_context(sources)}\n\nQUESTION: {question}"
         recent = (history or [])[-6:]  # last 3 exchanges give follow-up context
+        system, messages = to_anthropic(ANSWER_PROMPT.invoke({
+            "language_rule": language_rule(lang), "history": recent, "passages": format_context(sources),
+            "question": question}))
+        prompt = messages[-1]["content"]
         user_text = " ".join([question, *(h["content"] for h in recent if h["role"] == "user")])
         try:
-            text, tools_used = self._agent(ANSWER_SYSTEM + language_rule(lang), [*recent, {"role": "user", "content": prompt}],
-                                           user_text)
+            text, tools_used = self._agent(system, messages, user_text)
         except AIBusy:
             return Answer(text=offline_answer(sources), sources=sources, error=AI_BUSY)
         except Exception as exc:  # network/quota errors: show passages and say why
@@ -324,9 +342,10 @@ class LLM:
         facts_text = "\n".join(f"- {k}: {v}" for k, v in facts.items())
         if not self.available:
             return template_explanation(facts), False
-        prompt = f"FACTS:\n{facts_text}\n\nRULE PASSAGES:\n{format_context(sources)}"
+        prompt = EXPLAIN_PROMPT.invoke({"language_rule": language_rule(lang), "facts": facts_text,
+                                        "passages": format_context(sources)})
         try:
-            text = self._chat(EXPLAIN_SYSTEM + language_rule(lang), [{"role": "user", "content": prompt}])
+            text = self._chat(*to_anthropic(prompt))
         except Exception as exc:
             print(f"[runway] explanation call failed, using template: {type(exc).__name__}: {exc}")
             return template_explanation(facts), False
@@ -343,7 +362,7 @@ class LLM:
         if self.available:
             transcript = "\n".join(f"{t['role'].upper()}: {t['content']}" for t in history[-12:])
             try:
-                return self._chat(SUMMARY_SYSTEM, [{"role": "user", "content": transcript}])
+                return self._chat(*to_anthropic(SUMMARY_PROMPT.invoke({"transcript": transcript})))
             except Exception as exc:
                 print(f"[runway] summary call failed, listing questions: {type(exc).__name__}: {exc}")
         return "You asked about:\n" + "\n".join(f"- {q}" for q in questions)
