@@ -10,22 +10,25 @@ can put towards a flat depends on whether its lease will last until the youngest
 and the HDB loan are both scaled down. Runway works this out for your own ages and flat, shows what a shorter lease
 costs in each town you're considering, and explains the result in plain English with the official rule quoted.
 
+Runway is a Streamlit app: `app.py` is the Streamlit host, and the whole interface (`runway_game/index.html`) is a
+custom Streamlit component that it runs full-window and exchanges messages with.
+
 ## What's in the app
 
-The interface in `runway_game/index.html` is the approved design hand-off, running full-window inside Streamlit. One left navigation (Home, Map, Shortlist, Trends, Ask, More, Log in) is on every screen: a fixed sidebar on wide screens, a drawer behind the menu button on phones. Every screen has its own address (`/`, `/map`, `/shortlist`, `/trends`, `/ask`, `/more`, and `/details`, `/text-size`, `/about`, `/how-it-works`, `/sources`, `/faq`, `/timeline`, `/case-study`, `/privacy`, `/terms` under More), so reloads, shared links and Back/Forward work; addresses carry page names only, never anything you type. Every inner page has a breadcrumb back to Home, the navigation has a site search (pages, FAQ questions and towns, in the browser only), and an unknown address opens Home with a "Page not found" notice.
+The interface in `runway_game/index.html` is the approved design hand-off, running full-window inside Streamlit. One left navigation (Home, Map, Shortlist, Trends, Ask, More, Log in) is on every screen: a fixed sidebar on wide screens, a drawer behind the menu button on phones. Every screen has its own address (`/`, `/map`, `/shortlist`, `/trends`, `/ask`, `/more`, and `/details`, `/text-size`, `/about`, `/methodology` (the old `/how-it-works` still opens it), `/sources`, `/faq`, `/timeline`, `/case-study`, `/lease-explorer`, `/insights`, `/privacy`, `/terms` under More), so reloads, shared links and Back/Forward work; addresses carry page names only, never anything you type. Every inner page has a breadcrumb back to Home, the navigation has a site search (pages, FAQ questions and towns, in the browser only), and an unknown address opens Home with a "Page not found" notice.
 
 | Screen | What it does |
 |---|---|
-| **Home page** | Landing page, Ask Runway first: a question box (**Ask Runway** asks it on the Ask page) beside one worked example that quotes the official document, the age-95 rule calculator, what a shorter lease costs by town, and the required notice. Green and beige palette, the device's system font (Anton only for the RUNWAY wordmark), as set out in `DESIGN.md`. **Log in** in the navigation opens the reviewer login over the page. |
+| **Home page** | Landing page, Ask Runway first: a question box (**Ask Runway** asks it on the Ask page) beside one worked example that quotes the official document, the age-95 rule calculator, what a shorter lease costs by town, and the required notice. Green and beige palette, the device's system font (Anton only for the RUNWAY wordmark), as set out in `DESIGN.md`. **Log in** in the navigation opens the login (admin or user) over the page. |
 | **Setup** | Youngest buyer's age, rough CPF, first town. No names or NRIC. A labelled Singpass demo (made-up people, not connected to Singpass) shows how these could be filled in for you; see `docs/singpass-integration.md`. |
 | **Map** (use case 1) | Town Safari: every HDB block, MRT lines and the flats sold in Jul–Sep 2026. Tap a diamond for the verdict, runway bar, CPF you can use and cash you need. Keep, Why?, Next flat. **Find by budget** ranks towns and flat types by how many recent sales your cash and CPF cover; **Filters** narrow the diamonds by flat type, price, cash and CPF verdict. |
 | **Flat result** | Opened from a diamond. A price check against similar recent sales (same town and flat type, lease within 5 years, last 12 months, from `runway/price_check.py`); Buyer's Stamp Duty, HDB fees and the grants you may get once you add income and household details; an HDB loan beside a bank loan at a rate you type, with the 30% income cap; and what the lease means for whoever buys from you in 5 to 20 years. Every figure names its document in `data/corpus/`. |
 | **Shortlist** | Kept flats recalculated for your details, two or three of them side by side in a table, a printable summary, CSV download, and 26 town stamps with Wikimedia Commons photos. |
 | **Trends** | Public price charts, no login or setup needed. Compare median resale price or price per sqm by town since 1990 (up to 5 places, by flat type and period), and what remaining lease does to price. Numbers are built from `data/resale.parquet` by `runway/trends.py`; each chart has a table view. |
-| **Ask** (use case 2) | Answers from 32 official documents with sources, "Why?" for a flat, chat summary, chat download (a text file with each answer's sources), read-aloud, and document upload that suggests towns. A question that gives an age, a lease or a price is worked out with Runway's calculator tools (`runway/agent.py`: lease check, HDB loan length, Buyer's Stamp Duty), which Claude calls instead of doing sums; every figure in the answer must come from the passages, the question or a tool result. Answers, read-aloud and voice input in English, Chinese, Malay or Tamil (official quotes and figures stay in English; the rest of the interface is English). Helpful / Not helpful under each AI answer: a vote writes one line to the server log and to `data/feedback.jsonl` where the disk is writable, with the question kept only if it has no personal details. |
+| **Ask** (use case 2) | Answers from 32 official documents with sources, "Why?" for a flat, chat summary, **Download this chat** (a text file with the date, the notice, each answer's sources and the summary, made in the browser), a **Your questions** list that jumps to each answer, read-aloud, and document upload that suggests towns. A question that gives an age, a lease or a price is worked out with Runway's calculator tools (`runway/agent.py`: lease check, HDB loan length, Buyer's Stamp Duty), which Claude calls instead of doing sums; every figure in the answer must come from the passages, the question or a tool result. Answers, read-aloud and voice input in English, Chinese, Malay or Tamil (official quotes and figures stay in English; the rest of the interface is English). Helpful / Not helpful under each AI answer: a vote writes one line to the server log and to `data/feedback.jsonl` where the disk is writable, with the question kept only if it has no personal details. |
 | **Lease explorer** (use case 3, `/lease-explorer`) | CPF use for every age of the youngest buyer and every lease left, as one chart, with sliders for your own case: CPF share, HDB loan limit and the lease needed for full CPF. Worked out in the browser (tested against `runway/cpf_rules.py`); "Ask Runway about this flat" sends the case to Ask. |
 | **Insights** (admin only, `/insights`) | Answer votes and the questions marked Not helpful, the latest eval run including retrieval by search mode, every document and its passage count, and AI calls against the hourly cap (`runway/insights.py`). The server checks the admin role again, so a `user` or guest is refused. |
-| **More** | Your details (with a reset), text size, About Us (with the required notice), How it works (flowcharts), Sources and credits, an FAQ whose answers each cite one document in `data/corpus/`, a buying timeline (`/timeline`) from the HFE letter to completion with a source for every step, a case study worked out live from the Trends data, the Privacy Policy and the Terms. Visitors browse as guests and see short versions; logging in as `user` or `admin` shows the full About Us and How it works. |
+| **More** | Your details (with a reset), text size, About Us (with the required notice), Methodology (the Ask pipeline, the rules, a requirements checklist and the flowcharts; it was How it works), Sources and credits, an FAQ whose answers each cite one document in `data/corpus/`, a buying timeline (`/timeline`) from the HFE letter to completion with a source for every step, a case study worked out live from the Trends data, the Lease explorer, the Privacy Policy and the Terms; for `admin`, the admin tools and Insights. Visitors browse as guests and see short versions; logging in as `user` or `admin` shows the full About Us and Methodology. |
 
 Python (`runway/bridge.py`) checks logins and roles, sends the map data after the home page loads, and answers questions
 (`runway/rag.py` + `runway/llm.py`). The map's calculator runs in the browser and is tested against
@@ -60,8 +63,8 @@ Anyone can use Runway as a guest, without an account. Two accounts are built in:
 
 | Account | Role | What it can do |
 |---|---|---|
-| `admin` | admin | Everything `user` can, plus the admin tools: upload or replace Ask documents; edit About Us, How it works, the Privacy Policy, Terms and the FAQ; and the Insights page (`/insights`) |
-| `user` | user | Ask questions and use everything a guest can, and read the full About Us and How it works. No admin tools, and no Insights |
+| `admin` | admin | Everything `user` can, plus the admin tools: upload or replace Ask documents; edit About Us, Methodology, the Privacy Policy, Terms and the FAQ; and the Insights page (`/insights`) |
+| `user` | user | Ask questions and use everything a guest can, and read the full About Us and Methodology. No admin tools, and no Insights |
 
 Only salted PBKDF2 hashes (600,000 rounds) of their passwords are in the repo, in `BUILTIN_USERS` in
 `runway/auth.py`. The passwords are long random strings handed over separately; they are not in the repo.
@@ -94,7 +97,7 @@ A logged-in account sees a green **Admin view** or **User view** pill on every s
 
 - **Upload Ask documents**: a PDF, web page (HTML), Markdown or text file (up to 6 MB) becomes a document in
   `data/corpus/`, added or replacing one, and Ask Runway searches it from the next question.
-- **Edit pages**: About Us and How it works (full and public versions), Privacy Policy and Terms have an
+- **Edit pages**: About Us and Methodology (full and public versions), Privacy Policy and Terms have an
   *Edit this page* button; the FAQ has an editor to add, change or remove questions. *Restore* puts back the built text.
 - **Insights** (`/insights`): answer votes and the questions marked Not helpful, the latest eval run, every document
   and its passage count, and AI calls this hour (`runway/insights.py`). A guest or `user` who opens it is asked to log in as admin.
@@ -135,6 +138,37 @@ Each commit redeploys the app. Without a token, changes last until the app next 
    username and the AI stays off) into the app's
    Secrets.
 
+## API and model usage
+
+- **API.** Ask Runway calls Claude through the Anthropic API (the `anthropic` Python SDK) from `runway/llm.py`, on
+  the server only; the browser never talks to Anthropic.
+- **Model.** `claude-opus-5-5` by default (`DEFAULT_CHAT_MODEL` in `runway/config.py`), or the model named in
+  `ANTHROPIC_MODEL`, for example `claude-haiku-5-5`.
+- **Secrets.** `ANTHROPIC_API_KEY` and, optionally, `ANTHROPIC_MODEL`, read from Streamlit secrets first, then from
+  environment variables (`runway/config.py`).
+- **Settings.** `max_tokens` 16,000 (the model's thinking counts towards it; the prompts keep answers short), effort
+  `low`, a 40-second timeout and one retry (`MAX_TOKENS`, `EFFORT` in `runway/llm.py`). With the calculator tools, at
+  most 3 model turns and no new turn after 75 seconds per question (`MAX_STEPS`, `DEADLINE_SECONDS` in `runway/agent.py`).
+- **Rate cap.** At most 300 AI calls an hour for the whole app (`AI_CALLS_PER_HOUR` in `runway/llm.py`), since guests
+  can ask without an account. Past the cap, Ask falls back as below.
+- **What is sent.** For an answer: the question, up to six recent chat turns, the youngest buyer's age if set, the
+  answer language, the 5 retrieved passages and the definitions of Runway's 3 calculator tools; when Claude calls a tool,
+  its result (worked out on Runway's server from figures the visitor typed) goes back too. "Why?" sends one flat's calculator figures and the rule passages; "Sum
+  up this chat" sends the chat (the last 12 turns are used); a question in Chinese, Malay or Tamil is first sent alone to
+  be put into English for the search. Never sent: files a visitor opens on Ask (read in the browser only), questions
+  with an NRIC, phone number or email (stopped in the browser and again on the server), and income or household details.
+- **Prompts.** The system prompts (answer, "Why?", summary, translation for search) and the question screening are in
+  `runway/llm.py`.
+- **Fallbacks.** No key, the hourly cap reached or an API error: Ask shows the matching official passages, "Why?" a
+  plain template and the summary a list of the questions asked. An answer with a figure that is not in the passages, the
+  question, the chat or a tool result is replaced by the passages too. A request the model declines is re-run on Anthropic's fallback model
+  (`fallbacks="default"`, beta `server-side-fallback-2026-07-01`).
+- **Search.** Document search makes no API call and needs no key: BM25 keywords and TF-IDF vectors (cosine
+  similarity), worked out on Runway's server in `runway/rag.py` (see Run it locally, above).
+- **Voice.** Read-aloud uses the edge-tts package (Microsoft's free online neural voices, no key) in
+  `runway/voicepack.py`: the server sends the text being read, never the visitor's voice. If it fails, the device's own
+  voices read the answer.
+
 ## Project layout
 
 ```
@@ -153,7 +187,7 @@ runway/insights.py     the admin-only Insights page: votes, eval by search mode,
 runway/auth.py         built-in accounts, roles, password hashing and checks
 runway/game_data.py    map data and town photos; town list and one photo at a time for the home page
 runway/trends.py       price trends by town and by lease left, built from resale.parquet (Trends tab)
-runway/content.py      reviewer edits to page text and the FAQ, and uploaded Ask documents
+runway/content.py      admin edits to page text and the FAQ, and uploaded Ask documents
 runway/store.py        lasting storage for those edits and for votes (Neon database, Cloudflare R2 files)
 runway/voicepack.py    Singapore voice pack for read-aloud (edge-tts)
 runway/config.py       settings (Streamlit secrets, then environment) and defaults

@@ -87,7 +87,7 @@ Rules: no second accent, no purple, no glowing buttons. Gradients appear in two 
 - Current page: green text on a beige-2 fill with a 2px green edge. More's own pages keep More marked.
 - One URL per page (page names only, never user input); Back and Forward follow it.
 - Every inner page starts with a breadcrumb (`crumbs()`: Home › … › page, the last crumb plain text). On the map it sits in the town card.
-- Site search lives in the nav, under the brand. Long pages (Home, How it works, FAQ, Sources, Privacy, Terms) get a Back to top button 72px above the bottom edge, clear of Streamlit Cloud's badge.
+- Site search lives in the nav, under the brand. Long pages (Home, Methodology, FAQ, Sources, Privacy, Terms) get a Back to top button 72px above the bottom edge, clear of Streamlit Cloud's badge.
 - Loading the map data shows the `.rwload` panel with only the stages the page can observe; never a percentage.
 
 ## Icons

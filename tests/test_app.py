@@ -425,7 +425,7 @@ def test_search_lists_every_page_by_its_name():
 
     block = GAME[GAME.index("const SEARCH = ["):GAME.index("const q = document.getElementById('navQ')")]
     found = re.findall(r"\['([^']*)', '([^']+)', '[^']*'\]", block)
-    assert [p for p, _ in found] == list(PAGES)
+    assert [p for p, _ in found] == [p for p in PAGES if p != "how-it-works"]  # Methodology's old address: an alias
     assert all(name == (PAGES[p] if p else "Home") for p, name in found)
     assert 'aria-label="Breadcrumb"' in GAME and "function crumbs(" in GAME
 
