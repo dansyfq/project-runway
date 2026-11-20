@@ -17,6 +17,7 @@ from collections.abc import MutableMapping
 from pathlib import Path
 
 from runway.auth import check_login
+from runway.chain import retrieve
 from runway.game_data import load_towns, recent_months, town_photo
 from runway.llm import AI_BUSY, INVENTED_FIGURE, LLM, language, screen_question
 from runway.rag import Chunk, Retriever
@@ -148,14 +149,15 @@ def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retri
             if not isinstance(facts, dict) or not REQUIRED_FACTS <= facts.keys():
                 return {"ok": False, "error": "bad facts"}
             facts = {k: str(facts[k])[:60] for k in FACT_KEYS if k in facts}  # only known keys reach the AI
-            sources = index.search(WHY_QUERY[facts.get("Lease covers youngest buyer to age 95") == "yes"], k=4)
+            sources = retrieve(index, WHY_QUERY[facts.get("Lease covers youngest buyer to age 95") == "yes"], k=4)
             text, used_llm = bot.explain(facts, sources, lang=lang)
             return {"text": text, "sources": source_view(sources), "offline": False, "lang": lang if used_llm else "en",
                     "note": NUMBERS_NOTE if used_llm else NUMBERS_NOTE + " Written from a fixed template."}
         history = clean_history(payload.get("history"), 6)
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
         # A question that will be declined must not spend an AI call on the search (the hourly budget is shared).
-        sources = [] if screen_question(question) else index.search(bot.search_query(f"{previous} {question}", lang), k=5)
+        sources = ([] if screen_question(question)
+                   else retrieve(index, bot.search_query(f"{previous} {question}", lang), k=5))
         answer = bot.answer(question, sources, history=history, situation=situation_from(payload.get("age")), lang=lang)
         offline = bool(answer.error) or (not bot.available and not answer.blocked)
         why = {INVENTED_FIGURE: "used a figure not in the documents", AI_BUSY: "has reached its limit for this hour",

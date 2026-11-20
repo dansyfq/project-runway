@@ -1,6 +1,6 @@
 {
-  "run_at": "20 Nov 2026 15:36",
-  "retrieval_mode": "hybrid (BM25 keywords + TF-IDF vector store)",
+  "run_at": "20 Nov 2026 08:18",
+  "retrieval_mode": "hybrid (BM25 keywords + FAISS vector store, bge-small embeddings)",
   "summary": {
     "retrieval_hits": 19,
     "retrieval_total": 19,
@@ -20,13 +20,13 @@
       "total": 19
     },
     "vector": {
-      "top1": 15,
-      "top3": 16,
-      "top5": 18,
+      "top1": 18,
+      "top3": 19,
+      "top5": 19,
       "total": 19
     },
     "hybrid": {
-      "top1": 15,
+      "top1": 17,
       "top3": 19,
       "top5": 19,
       "total": 19
@@ -43,7 +43,7 @@
       "Type": "retrieval",
       "Question": "What is the minimum remaining lease to use CPF at all?",
       "Result": "pass",
-      "Detail": "top source: mom-2019-home-for-life"
+      "Detail": "top source: mnd-2019-annex-a"
     },
     {
       "Type": "retrieval",
@@ -55,7 +55,7 @@
       "Type": "retrieval",
       "Question": "How is the HDB loan tenure capped?",
       "Result": "pass",
-      "Detail": "top source: cpf-guide-buying-financing"
+      "Detail": "top source: hdb-housing-loan-from-hdb"
     },
     {
       "Type": "retrieval",
@@ -139,7 +139,7 @@
       "Type": "retrieval",
       "Question": "How much cash must I pay if I take a bank loan?",
       "Result": "pass",
-      "Detail": "top source: mynicehome-resale-guide"
+      "Detail": "top source: mynicehome-loans-guide"
     },
     {
       "Type": "retrieval",

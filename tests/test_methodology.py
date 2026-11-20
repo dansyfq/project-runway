@@ -107,7 +107,7 @@ def test_guests_see_the_rag_pipeline_and_the_flowcharts(tmp_path):
     guest = method_pages(tmp_path)["guest"]
     assert "<h1>Methodology</h1>" in guest and "How it works:" in guest
     for words in ["How Ask Runway answers", "32 official documents", "160 words", "40 words", "BM25", "vector store",
-                  "weighted reciprocal rank fusion", "TF-IDF vectors, cosine similarity", "LangChain", "Anthropic SDK",
+                  "weighted reciprocal rank fusion", "FAISS index of bge-small-en-v1.5 embeddings", "TF-IDF vectors stand in", "LangChain retriever", "Anthropic SDK",
                   "Calculator tools", "a tool result", "numbered citations", "PBKDF2-SHA256", "Number guard", "Fallback",
                   "Insights", "Flowchart · Use case 1: Map", "Flowchart · Use case 2: Ask Runway",
                   "Flowchart · Use case 3: Lease explorer", "AI calls Runway's calculator tools"]:
@@ -126,27 +126,27 @@ def test_checklist_names_each_item_of_the_brief(tmp_path):
     assert re.findall(r"<tr><td>(.*?)</td>", brief) == BRIEF
     assert re.findall(r"<tr><td>(.*?)</td>", more) == EARLIER  # one table: the brief first, then the rest
     for words in ["Download this chat", "a text file", "Save shortlist as a file", "Your questions", "runway-hdb.streamlit.app",
-                  "#api-and-model-usage", "TF-IDF vectors, cosine similarity", "LangChain is not used yet", "Admin:", "User:",
+                  "#api-and-model-usage", "FAISS index of bge-small-en-v1.5 embeddings", "ChatPromptTemplates", "Admin:", "User:",
                   "opens Insights", "admin and user log-ins"]:
         assert words in brief, words
     for words in ["3 calculator tools", "Insights (admin only)", "Lease explorer", "Notice"]:
         assert words in more, words
-    assert "Markdown" not in section and "FAISS" not in section
+    assert "Markdown" not in section and "LangChain is not used" not in section
     assert "How Ask Runway answers" in full and "Test cases" in full and "Flowchart" in full
 
 
 def test_retrieval_and_roles_are_described_in_one_place():
     """Only METHOD_FACTS names the retrieval stack and says whether LangChain is used, so a change to either is one edit.
-    vectors and langchain are marked PENDING: the retrieval branch changes those two strings when it lands."""
+    """
     start, end = GAME.index("const METHOD_FACTS = {"), GAME.index("const README_API")
     facts = GAME[start:end]
     page = GAME[GAME.index("function methodHtml(){"):GAME.index("/* ---------- FAQ, Privacy Policy")]
     page += GAME[GAME.index("const methodPipeline"):GAME.index("function methodHtml(){")]
-    for words in ["TF-IDF", "cosine", "reciprocal rank", "LangChain is not used", "Anthropic SDK"]:
+    for words in ["TF-IDF", "FAISS", "bge-small", "cosine", "reciprocal rank", "ChatPromptTemplate", "Anthropic SDK"]:
         assert words in facts and words not in page, words
     assert "retrieval: 'Hybrid search: BM25 keyword ranking plus a vector store, fused by weighted reciprocal rank fusion'" in facts
-    assert "vectors: 'TF-IDF vectors, cosine similarity',  // PENDING" in facts
-    assert facts.count("// PENDING") == 2 and "PENDING (retrieval branch" in GAME[:start + 2000]
+    assert "vectors: 'a FAISS index of bge-small-en-v1.5 embeddings" in facts and "langchain: 'Built on LangChain core" in facts
+    assert "PENDING" not in facts
 
 
 # ---------- Ask: download this chat, your questions ----------

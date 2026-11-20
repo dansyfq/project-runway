@@ -3804,13 +3804,12 @@ const FLOW_EXPLORER = `<h2>Flowchart · Use case 3: Lease explorer</h2>
 /* ---------- Methodology (the page was "How it works"; /how-it-works still opens it) ---------- */
 /* What the Methodology page says about retrieval, LangChain and accounts, in one place: correct it here if runway/rag.py,
    runway/llm.py or the login roles change. Used by the pipeline, the Accounts table and the requirements checklist.
-   PENDING (retrieval branch, fix/rag-vector): `vectors` is the only place the page names the vector-store technology and
-   `langchain` the only place it says whether LangChain is used. Both describe main as it is today (runway/rag.py: TF-IDF
-   vectors; runway/llm.py: the Anthropic SDK, no LangChain). Change these two strings, nothing else, when that branch lands. */
+   `vectors` is the only place the page names the vector-store technology and `langchain` the only place it says how
+   LangChain is used (runway/vector.py, runway/rag.py, runway/chain.py). */
 const METHOD_FACTS = {
   retrieval: 'Hybrid search: BM25 keyword ranking plus a vector store, fused by weighted reciprocal rank fusion',
-  vectors: 'TF-IDF vectors, cosine similarity',  // PENDING: the vector store in use
-  langchain: 'LangChain is not used yet: the retrieval, prompts and tool loop are Runway\'s own Python around the Anthropic SDK (runway/rag.py, runway/llm.py, runway/agent.py)',  // PENDING
+  vectors: 'a FAISS index of bge-small-en-v1.5 embeddings (made on Runway\'s server with fastembed), cosine similarity; TF-IDF vectors stand in while it loads or if it is switched off',
+  langchain: 'Built on LangChain core (runway/chain.py): the search is a LangChain retriever returning Documents and the prompts are ChatPromptTemplates, sent with the Anthropic SDK; the calculator tool loop is Runway\'s own (runway/agent.py)',
   roles: [['Admin', 'Uploads and replaces Ask documents, edits the pages and the FAQ, and opens Insights (answer feedback, quality checks, AI use).'],
           ['User', 'Logs in to see the full About Us and Methodology, and can ask questions. No admin tools, no Insights.'],
           ['Guest', 'No account needed. Uses everything else.']],
@@ -4043,7 +4042,7 @@ function insightsPage(b,top){
       <h2>Quality checks</h2>
       ${e?`<div class="scroll"><table class="tbl"><thead><tr><th>Check</th><th>Passed</th></tr></thead><tbody>${e.checks.filter(x=>x[2]).map(x=>`<tr><td>${esc(x[0])}</td><td>${x[1]} of ${x[2]}</td></tr>`).join('')}</tbody></table></div>
         ${modes.length?`<p>Search compared by mode, on the same ${modes[0][1].total} questions: is the right document first, in the top 3, in the top 5?</p>
-        <div class="scroll"><table class="tbl"><thead><tr><th>Search</th><th>First</th><th>Top 3</th><th>Top 5</th></tr></thead><tbody>${modes.map(([m,v])=>`<tr><td>${esc({keyword:'Keywords (BM25)',vector:'Vectors (TF-IDF)',hybrid:'Hybrid, in use'}[m]||m)}</td><td>${v.top1}</td><td>${v.top3}</td><td>${v.top5}</td></tr>`).join('')}</tbody></table></div>`:''}
+        <div class="scroll"><table class="tbl"><thead><tr><th>Search</th><th>First</th><th>Top 3</th><th>Top 5</th></tr></thead><tbody>${modes.map(([m,v])=>`<tr><td>${esc({keyword:'Keywords (BM25)',vector:'Vectors (FAISS)',hybrid:'Hybrid, in use'}[m]||m)}</td><td>${v.top1}</td><td>${v.top3}</td><td>${v.top5}</td></tr>`).join('')}</tbody></table></div>`:''}
         <p class="small">From the last run of eval/run_eval.py, ${esc(e.run_at||'')}. Search in use: ${esc(c.mode)}.</p>`:'<p>No quality run saved yet. Run python eval/run_eval.py.</p>'}
       <h2>AI</h2>
       <p>${ai.on?`On: ${esc(ai.model)}, with Runway's calculator tools for questions that give an age, a lease or a price.`:'Off: no API key is set, so Ask shows the matching official passages instead of an AI answer.'} The cap of ${ai.cap} calls an hour is shared by every visitor.</p>
