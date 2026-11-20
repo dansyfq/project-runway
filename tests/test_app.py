@@ -267,8 +267,11 @@ def test_landing_town_cards_match_the_data():
 
 def test_landing_look_and_copy():
     for text in ('data-photo="punggol.jpg"', 'data-photo="toapayoh.jpg"', "Less lease, less CPF:",
-                 "what buyers need to know.", "Have more questions? Ask Runway.", "not from the AI"):
+                 "what buyers need to know.", "not from the AI"):
         assert text in GAME, text
+    # the closing "Have more questions?" band is gone: its "Start asking" only jumped back up to the hero's ask box
+    for text in ("Have more questions? Ask Runway.", "Start asking", 'href="#lask"', "lband"):
+        assert text not in GAME, text
     # the system font everywhere; Google Fonts loads only Anton, for the RUNWAY wordmark
     assert re.findall(r'href="https://fonts\.googleapis\.com/css2\?([^"]*)"', GAME) == ["family=Anton&display=swap"]
     for text in ("IBM Plex", "--rust", "Special:FilePath", "One flat, two buyers", "ordinary way", "Plus+Jakarta+Sans",
@@ -642,3 +645,53 @@ def test_read_aloud_is_on_by_default_and_never_talks_over_the_mic():
     assert "const INTRO=" in GAME and "speak(" not in GAME[GAME.index("function renderChat(){"):GAME.index("$('#autoRead').onchange")].replace("speak(plain(m.html),b,m.lang)", "")
     policy = GAME[GAME.index("function privacyHtml"):GAME.index("function termsHtml")]
     assert "Read aloud is on until you turn it off." in policy and "never your voice" in policy
+
+def bridge_js(tmp_path, script):
+    """The interface's send queue and RW.enter, run in Node with a stand-in page; script's last line prints JSON."""
+    start, end = GAME.index("  const RW = window.RW = "), GAME.index("  /* One URL per screen.")
+    stub = """const posted = [], els = {};
+const el = id => els[id] || (els[id] = {id, hidden: true, textContent: '', dataset: {}, querySelectorAll: () => [],
+  setAttribute(){}, removeAttribute(){}});
+const document = {getElementById: el, createElement: () => ({}), head: {appendChild(){}}};
+const window = {parent: {postMessage: m => posted.push(m.value || m.type), innerHeight: 800}};
+const setTimeout = () => 0, clearTimeout = () => {};  // no 90 s reply timers keeping Node running
+const sent = () => posted.filter(v => v && v.type).map(v => v.type + (v.payload.q ? ':' + v.payload.q : ''));
+"""
+    return node_json(tmp_path, stub + "(function(){\n" + GAME[start:end] + "\n})();\nconst RW = window.RW;\n" + script)
+
+
+@needs_node
+def test_a_repeat_while_the_data_loads_keeps_the_question(tmp_path):
+    """Regression (bug B): Enter on the home ask box, then Enter again on the emptied box (or the send button, or speech
+    ending) while the map data loads, used to replace the waiting question with an empty one: Ask opened, unanswered."""
+    got = bridge_js(tmp_path, """RW.enter('ask', 'Can I use CPF?'); RW.enter('ask', ''); RW.enter('ask', 'Can I use CPF?');
+const one = {pending: RW.pendingEnter, sent: sent(), shown: el('rwLoadQ').textContent, hidden: el('rwLoadQ').hidden};
+RW.enter('ask', 'What is the 20-year minimum?');  // a new question replaces it
+const two = RW.pendingEnter.arg;
+RW.enter('map');  // choosing another page drops it
+console.log(JSON.stringify({one, two, map: RW.pendingEnter, hidden: el('rwLoadQ').hidden}));""")
+    assert got["one"]["pending"] == {"target": "ask", "arg": "Can I use CPF?"}
+    assert got["one"]["sent"] == ["need_data"]  # the data is asked for once
+    assert not got["one"]["hidden"] and "Can I use CPF?" in got["one"]["shown"]  # the loading panel shows it was taken
+    assert got["two"] == "What is the 20-year minimum?"
+    assert got["map"]["target"] == "map" and got["hidden"]
+
+
+@needs_node
+def test_a_question_on_its_way_is_not_asked_twice(tmp_path):
+    """Once the app is loaded, a second call with the same question (double click, speech and Enter) opens Ask only."""
+    got = bridge_js(tmp_path, """const calls = []; globalThis.RWAPP = window.RWAPP = {enter: (t, a) => calls.push([t, a ?? null])};
+RW.send('ask', {q: 'Can I use CPF?'}); RW.enter('ask', 'Can I use CPF?'); RW.enter('ask', 'Another one');
+console.log(JSON.stringify(calls));""")
+    assert got == [["ask", None], ["ask", "Another one"]]
+
+
+@needs_node
+def test_questions_and_data_go_ahead_of_waiting_read_aloud(tmp_path):
+    """One message at a time: a slow voice service must not hold up a question or the data behind queued audio.
+    The message already sent stays first; a nav still goes next in line."""
+    got = bridge_js(tmp_path, """RW.send('tts', {}); RW.send('tts', {}); RW.send('feedback', {}); RW.send('ask', {q: 'Q'});
+RW.send('need_data'); RW.send('nav', {page: 'ask'}); RW.send('tts', {});
+console.log(JSON.stringify({queue: RW.queue.map(m => m.type), sent: sent()}));""")
+    assert got["queue"] == ["tts", "nav", "ask", "need_data", "tts", "feedback", "tts"]
+    assert got["sent"] == ["tts"]

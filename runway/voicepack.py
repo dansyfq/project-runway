@@ -11,6 +11,7 @@ import base64
 
 VOICES = {"en": "en-SG-LunaNeural", "ta": "ta-SG-VenbaNeural", "ms": "ms-MY-YasminNeural", "zh": "zh-CN-XiaoxiaoNeural"}
 MAX_CHARS = 700  # about a minute of speech; keeps the reply small
+TIMEOUT_S = 10  # a 600-character chunk normally arrives in a few seconds
 
 
 def speak(text: str, lang: str) -> str | None:
@@ -24,12 +25,16 @@ def speak(text: str, lang: str) -> str | None:
 
         return b"".join([c["data"] async for c in edge_tts.Communicate(text, voice, rate="-8%").stream() if c["type"] == "audio"])
 
-    for attempt in (1, 2):  # the service sometimes returns nothing once; a second try usually works
+    # The page sends one message at a time, so a hung voice service would hold up the next question: one 10 s wait at
+    # most. A quick failure is tried once more (the service sometimes returns nothing once); a timeout is not.
+    for attempt in (1, 2):
         try:
-            audio = asyncio.run(asyncio.wait_for(run(), 20))
+            audio = asyncio.run(asyncio.wait_for(run(), TIMEOUT_S))
             break
         except Exception as exc:  # network, bad voice, library change: the caller falls back
             print(f"[runway] voice pack failed (try {attempt}): {type(exc).__name__}: {exc}", flush=True)
+            if isinstance(exc, (asyncio.TimeoutError, TimeoutError)):
+                return None
     else:
         return None
     return base64.b64encode(audio).decode() if audio else None
