@@ -267,8 +267,11 @@ def test_landing_town_cards_match_the_data():
 
 def test_landing_look_and_copy():
     for text in ('data-photo="punggol.jpg"', 'data-photo="toapayoh.jpg"', "Less lease, less CPF:",
-                 "what buyers need to know.", "Have more questions? Ask Runway.", "not from the AI"):
+                 "what buyers need to know.", "not from the AI"):
         assert text in GAME, text
+    # the closing "Have more questions?" band is gone: its "Start asking" only jumped back up to the hero's ask box
+    for text in ("Have more questions? Ask Runway.", "Start asking", 'href="#lask"', "lband"):
+        assert text not in GAME, text
     # the system font everywhere; Google Fonts loads only Anton, for the RUNWAY wordmark
     assert re.findall(r'href="https://fonts\.googleapis\.com/css2\?([^"]*)"', GAME) == ["family=Anton&display=swap"]
     for text in ("IBM Plex", "--rust", "Special:FilePath", "One flat, two buyers", "ordinary way", "Plus+Jakarta+Sans",
@@ -577,3 +580,123 @@ def test_upload_card_does_not_contradict_itself():
     card = GAME[GAME.index("Have a document? I can suggest towns."):GAME.index('id="chatLive"')]
     assert "removed first, before I look for anything else" in card and "I pick out your age, budget, CPF and flat type" in card
     assert "opened in this browser only and never uploaded" in card and " read" not in card
+
+
+# ---- voice: one tap greets, then dictation that keeps going through pauses ----
+
+def speech_text(tmp_path, cases):
+    code = GAME[GAME.index("const joinSpeech = "):GAME.index("// Dictation:")]
+    return node_json(tmp_path, f"{code}\nconsole.log(JSON.stringify({json.dumps(cases, ensure_ascii=False)}.map(speechText)));")
+
+
+@needs_node
+def test_speech_pieces_join_on_desktop_and_android(tmp_path):
+    """Desktop Chrome gives one result per phrase; Android Chrome repeats everything said so far in each result."""
+    got = speech_text(tmp_path, [
+        ["can I use", " CPF for a 58 year lease"],                        # desktop: phrases add up
+        ["what is", "what is the lease", "What is the lease rule"],       # Android: cumulative, never doubled
+        ["how much can", "how match can I borrow", "how match can I borrow for a flat"],  # Android correcting a word
+        ["我想", "我想问", "公积金"],                                          # Chinese: no spaces added
+        ["", "  yes  ", ""],
+        ["I want to buy a flat", "I want to know the lease rules"]])                   # desktop: a new phrase, not a repeat
+    assert got == ["can I use CPF for a 58 year lease", "What is the lease rule", "how match can I borrow for a flat",
+                   "我想问公积金", "yes", "I want to buy a flat I want to know the lease rules"]
+
+
+def test_both_mics_dictate_through_pauses_and_greet_first():
+    shared = GAME[GAME.index("/* ---------- voice, shared by the Home ask box"):GAME.index("// Slider for every number")]
+    hero = GAME[GAME.index("  /* voice: as on the Ask page"):GAME.index("/* ---------- your town")]
+    ask = GAME[GAME.index("/* ---------- voice: speech to text (in the answer language"):GAME.index("/* ---------- more ----------")]
+    assert "r.continuous = true" in shared and "r.interimResults = true" in shared
+    assert "const SILENCE_MS = 5000, HUSH_MS = 10000" in shared  # a thinking pause of a couple of seconds never ends it
+    assert "10000);" not in hero + ask and "new SR(" not in hero + ask  # no fixed 10-second cut-off; one dictation for both
+    # a session the browser ends restarts unless the user stopped, an error ended it, or it keeps ending at once
+    assert "if(phase !== 'listen' || err) return end();" in shared and "if(quick >= 3) return end();" in shared
+    assert "e.error !== 'no-speech'" in shared
+    assert "MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported']" in shared
+    # listening starts only once the greeting is over, so the greeting is never written into the box
+    assert "greet(lang).then(() => {" in shared and "phase = 'listen'" in shared[shared.index("greet(lang).then"):]
+    assert "const base = o.input.value.trim()" in shared and "joinSpeech(base, heard())" in shared  # typed text is kept in front
+    assert "dictate({btn: mic, input: inp, lang: RW.lang," in hero and "RW.enter('ask', q)" in hero
+    assert "dictate({btn:mb, input:$('#askIn'), lang:S.lang," in ask and "ask(v)" in ask
+    assert "The microphone is blocked, so I could not hear you." in ask and "is not available in this browser" in ask
+    # leaving the page or the screen stops the mic without asking
+    assert "addEventListener('pagehide'" in shared and "'visibilitychange'" in shared
+    assert "['#scrLanding', '#rwLoading']" in hero and "MIC.stop(false)" in hero and "MIC.stop(false)" in ask
+
+
+def test_mic_greeting_in_each_answer_language():
+    from runway.llm import LANGUAGES
+
+    voice = GAME[GAME.index("const VOICE = {"):GAME.index("const TTS = ")]
+    greet = {k: a or b for k, a, b in re.findall(r"(\w+): \{rec: '[\w-]+', hi: (?:\"([^\"]+)\"|'([^']+)')", voice)}
+    assert set(greet) == set(LANGUAGES) and all("Runway" in g for g in greet.values())  # the name stays "Runway"
+    assert greet["en"] == "Hi, I'm Runway. How are you?" and greet["ms"] == "Hai, saya Runway. Apa khabar?"
+    assert re.findall(r"rec: '([\w-]+)'", voice) == ["en-SG", "zh-CN", "ms-MY", "ta-SG"]
+    assert "rec:" not in GAME[GAME.index("const LANGS={"):GAME.index("S.lang='en';")]  # one list of recognition tags
+    assert "RW.lang = S.lang" in GAME  # the Home mic uses the language chosen on the Ask page
+    # the pack's audio if already fetched, else a device voice inside the tap; never stuck
+    shared = GAME[GAME.index("function greet(lang){"):GAME.index("// Speech pieces")]
+    assert "if(h.a) pack(h.a);" in shared and "cap = setTimeout(end, 8000)" in shared and "setTimeout(end, 2500)" in shared
+
+
+def test_read_aloud_is_on_by_default_and_never_talks_over_the_mic():
+    assert '<input type="checkbox" id="autoRead" checked> Read answers aloud' in GAME
+    assert "if($('#autoRead').checked&&!MIC)" in GAME  # an answer arriving while listening is not read into the mic
+    speak = GAME[GAME.index("async function speak("):GAME.index("/* ---------- voice: speech to text")]
+    assert speak.index("if(MIC)MIC.stop(false);") < speak.index("stopSpeak();")
+    ask = GAME[GAME.index("$('#micBtn').onclick=()=>{"):GAME.index("/* ---------- more ----------")]
+    assert ask.index("stopSpeak();") < ask.index("dictate(")  # the mic stops an answer being read before it greets
+    assert "const INTRO=" in GAME and "speak(" not in GAME[GAME.index("function renderChat(){"):GAME.index("$('#autoRead').onchange")].replace("speak(plain(m.html),b,m.lang)", "")
+    policy = GAME[GAME.index("function privacyHtml"):GAME.index("function termsHtml")]
+    assert "Read aloud is on until you turn it off." in policy and "never your voice" in policy
+
+def bridge_js(tmp_path, script):
+    """The interface's send queue and RW.enter, run in Node with a stand-in page; script's last line prints JSON."""
+    start, end = GAME.index("  const RW = window.RW = "), GAME.index("  /* One URL per screen.")
+    stub = """const posted = [], els = {};
+const el = id => els[id] || (els[id] = {id, hidden: true, textContent: '', dataset: {}, querySelectorAll: () => [],
+  setAttribute(){}, removeAttribute(){}});
+const document = {getElementById: el, createElement: () => ({}), head: {appendChild(){}}};
+const window = {parent: {postMessage: m => posted.push(m.value || m.type), innerHeight: 800}};
+const setTimeout = () => 0, clearTimeout = () => {};  // no 90 s reply timers keeping Node running
+const sent = () => posted.filter(v => v && v.type).map(v => v.type + (v.payload.q ? ':' + v.payload.q : ''));
+"""
+    return node_json(tmp_path, stub + "(function(){\n" + GAME[start:end] + "\n})();\nconst RW = window.RW;\n" + script)
+
+
+@needs_node
+def test_a_repeat_while_the_data_loads_keeps_the_question(tmp_path):
+    """Regression (bug B): Enter on the home ask box, then Enter again on the emptied box (or the send button, or speech
+    ending) while the map data loads, used to replace the waiting question with an empty one: Ask opened, unanswered."""
+    got = bridge_js(tmp_path, """RW.enter('ask', 'Can I use CPF?'); RW.enter('ask', ''); RW.enter('ask', 'Can I use CPF?');
+const one = {pending: RW.pendingEnter, sent: sent(), shown: el('rwLoadQ').textContent, hidden: el('rwLoadQ').hidden};
+RW.enter('ask', 'What is the 20-year minimum?');  // a new question replaces it
+const two = RW.pendingEnter.arg;
+RW.enter('map');  // choosing another page drops it
+console.log(JSON.stringify({one, two, map: RW.pendingEnter, hidden: el('rwLoadQ').hidden}));""")
+    assert got["one"]["pending"] == {"target": "ask", "arg": "Can I use CPF?"}
+    assert got["one"]["sent"] == ["need_data"]  # the data is asked for once
+    assert not got["one"]["hidden"] and "Can I use CPF?" in got["one"]["shown"]  # the loading panel shows it was taken
+    assert got["two"] == "What is the 20-year minimum?"
+    assert got["map"]["target"] == "map" and got["hidden"]
+
+
+@needs_node
+def test_a_question_on_its_way_is_not_asked_twice(tmp_path):
+    """Once the app is loaded, a second call with the same question (double click, speech and Enter) opens Ask only."""
+    got = bridge_js(tmp_path, """const calls = []; globalThis.RWAPP = window.RWAPP = {enter: (t, a) => calls.push([t, a ?? null])};
+RW.send('ask', {q: 'Can I use CPF?'}); RW.enter('ask', 'Can I use CPF?'); RW.enter('ask', 'Another one');
+console.log(JSON.stringify(calls));""")
+    assert got == [["ask", None], ["ask", "Another one"]]
+
+
+@needs_node
+def test_questions_and_data_go_ahead_of_waiting_read_aloud(tmp_path):
+    """One message at a time: a slow voice service must not hold up a question or the data behind queued audio.
+    The message already sent stays first; a nav still goes next in line."""
+    got = bridge_js(tmp_path, """RW.send('tts', {}); RW.send('tts', {}); RW.send('feedback', {}); RW.send('ask', {q: 'Q'});
+RW.send('need_data'); RW.send('nav', {page: 'ask'}); RW.send('tts', {});
+console.log(JSON.stringify({queue: RW.queue.map(m => m.type), sent: sent()}));""")
+    assert got["queue"] == ["tts", "nav", "ask", "need_data", "tts", "feedback", "tts"]
+    assert got["sent"] == ["tts"]

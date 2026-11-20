@@ -336,3 +336,27 @@ def test_voicepack_retries_once_then_gives_up(monkeypatch):
 
     monkeypatch.setitem(sys.modules, "edge_tts", types.SimpleNamespace(Communicate=Fail))
     assert voicepack.speak("Hello there.", "en") is None and len(tries) == 2
+
+
+def test_voicepack_gives_up_at_once_on_a_hung_service(monkeypatch):
+    """A hang is not retried: the page's next question waits behind this reply."""
+    import sys
+    import types
+
+    from runway import voicepack
+
+    tries = []
+
+    class Hang:
+        def __init__(self, *a, **k):
+            tries.append(1)
+
+        async def stream(self):
+            import asyncio
+
+            await asyncio.sleep(5)
+            yield {"type": "audio", "data": b"x"}  # pragma: no cover
+
+    monkeypatch.setattr(voicepack, "TIMEOUT_S", 0.05)
+    monkeypatch.setitem(sys.modules, "edge_tts", types.SimpleNamespace(Communicate=Hang))
+    assert voicepack.speak("Hello there.", "en") is None and len(tries) == 1

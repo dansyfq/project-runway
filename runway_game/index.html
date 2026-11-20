@@ -1220,7 +1220,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .lw{max-width:1240px;margin:0 auto;padding-inline:32px}
 .lsr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 #scrLanding :focus-visible{outline:2px solid var(--green);outline-offset:3px}
-#scrLanding .ltc.dark :focus-visible,#scrLanding .lband :focus-visible,#scrLanding .lfoot :focus-visible{outline-color:var(--brand-hi)}
+#scrLanding .ltc.dark :focus-visible,#scrLanding .lfoot :focus-visible{outline-color:var(--brand-hi)}
 #scrLanding [tabindex="-1"]:focus{outline:none}
 /* buttons: one base, three colours, sizes per place */
 .lb{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--radius-btn);font:700 14px var(--font-ui);text-decoration:none;white-space:nowrap}
@@ -1231,7 +1231,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .lb-act{min-height:44px;padding:0 14px;border-radius:12px;font-size:13px}
 .lb-50{flex:1 1 180px;height:50px;font-size:15px}
 .lb-town{min-height:44px;padding:0 14px;border-radius:12px}
-.lb-big{position:relative;height:56px;padding:0 26px;gap:10px;font-size:16px}
 .lb-ic44{width:44px;height:44px;padding:0;border-radius:12px}
 .lheart[aria-pressed="true"] path{fill:currentColor}
 .llink{align-self:flex-start;min-height:44px;padding:6px 0 0;border:0;background:none;font:700 14px var(--font-ui);color:var(--green);text-align:left}
@@ -1371,15 +1370,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .ltc.dash{justify-content:center;background:var(--beige)}
 .lpill2{padding:5px 10px;border-radius:10px;background:var(--snow);font:700 11px var(--font-ui);color:var(--green)}
 .ldia{display:inline-flex;align-items:center;gap:3px;color:var(--brand-hi)}
-/* closing band, notice, footer */
-.lband-s{padding-bottom:64px}
-.lband{position:relative;overflow:hidden;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:28px;padding:48px;border-radius:24px;color:var(--on-brand)}
-.lband-t{position:relative;flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:14px}
-.lband h2{margin:0;font:700 clamp(30px,3.2vw,44px)/1.1 var(--font-display);letter-spacing:var(--track-display);color:var(--on-brand)}
-/* on the brand surface the beige button keeps its light beige in both themes */
-.lband .lb-beige{background:var(--brand-hi);color:var(--brand)}
-.lband .lb-beige:active{background:color-mix(in srgb,var(--brand-hi) 85%,var(--brand))}
-.lband p{max-width:36em;font:400 .944rem/1.5 var(--font-ui);color:color-mix(in srgb,var(--on-brand) 88%,var(--brand))}
+/* notice, footer */
 .lnotice-s{padding-bottom:56px}
 .lnotice{padding:10px 22px;border-radius:16px;background:var(--beige-2)}
 .lbang{flex:0 0 28px;height:28px;border-radius:50%;background:var(--green);color:var(--snow);display:grid;place-items:center;font:700 14px var(--font-ui)}
@@ -1391,8 +1382,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .lnotice-h{font:700 14px var(--font-ui);color:var(--ink)}
 .lfoot{color:var(--on-brand)}
 /* green surfaces: a soft sage glow around a dark disc, with still film grain. At 25% the glow's brightest point keeps snow and beige text at 4.5:1. */
-.lfoot,.lband,.ltc.dark,.lstat:not(.alt){position:relative;isolation:isolate;background:radial-gradient(circle at 84% 110%,var(--brand-deep) 0 44%,transparent 62%),radial-gradient(ellipse 75% 120% at 36% 0%,rgba(190,220,196,.25),transparent 72%),var(--brand)}
-.lfoot::before,.lband::before,.ltc.dark::before,.lstat:not(.alt)::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;opacity:.45;mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.lfoot,.ltc.dark,.lstat:not(.alt){position:relative;isolation:isolate;background:radial-gradient(circle at 84% 110%,var(--brand-deep) 0 44%,transparent 62%),radial-gradient(ellipse 75% 120% at 36% 0%,rgba(190,220,196,.25),transparent 72%),var(--brand)}
+.lfoot::before,.ltc.dark::before,.lstat:not(.alt)::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;opacity:.45;mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .lfoot .lbrand{padding:16px 0;color:var(--on-brand);--mk-bg:var(--brand-deep)}
 .lfoot .lmark{width:36px;height:36px}
 .lfoot-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;column-gap:40px;row-gap:8px;min-height:112px;border-bottom:1px solid color-mix(in srgb,var(--on-brand) 12%,var(--brand))}
@@ -1414,9 +1405,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   .lw{padding-inline:16px}
   .lsec{padding-block:48px}
   .lhero-in{padding-top:48px}
-  .lans-in,.lband-s,.lnotice-s{padding-bottom:48px}
+  .lans-in,.lnotice-s{padding-bottom:48px}
   .lcomp input{flex-basis:100%}
-  .lband{padding:32px 24px}
   .lfl{min-height:48px}
 }
 /* login overlay */
@@ -1470,6 +1460,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .rwload-card{width:100%;max-width:420px;background:var(--snow);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--green);text-align:center}
 .rwload-card .lmark{width:56px;height:56px}
 .rwload-t{font:700 1.2rem/1.3 var(--font-display);letter-spacing:var(--track-heading);color:var(--green)}
+.rwload-q{margin:0;max-width:100%;font:400 .944rem/1.45 var(--font-ui);color:var(--ink);overflow-wrap:anywhere}
 .rwload-steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font:400 .944rem var(--font-ui);color:var(--ink-2)}
 .rwload-steps li[data-s="done"]{color:var(--green)}
 .rwload-steps li[data-s="done"]::before{content:"✓ "}
@@ -1486,7 +1477,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   .pchip:hover,.mapctl button:hover,.totop:hover,.noticelink:hover{background:var(--beige-2)}
   .btn.primary:hover,.lb-g:hover,.chip[aria-pressed="true"]:hover,.speakbtn[aria-pressed="true"]:hover,.mic.on:hover,.townrow[aria-pressed="true"]:hover{background:var(--green-deep)}
   .btn.ghost:hover,.lb-beige:hover{background:color-mix(in srgb,var(--beige-deep) 60%,var(--beige))}
-  .lband .lb-beige:hover{background:color-mix(in srgb,var(--brand-hi) 85%,var(--brand))}
   .lmic[aria-pressed="true"]:hover{background:var(--beige)}
   .btn:disabled:hover,.chip:disabled:hover{background:var(--beige-2)}
   .trk button:hover{background:var(--tint-2);color:var(--ink)}
@@ -1712,16 +1702,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
         </div>
       </section>
 
-      <section class="lw lband-s" aria-labelledby="lBandH">
-        <div class="lband sq">
-          <div class="lband-t">
-            <h2 id="lBandH">Have more questions? Ask Runway.</h2>
-            <p>Why is your CPF usage reduced? What happens if your partner is the younger buyer? What is the 20-year minimum lease about? Runway reads the CPF, HDB and MND documents and explains to you in plain text.</p>
-          </div>
-          <a href="#lask" class="lb lb-beige lb-big sq"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Start asking</a>
-        </div>
-      </section>
-
       <section class="lw lnotice-s" aria-label="Notice">
         <details class="lnotice sq" open>
           <summary><span class="lbang" aria-hidden="true">!</span><span class="lnotice-h">Important notice: educational prototype, not for real-world use</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
@@ -1799,7 +1779,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
       <div class="pad" style="flex:1">
         <nav aria-label="Breadcrumb" class="crumbs"><ol><li><button type="button" data-go="">Home</button></li><li aria-current="page">Ask</li></ol></nav>
         <div class="scr-h"><h1>Ask Runway</h1></div>
-        <div class="voicebar" data-st="Singapore voice pack; device voices as a fallback"><label><input type="checkbox" id="autoRead"> Read answers aloud</label><span class="lang"><label for="askLang">Answer language</label><span class="lselw"><select class="lsel" id="askLang"><option value="en" lang="en">English</option><option value="zh" lang="zh-Hans">中文</option><option value="ms" lang="ms">Bahasa Melayu</option><option value="ta" lang="ta">தமிழ்</option></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></span></div>
+        <div class="voicebar" data-st="Singapore voice pack; device voices as a fallback"><label><input type="checkbox" id="autoRead" checked> Read answers aloud</label><span class="lang"><label for="askLang">Answer language</label><span class="lselw"><select class="lsel" id="askLang"><option value="en" lang="en">English</option><option value="zh" lang="zh-Hans">中文</option><option value="ms" lang="ms">Bahasa Melayu</option><option value="ta" lang="ta">தமிழ்</option></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></span></div>
         <div class="upcard" data-st="st.file_uploader → extract → recommend">
           <b class="ui" style="font-size:1rem;color:var(--ink)">Have a document? I can suggest towns.</b>
           <p class="small" style="color:var(--ink)">Upload your notes, budget, or HFE letter. I pick out your age, budget, CPF and flat type, then rank towns using recent sales.</p>
@@ -1849,6 +1829,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
       <div class="rwload-card">
         <svg viewBox="0 0 100 100" aria-hidden="true" class="lmark"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="var(--snow)"/><path d="M31 52 38 48 38 73 31 66Z" fill="currentColor"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/><path d="M62 50 69 54 69 66 62 73Z" fill="currentColor"/></svg>
         <p class="rwload-t" id="rwLoadT">Loading the map and recent sales…</p>
+        <p class="rwload-q" id="rwLoadQ" hidden></p>
         <ol class="rwload-steps"><li>Asking for the map</li><li>Receiving 26 towns and the latest sales</li><li id="rwLoad3">Drawing the map</li></ol>
         <button type="button" class="btn primary sm" id="rwRetry" hidden>Try again</button>
         <button type="button" class="btn ghost sm" data-go="">Back to Home</button>
@@ -1869,7 +1850,10 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   RW.send = (type, payload) => new Promise((resolve, reject) => {
     const m = {id: Date.now().toString(36) + '-' + (++RW.seq), type, payload: payload || {}, resolve, reject};
     // the address bar shouldn't wait behind a slow answer: a nav goes next in line
-    if(type === 'nav') RW.queue.splice(RW.busy ? 1 : 0, 0, m); else RW.queue.push(m);
+    // and a question or the map data goes ahead of read-aloud audio still waiting (the voice service can be slow)
+    const tts = RW.queue.findIndex((x, i) => x.type === 'tts' && (i > 0 || !RW.busy));
+    if(type === 'nav') RW.queue.splice(RW.busy ? 1 : 0, 0, m);
+    else if((type === 'ask' || type === 'need_data') && tts >= 0) RW.queue.splice(tts, 0, m); else RW.queue.push(m);
     pump();
   });
   function pump(){
@@ -1916,10 +1900,18 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
       set: o => { Object.assign(mem, o); try { sessionStorage.setItem('runway-details', JSON.stringify(mem)); } catch(e) { /* storage off */ } }
     };
   })();
+  /* Callers (the home page's ask box, typed or spoken; the FAQ's "Ask Runway instead") may call this twice for one question.
+     A question already on its way is not asked again, and while the data loads a repeat without one (a second Enter on
+     the emptied box, the send button after Enter) keeps the question waiting instead of replacing it. */
   RW.enter = (target, arg) => {
+    if(target === 'ask' && arg && RW.queue.some(m => m.type === 'ask' && m.payload.q === String(arg).slice(0, 1000))) arg = undefined;
     if(window.RWAPP) return RWAPP.enter(target, arg);
+    const p = RW.pendingEnter;
+    if(target === 'ask' && !arg && p && p.target === 'ask') arg = p.arg;
     RW.pendingEnter = {target, arg};
-    document.getElementById('rwLoad3').textContent = target === 'map' ? 'Drawing the map' : 'Opening the page';
+    const asking = target === 'ask' && !!arg, lq = document.getElementById('rwLoadQ');
+    document.getElementById('rwLoad3').textContent = target === 'map' ? 'Drawing the map' : asking ? 'Opening Ask with your question' : 'Opening the page';
+    lq.hidden = !asking; lq.textContent = asking ? `Your question: “${arg}”` : '';  // shows it was taken, so nobody sends it again
     if(target === 'map') RW.leaflet().catch(() => {});  // alongside the data; drawMap reports a failure
     if(RW.asked){ if(box.hidden) RW.loading(1); return; }
     RW.asked = true; RW.loading(0);
@@ -2225,6 +2217,127 @@ function uploadProblem(name, size){
   return '';
 }
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+/* ---------- voice, shared by the Home ask box and the Ask page: device voices, the mic's greeting, dictation ---------- */
+// Each answer language: its speech-recognition tag (en-SG for English) and the greeting the mic says before it listens.
+const VOICE = {en: {rec: 'en-SG', hi: "Hi, I'm Runway. How are you?"}, zh: {rec: 'zh-CN', hi: '你好，我是 Runway。你好吗？'},
+  ms: {rec: 'ms-MY', hi: 'Hai, saya Runway. Apa khabar?'}, ta: {rec: 'ta-SG', hi: 'வணக்கம், நான் Runway. நீங்கள் எப்படி இருக்கிறீர்கள்?'}};
+const TTS = 'speechSynthesis' in window ? window.speechSynthesis : null;
+// The voices that can read each answer language, best first: Singapore, then the nearest region. Mandarin skips
+// zh-HK, which is Cantonese. A voice named "Singapore" counts as Singapore English even with a bare "en" tag.
+const VPREF={en:[/^en[-_]SG/i,/^en[-_](GB|AU|IN)/i,/^en/i], zh:[/^(zh|cmn)[-_](Hans[-_])?SG/i,/^(zh|cmn)[-_](Hans[-_])?CN/i,/^(zh|cmn)[-_](Hant[-_])?TW/i],
+  ms:[/^ms[-_]SG/i,/^ms[-_]MY/i,/^ms/i], ta:[/^ta[-_]SG/i,/^ta[-_]MY/i,/^ta/i]};
+const isSG=v=>/[-_]SG/i.test(v.lang)||/singapore/i.test(v.name);
+const vrank=(v,lang)=>{const i=VPREF[lang].findIndex(re=>re.test(v.lang)); return i>0&&isSG(v)?0:i;};
+const voicesFor=lang=>!TTS?[]:TTS.getVoices().map(v=>[v,vrank(v,lang)]).filter(x=>x[1]>=0).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);
+function chosenVoice(lang){
+  const vs=voicesFor(lang);
+  return vs[0]||null;
+}
+// The greeting: the voice pack's audio if it has already arrived (greetPrefetch), else a device voice at once, so it starts
+// inside the tap; with neither (no device voice for the language) it waits up to 2.5 s for the pack. greet() resolves when
+// the greeting has finished, failed or been stopped (HIOFF), and after 8 s at most, so listening always starts.
+const HI = {};  // language → {p: the pack request, a: its audio once arrived, null if the pack failed}
+function greetPrefetch(lang){
+  if(!VOICE[lang] || HI[lang]) return;
+  const h = HI[lang] = {a: undefined};
+  h.p = RW.send('tts', {text: VOICE[lang].hi, lang}).then(r => r && r.ok && r.audio || null, () => null).then(a => (h.a = a));
+}
+let HIOFF = null;  // stops the greeting now
+function greet(lang){
+  greetPrefetch(lang);
+  return new Promise(done => {
+    let over = false, cap = 0;
+    const end = () => { if(over) return; over = true; clearTimeout(cap); HIOFF = null; done(); };
+    const h = HI[lang], voice = chosenVoice(lang);
+    const device = () => {
+      if(over) return; if(!TTS || (lang !== 'en' && !voice)) return end();
+      const u = new SpeechSynthesisUtterance(VOICE[lang].hi); let began = false;
+      if(voice){ u.voice = voice; u.lang = voice.lang; } else u.lang = 'en-SG';
+      u.rate = .92; u.onstart = () => { began = true; }; u.onend = u.onerror = end;
+      window._utter = u; HIOFF = () => { TTS.cancel(); end(); };
+      if(TTS.speaking || TTS.pending){ TTS.cancel(); setTimeout(() => { if(!over) TTS.speak(u); }, 60); } else TTS.speak(u);
+      setTimeout(() => { if(!began) end(); }, 1500);  // a device that never starts (Chrome can drop it) must not hold the mic
+    };
+    const pack = a => {
+      if(over) return; const el = new Audio('data:audio/mpeg;base64,' + a);
+      el.onended = el.onerror = end; HIOFF = () => { el.pause(); end(); };
+      el.play().catch(() => { HIOFF = end; device(); });  // no autoplay: a device voice instead
+    };
+    cap = setTimeout(end, 8000); HIOFF = end;
+    if(h.a) pack(h.a);
+    else if(TTS && (lang === 'en' || voice)) device();
+    else { const wait = setTimeout(end, 2500); h.p.then(a => { clearTimeout(wait); if(a) pack(a); else end(); }); }
+  });
+}
+// Speech pieces, in order, as one text. Android Chrome repeats everything said so far in each result, so a piece that
+// starts with the text so far (or, when it corrects a word, starts with the same word and has most of its words) replaces it.
+// Chinese has no spaces.
+const joinSpeech = (a, b) => !a ? b : !b ? a : /[\u2e80-\u9fff\uff00-\uffef]$/.test(a) && /^[\u2e80-\u9fff\uff00-\uffef]/.test(b) ? a + b : a + ' ' + b;
+function speechText(parts){
+  let out = '';
+  for(const p of parts){
+    const t = String(p || '').trim(); if(!t) continue;
+    const a = out.toLowerCase().split(/\s+/), b = t.toLowerCase().split(/\s+/), bs = new Set(b);
+    const again = t.toLowerCase().startsWith(out.toLowerCase()) || (b.length >= a.length && a[0] === b[0] && a.filter(w => bs.has(w)).length >= a.length * .6);
+    out = out && again ? t : joinSpeech(out, t);
+  }
+  return out;
+}
+// Dictation: a tap greets in the answer language, then listens until a second tap, or until the user has been quiet for
+// SILENCE_MS after speaking (HUSH_MS if they say nothing). Chrome ends a recognition by itself (after a silence; on Android
+// after every phrase), so a new one starts until then and the text adds up across them, after anything already typed in
+// the box. o: {btn, input, lang, hint: the placeholder to put back, done(text): speech was heard, fail(error)}.
+const SILENCE_MS = 5000, HUSH_MS = 10000, MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported'];
+let MIC = null;  // the mic in use, on either page: MIC.stop(true) sends what was heard, MIC.stop(false) leaves it in the box
+function dictate(o){
+  if(MIC) MIC.stop(false);
+  const base = o.input.value.trim(), lang = VOICE[o.lang] ? o.lang : 'en';
+  let phase = 'greet', send = true, kept = '', live = '', rec = null, quiet = 0, wait = 0, quick = 0, err = '';
+  const heard = () => joinSpeech(kept, live);
+  const pressed = v => { o.btn.setAttribute('aria-pressed', String(v)); o.btn.classList.toggle('on', v); };
+  const arm = () => { clearTimeout(quiet); quiet = setTimeout(() => me.stop(true), heard() ? SILENCE_MS : HUSH_MS); };
+  const me = MIC = {btn: o.btn, stop(submit){
+    if(phase === 'greet'){ send = submit; if(HIOFF) HIOFF(); return end(); }
+    if(phase !== 'listen') return;
+    send = submit; phase = 'stopping'; clearTimeout(quiet);
+    if(!submit) return end();
+    try{ rec.stop(); }catch(e){ return end(); }
+    wait = setTimeout(end, 2000);  // the last words arrive before onend; never wait longer than this
+  }};
+  function session(){
+    const r = rec = new SR(), t0 = Date.now(); let got = false;
+    r.lang = VOICE[lang].rec; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1;
+    r.onresult = e => { if(rec !== r) return; live = speechText(Array.from(e.results, x => x[0].transcript)); got = got || !!live;
+      o.input.value = joinSpeech(base, heard()); if(phase === 'listen') arm(); };
+    r.onerror = e => { if(rec === r && e.error !== 'no-speech') err = e.error; };
+    r.onend = () => {
+      if(rec !== r) return; kept = heard(); live = '';
+      if(phase !== 'listen' || err) return end();
+      quick = got || Date.now() - t0 > 1000 ? 0 : quick + 1; if(quick >= 3) return end();  // it keeps ending at once: give up
+      try{ session(); }catch(e){ end(); }
+    };
+    r.start();
+  }
+  function end(){
+    if(phase === 'done') return;
+    phase = 'done'; clearTimeout(quiet); clearTimeout(wait);
+    if(rec){ const r = rec; rec = null; try{ r.abort(); }catch(e){} }
+    if(MIC === me) MIC = null;
+    pressed(false); o.input.placeholder = o.hint;
+    const said = heard().trim(), text = joinSpeech(base, said);
+    if(said) o.input.value = text;
+    if(MIC_FATAL.includes(err)) o.fail(err); else if(said && send) o.done(text);
+  }
+  pressed(true);
+  greet(lang).then(() => {  // listening starts after the greeting, so the greeting is never written down
+    if(phase !== 'greet') return;
+    phase = 'listen'; o.input.placeholder = 'Listening…'; arm();
+    try{ session(); }catch(e){ end(); }
+  });
+  return me;
+}
+addEventListener('pagehide', () => { if(MIC) MIC.stop(false); });
+document.addEventListener('visibilitychange', () => { if(document.hidden && MIC) MIC.stop(false); });
 // Slider for every number the user picks: the value shown large above a native range input (arrows, Page Up/Down, Home/End).
 // The large number repeats the slider's own value, so it is hidden from screen readers; onPick(n) runs on every change.
 function sliderHtml(id, label, lo, hi, v, unit = ''){
@@ -2261,7 +2374,6 @@ function faqFilter(faq, text){
     const a = e.target.closest('a[href^="#"]'); if(!a) return;
     e.preventDefault();
     const id = a.getAttribute('href').slice(1), el = document.getElementById(id);
-    if(id === 'lask') return toComposer();
     if(id === 'ltop') return scr.scrollTo({top: 0, behavior: behavior()});
     el.scrollIntoView({behavior: behavior(), block: 'start'}); el.focus({preventScroll: true});
   });
@@ -2331,18 +2443,20 @@ function faqFilter(faq, text){
   // the Ask page asks it in the full chat (which refuses NRIC, phone and email); an empty box just opens the page
   $('#lAskForm').addEventListener('submit', e => { e.preventDefault(); const i = $('#lAskIn'), q = i.value.trim(); i.value = ''; RW.enter('ask', q); });
 
-  /* voice: speech to text (en-SG), as in the app's Ask tab; it only fills the box */
-  const mic = $('#lMic'); let rec = null;
+  /* voice: as on the Ask page (dictate, in the shared script): greets in the answer language chosen on the Ask page this
+     visit (RW.lang; English until then), listens through pauses, then asks what was said on the Ask page */
+  const mic = $('#lMic'), inp = $('#lAskIn'), HINT = inp.placeholder, mine = () => MIC && MIC.btn === mic;
   if(!SR){ mic.setAttribute('aria-disabled', 'true'); mic.title = "Voice input isn't available in this browser"; }
+  else ['pointerenter', 'focus'].forEach(k => [mic, inp].forEach(x => x.addEventListener(k, () => greetPrefetch(RW.lang || 'en'))));
   mic.onclick = () => {
     if(!SR) return;
-    if(rec){ rec.stop(); return; }
-    const inp = $('#lAskIn'), me = rec = new SR(); me.lang = 'en-SG'; me.interimResults = true; me.maxAlternatives = 1;
-    mic.setAttribute('aria-pressed', 'true'); inp.placeholder = 'Listening…';
-    me.onresult = e => { let s = ''; for(const x of e.results) s += x[0].transcript; inp.value = s; };
-    me.onend = () => { mic.setAttribute('aria-pressed', 'false'); inp.placeholder = "e.g. Can I use CPF for a 58-year lease if I'm 28?"; if(rec === me) rec = null; inp.focus(); };
-    try{ me.start(); setTimeout(() => { if(rec === me) me.stop(); }, 10000); }catch(err){ me.onend(); }
+    if(mine()){ MIC.stop(true); return; }
+    dictate({btn: mic, input: inp, lang: RW.lang, hint: HINT, done: q => { inp.value = ''; RW.enter('ask', q); },
+      fail: e => { inp.placeholder = e === 'language-not-supported' ? "Voice input in this language isn't available here. Type your question." : 'The microphone is blocked. Allow it, or type your question.'; }});
   };
+  // leaving Home (another screen, or the loading panel over it) stops the mic and keeps what was heard in the box
+  const away = () => { if(mine() && ($('#scrLanding').hidden || !$('#rwLoading').hidden)) MIC.stop(false); };
+  ['#scrLanding', '#rwLoading'].forEach(id => new MutationObserver(away).observe($(id), {attributes: true, attributeFilter: ['hidden']}));
 
   /* ---------- your town: Toa Payoh as written, the other 25 from the data ---------- */
   const feat = $('#lFeat'), TP_HTML = feat.innerHTML, sel = $('#lTown');
@@ -3026,10 +3140,10 @@ function renderList(){
 
 /* ---------- Ask Runway ---------- */
 // Answer language: AI answers, read-aloud and voice input only; like Text size it lasts for the visit and is not stored.
-const LANGS={en:{tag:'en',name:'English',rec:'en-SG'}, zh:{tag:'zh-Hans',name:'Chinese',rec:'zh-CN'},
-  ms:{tag:'ms',name:'Malay',rec:'ms-MY'}, ta:{tag:'ta',name:'Tamil',rec:'ta-SG'}};  // read-aloud voices: VPREF
+const LANGS={en:{tag:'en',name:'English'}, zh:{tag:'zh-Hans',name:'Chinese'},
+  ms:{tag:'ms',name:'Malay'}, ta:{tag:'ta',name:'Tamil'}};  // read-aloud voices: VPREF; voice input and the mic's greeting: VOICE
 S.lang='en';
-$('#askLang').onchange=e=>{ S.lang = LANGS[e.target.value] ? e.target.value : 'en'; };
+$('#askLang').onchange=e=>{ S.lang = LANGS[e.target.value] ? e.target.value : 'en'; RW.lang = S.lang; if(!RW.busy) greetPrefetch(S.lang); };  // RW.lang: the Home mic's language
 const SUGG=['Can I still use CPF for an old flat?','Is my HDB loan cut too?','How long can my loan be?','Why do short leases cost more in Clementi than Yishun?'];
 // Follow-up questions, picked by the words in the latest question and answer (no AI needed).
 const FOLLOW=[
@@ -3116,7 +3230,7 @@ function renderChat(){
 }
 $('#autoRead').onchange=e=>{ if(!e.target.checked){stopSpeak();return;} const btns=$$('[data-say]'); if(btns.length) btns[btns.length-1].click(); };
 function fbHtml(m,i){return `<div class="fb" role="group" aria-label="Was this answer helpful?">${[['up','Helpful','M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3'],['down','Not helpful','M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17']].map(([v,t,d])=>`<button type="button" class="chip" data-fb="${i}" data-v="${v}" aria-pressed="${m.fb.v===v}" aria-label="${t}" title="${t}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;margin:auto"><path d="${d}"/></svg></button>`).join('')}<p class="small">A vote keeps this question, unless it has personal details, to improve Runway.</p></div>`;}
-function pushBot(b){S.chat.push(b);renderChat();$('#chatLive').textContent=plain(b.html);if(!b.warn)prefetchPack(plain(b.html),b.lang);if($('#autoRead').checked){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1],b.lang);}}
+function pushBot(b){S.chat.push(b);renderChat();$('#chatLive').textContent=plain(b.html);if(!b.warn)prefetchPack(plain(b.html),b.lang);if($('#autoRead').checked&&!MIC){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1],b.lang);}}
 function plain(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.small').forEach(x=>x.remove());return d.textContent.replace(/\s+/g,' ').trim();}
 
 /* ---------- document upload → profile → town recommendations ---------- */
@@ -3209,18 +3323,7 @@ $('#upDoc').onchange=e=>{const f=e.target.files[0]; if(!f) return; e.target.valu
 $('#sampleBtn').onclick=()=>handleDoc('sample-buyer-notes.txt',async()=>SAMPLE_DOC);
 
 /* ---------- voice: text to speech (prefers a Singapore English voice) ---------- */
-const TTS = 'speechSynthesis' in window ? window.speechSynthesis : null;
-// The voices that can read each answer language, best first: Singapore, then the nearest region. Mandarin skips
-// zh-HK, which is Cantonese. A voice named "Singapore" counts as Singapore English even with a bare "en" tag.
-const VPREF={en:[/^en[-_]SG/i,/^en[-_](GB|AU|IN)/i,/^en/i], zh:[/^(zh|cmn)[-_](Hans[-_])?SG/i,/^(zh|cmn)[-_](Hans[-_])?CN/i,/^(zh|cmn)[-_](Hant[-_])?TW/i],
-  ms:[/^ms[-_]SG/i,/^ms[-_]MY/i,/^ms/i], ta:[/^ta[-_]SG/i,/^ta[-_]MY/i,/^ta/i]};
-const isSG=v=>/[-_]SG/i.test(v.lang)||/singapore/i.test(v.name);
-const vrank=(v,lang)=>{const i=VPREF[lang].findIndex(re=>re.test(v.lang)); return i>0&&isSG(v)?0:i;};
-const voicesFor=lang=>!TTS?[]:TTS.getVoices().map(v=>[v,vrank(v,lang)]).filter(x=>x[1]>=0).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);
-function chosenVoice(lang){
-  const vs=voicesFor(lang);
-  return vs[0]||null;
-}
+// (TTS, the device voices and chosenVoice are in the shared script, with voice input)
 // Singapore voice pack (always on; device voices above are only the fallback): a free server voice (Singapore English and Tamil; Malay and Mandarin use the nearest voice). Server side: runway/voicepack.py.
 const PACKJOBS=new Map(); let AUD=null, PACKRUN=0;  // PACKJOBS: one request per chunk, shared by a prefetch and a click
 const packText=(t,l)=>l==='en'?t.replace(/\$/g,' dollars ').replace(/ dollars ([\d,]+)/g,' $1 dollars'):t;
@@ -3258,6 +3361,7 @@ async function speakPack(text,btn,lang){
   stopSpeak(); return true;
 }
 async function speak(text,btn,lang='en'){
+  if(MIC)MIC.stop(false);  // never read aloud into the mic
   stopSpeak();
   if(await speakPack(packText(text,lang),btn,lang)) return;
   if(!TTS) return;
@@ -3270,23 +3374,23 @@ async function speak(text,btn,lang='en'){
   if(btn){speakingBtn=btn;btn.setAttribute('aria-pressed','true');btn.lastChild.textContent='Stop';}
   u.onend=u.onerror=()=>{if(speakingBtn===btn)stopSpeak();};
   window._utter=u;  // Chrome drops utterances it garbage-collects mid-speech
-  setTimeout(()=>TTS.speak(u),60);  // Chrome silently skips a speak() right after cancel()
+  setTimeout(()=>{if(speakingBtn===(btn||null))TTS.speak(u);},60);  // Chrome silently skips a speak() right after cancel(); not if stopped meanwhile
 }
 
-/* ---------- voice: speech to text (in the answer language; en-SG for English) ---------- */
-let REC=null;
+/* ---------- voice: speech to text (in the answer language; en-SG for English): dictate, in the shared script ---------- */
+// A tap stops any answer being read, greets, then listens through pauses; what was said is added to anything typed and asked.
 $('#micBtn').onclick=()=>{
-  if(REC){REC.stop();return;}
+  const mb=$('#micBtn');
+  if(MIC&&MIC.btn===mb){MIC.stop(true);return;}
   if(!SR){pushBot({warn:true,html:'<p>Voice input is not available in this browser. You can type your question instead.</p>'});return;}
-  REC=new SR(); REC.lang=LANGS[S.lang].rec; REC.interimResults=true; REC.maxAlternatives=1;
-  const mb=$('#micBtn'); mb.classList.add('on'); mb.setAttribute('aria-pressed','true'); $('#askIn').placeholder='Listening…';
-  let finalText='';
-  REC.onresult=e=>{let s='';for(const r of e.results){s+=r[0].transcript;if(r.isFinal)finalText=s;}$('#askIn').value=s;};
-  REC.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'||e.error==='audio-capture')pushBot({warn:true,html:'<p>The microphone is blocked, so I could not hear you. Allow the microphone and tap the mic again, or type your question.</p>'});
-    if(e.error==='language-not-supported')pushBot({warn:true,skip:true,html:`<p>Voice input in ${LANGS[S.lang].name} is not available in this browser. You can type your question instead.</p>`});};
-  REC.onend=()=>{mb.classList.remove('on');mb.setAttribute('aria-pressed','false');$('#askIn').placeholder='Type or tap the mic';REC=null;const v=($('#askIn').value||finalText).trim();if(v){$('#askIn').value='';ask(v);}};
-  try{REC.start();setTimeout(()=>{if(REC)REC.stop();},10000);}catch(err){REC.onend();}
+  stopSpeak();
+  dictate({btn:mb, input:$('#askIn'), lang:S.lang, hint:'Type or tap the mic', done:v=>{$('#askIn').value='';ask(v);},
+    fail:e=>e==='language-not-supported'?pushBot({warn:true,skip:true,html:`<p>Voice input in ${LANGS[S.lang].name} is not available in this browser. You can type your question instead.</p>`})
+      :pushBot({warn:true,html:'<p>The microphone is blocked, so I could not hear you. Allow the microphone and tap the mic again, or type your question.</p>'})});
 };
+['pointerenter','focus'].forEach(k=>$('#micBtn').addEventListener(k,()=>greetPrefetch(S.lang)));
+// leaving the Ask page stops the mic (what was heard stays in the box); opening it fetches the greeting while the line is free
+new MutationObserver(()=>{const h=$('#scrAsk').hidden; if(h&&MIC&&MIC.btn===$('#micBtn'))MIC.stop(false); if(!h&&!RW.busy&&!RW.queue.length)greetPrefetch(S.lang);}).observe($('#scrAsk'),{attributes:true,attributeFilter:['hidden']});
 $('#askForm').addEventListener('submit',e=>{e.preventDefault();const v=$('#askIn').value.trim();if(!v)return;$('#askIn').value='';ask(v);});
 
 /* ---------- more ---------- */
@@ -3635,7 +3739,8 @@ function privacyHtml(){
     <li>Others go to Runway's server with your last few chat turns, the answer language you chose and, once you set it, the youngest buyer's age. The server checks again and, without the AI, declines personal details, attempts to change its rules, requests for advice and off-topic questions.</li>
     <li>With the AI on, Anthropic (the maker of Claude) gets your question, up to six recent turns, the age if set and the matching official passages, to write the answer. A question that is not in English also goes there, with your previous one, to be put into English for the document search. With the AI off or busy, nothing goes to Anthropic and you see the official pages.</li>
     <li>"Why?" has the AI explain a flat's calculator figures (age, lease, percentages, the town's lease effect), with no chat history. "Sum up this chat" sends the chat so far; the AI reads the last 12 turns.</li>
-    <li>Voice input uses your browser's speech recognition (some browsers, such as Chrome, send the audio to their own speech service); Runway gets only the text. Read aloud uses your device's voices.</li></ul>
+    <li>Voice input uses your browser's speech recognition (some browsers, such as Chrome, send the audio to their own speech service); Runway gets only the text. The mic says a short greeting, then listens until you tap it again or stop talking for a few seconds.</li>
+    <li>Read aloud is on until you turn it off. It and the mic's greeting use Runway's voice pack: the server sends the words being read (never your voice) to Microsoft's free online voices. If that fails, your device's voices read them.</li></ul>
   <h2>Answer feedback</h2><ul>
     <li>Pressing Helpful or Not helpful under an answer sends Runway's server your vote, the answer language and the question you asked. A vote never uses the AI.</li>
     <li>The server checks the question again. If it has an NRIC number, a Singapore phone number or an email address, or is a question Runway declines, the question is dropped and only the vote and the language are kept.</li>
