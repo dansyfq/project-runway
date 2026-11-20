@@ -105,7 +105,7 @@ Rules: no second accent, no purple, no glowing buttons. Gradients appear in two 
 - Subhead: "How much CPF you can use for a flat depends on the years left on its lease and your age."
 - Section 01 is "The gist"; use *hinges* / *discover* / "– too late".
 - Verdict format: "Remaining lease 55 years · 43 years to 95. The flat has 55 lease years left — the youngest buyer turns 95 in 43 years. With 12 years to spare, CPF can be used up to the Valuation Limit, and the HDB loan is up to 75%."
-- Ask section: "Have more questions? Ask Runway." Suggested: "Why is your CPF usage reduced?", "What happens if your partner is the younger buyer?", "What is the 20-year minimum lease about?"
+- No closing "Have more questions?" band (removed Nov 2026): its "Start asking" only jumped back up to the hero's ask box, which is where questions start.
 - Replace "calculated in the ordinary way" with "The figures come from the rule itself, not from the AI."
 
 ## Pre-ship pass

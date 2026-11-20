@@ -1220,7 +1220,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .lw{max-width:1240px;margin:0 auto;padding-inline:32px}
 .lsr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 #scrLanding :focus-visible{outline:2px solid var(--green);outline-offset:3px}
-#scrLanding .ltc.dark :focus-visible,#scrLanding .lband :focus-visible,#scrLanding .lfoot :focus-visible{outline-color:var(--brand-hi)}
+#scrLanding .ltc.dark :focus-visible,#scrLanding .lfoot :focus-visible{outline-color:var(--brand-hi)}
 #scrLanding [tabindex="-1"]:focus{outline:none}
 /* buttons: one base, three colours, sizes per place */
 .lb{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--radius-btn);font:700 14px var(--font-ui);text-decoration:none;white-space:nowrap}
@@ -1231,7 +1231,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .lb-act{min-height:44px;padding:0 14px;border-radius:12px;font-size:13px}
 .lb-50{flex:1 1 180px;height:50px;font-size:15px}
 .lb-town{min-height:44px;padding:0 14px;border-radius:12px}
-.lb-big{position:relative;height:56px;padding:0 26px;gap:10px;font-size:16px}
 .lb-ic44{width:44px;height:44px;padding:0;border-radius:12px}
 .lheart[aria-pressed="true"] path{fill:currentColor}
 .llink{align-self:flex-start;min-height:44px;padding:6px 0 0;border:0;background:none;font:700 14px var(--font-ui);color:var(--green);text-align:left}
@@ -1371,15 +1370,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .ltc.dash{justify-content:center;background:var(--beige)}
 .lpill2{padding:5px 10px;border-radius:10px;background:var(--snow);font:700 11px var(--font-ui);color:var(--green)}
 .ldia{display:inline-flex;align-items:center;gap:3px;color:var(--brand-hi)}
-/* closing band, notice, footer */
-.lband-s{padding-bottom:64px}
-.lband{position:relative;overflow:hidden;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:28px;padding:48px;border-radius:24px;color:var(--on-brand)}
-.lband-t{position:relative;flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:14px}
-.lband h2{margin:0;font:700 clamp(30px,3.2vw,44px)/1.1 var(--font-display);letter-spacing:var(--track-display);color:var(--on-brand)}
-/* on the brand surface the beige button keeps its light beige in both themes */
-.lband .lb-beige{background:var(--brand-hi);color:var(--brand)}
-.lband .lb-beige:active{background:color-mix(in srgb,var(--brand-hi) 85%,var(--brand))}
-.lband p{max-width:36em;font:400 .944rem/1.5 var(--font-ui);color:color-mix(in srgb,var(--on-brand) 88%,var(--brand))}
+/* notice, footer */
 .lnotice-s{padding-bottom:56px}
 .lnotice{padding:10px 22px;border-radius:16px;background:var(--beige-2)}
 .lbang{flex:0 0 28px;height:28px;border-radius:50%;background:var(--green);color:var(--snow);display:grid;place-items:center;font:700 14px var(--font-ui)}
@@ -1391,8 +1382,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .lnotice-h{font:700 14px var(--font-ui);color:var(--ink)}
 .lfoot{color:var(--on-brand)}
 /* green surfaces: a soft sage glow around a dark disc, with still film grain. At 25% the glow's brightest point keeps snow and beige text at 4.5:1. */
-.lfoot,.lband,.ltc.dark,.lstat:not(.alt){position:relative;isolation:isolate;background:radial-gradient(circle at 84% 110%,var(--brand-deep) 0 44%,transparent 62%),radial-gradient(ellipse 75% 120% at 36% 0%,rgba(190,220,196,.25),transparent 72%),var(--brand)}
-.lfoot::before,.lband::before,.ltc.dark::before,.lstat:not(.alt)::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;opacity:.45;mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.lfoot,.ltc.dark,.lstat:not(.alt){position:relative;isolation:isolate;background:radial-gradient(circle at 84% 110%,var(--brand-deep) 0 44%,transparent 62%),radial-gradient(ellipse 75% 120% at 36% 0%,rgba(190,220,196,.25),transparent 72%),var(--brand)}
+.lfoot::before,.ltc.dark::before,.lstat:not(.alt)::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;opacity:.45;mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 .lfoot .lbrand{padding:16px 0;color:var(--on-brand);--mk-bg:var(--brand-deep)}
 .lfoot .lmark{width:36px;height:36px}
 .lfoot-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;column-gap:40px;row-gap:8px;min-height:112px;border-bottom:1px solid color-mix(in srgb,var(--on-brand) 12%,var(--brand))}
@@ -1414,9 +1405,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   .lw{padding-inline:16px}
   .lsec{padding-block:48px}
   .lhero-in{padding-top:48px}
-  .lans-in,.lband-s,.lnotice-s{padding-bottom:48px}
+  .lans-in,.lnotice-s{padding-bottom:48px}
   .lcomp input{flex-basis:100%}
-  .lband{padding:32px 24px}
   .lfl{min-height:48px}
 }
 /* login overlay */
@@ -1470,6 +1460,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .rwload-card{width:100%;max-width:420px;background:var(--snow);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--green);text-align:center}
 .rwload-card .lmark{width:56px;height:56px}
 .rwload-t{font:700 1.2rem/1.3 var(--font-display);letter-spacing:var(--track-heading);color:var(--green)}
+.rwload-q{margin:0;max-width:100%;font:400 .944rem/1.45 var(--font-ui);color:var(--ink);overflow-wrap:anywhere}
 .rwload-steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font:400 .944rem var(--font-ui);color:var(--ink-2)}
 .rwload-steps li[data-s="done"]{color:var(--green)}
 .rwload-steps li[data-s="done"]::before{content:"✓ "}
@@ -1486,7 +1477,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   .pchip:hover,.mapctl button:hover,.totop:hover,.noticelink:hover{background:var(--beige-2)}
   .btn.primary:hover,.lb-g:hover,.chip[aria-pressed="true"]:hover,.speakbtn[aria-pressed="true"]:hover,.mic.on:hover,.townrow[aria-pressed="true"]:hover{background:var(--green-deep)}
   .btn.ghost:hover,.lb-beige:hover{background:color-mix(in srgb,var(--beige-deep) 60%,var(--beige))}
-  .lband .lb-beige:hover{background:color-mix(in srgb,var(--brand-hi) 85%,var(--brand))}
   .lmic[aria-pressed="true"]:hover{background:var(--beige)}
   .btn:disabled:hover,.chip:disabled:hover{background:var(--beige-2)}
   .trk button:hover{background:var(--tint-2);color:var(--ink)}
@@ -1712,16 +1702,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
         </div>
       </section>
 
-      <section class="lw lband-s" aria-labelledby="lBandH">
-        <div class="lband sq">
-          <div class="lband-t">
-            <h2 id="lBandH">Have more questions? Ask Runway.</h2>
-            <p>Why is your CPF usage reduced? What happens if your partner is the younger buyer? What is the 20-year minimum lease about? Runway reads the CPF, HDB and MND documents and explains to you in plain text.</p>
-          </div>
-          <a href="#lask" class="lb lb-beige lb-big sq"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Start asking</a>
-        </div>
-      </section>
-
       <section class="lw lnotice-s" aria-label="Notice">
         <details class="lnotice sq" open>
           <summary><span class="lbang" aria-hidden="true">!</span><span class="lnotice-h">Important notice: educational prototype, not for real-world use</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
@@ -1849,6 +1829,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
       <div class="rwload-card">
         <svg viewBox="0 0 100 100" aria-hidden="true" class="lmark"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path d="M50 25 73 48 73 62 50 85 27 62 27 48Z" fill="var(--snow)"/><path d="M31 52 38 48 38 73 31 66Z" fill="currentColor"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/><path d="M62 50 69 54 69 66 62 73Z" fill="currentColor"/></svg>
         <p class="rwload-t" id="rwLoadT">Loading the map and recent sales…</p>
+        <p class="rwload-q" id="rwLoadQ" hidden></p>
         <ol class="rwload-steps"><li>Asking for the map</li><li>Receiving 26 towns and the latest sales</li><li id="rwLoad3">Drawing the map</li></ol>
         <button type="button" class="btn primary sm" id="rwRetry" hidden>Try again</button>
         <button type="button" class="btn ghost sm" data-go="">Back to Home</button>
@@ -1869,7 +1850,10 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   RW.send = (type, payload) => new Promise((resolve, reject) => {
     const m = {id: Date.now().toString(36) + '-' + (++RW.seq), type, payload: payload || {}, resolve, reject};
     // the address bar shouldn't wait behind a slow answer: a nav goes next in line
-    if(type === 'nav') RW.queue.splice(RW.busy ? 1 : 0, 0, m); else RW.queue.push(m);
+    // and a question or the map data goes ahead of read-aloud audio still waiting (the voice service can be slow)
+    const tts = RW.queue.findIndex((x, i) => x.type === 'tts' && (i > 0 || !RW.busy));
+    if(type === 'nav') RW.queue.splice(RW.busy ? 1 : 0, 0, m);
+    else if((type === 'ask' || type === 'need_data') && tts >= 0) RW.queue.splice(tts, 0, m); else RW.queue.push(m);
     pump();
   });
   function pump(){
@@ -1905,10 +1889,18 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
     document.head.appendChild(s);
   }));
   // The map data (~3 MB) is fetched on the first click into the app, not for landing-page readers.
+  /* Callers (the home page's ask box, typed or spoken; the FAQ's "Ask Runway instead") may call this twice for one question.
+     A question already on its way is not asked again, and while the data loads a repeat without one (a second Enter on
+     the emptied box, the send button after Enter) keeps the question waiting instead of replacing it. */
   RW.enter = (target, arg) => {
+    if(target === 'ask' && arg && RW.queue.some(m => m.type === 'ask' && m.payload.q === String(arg).slice(0, 1000))) arg = undefined;
     if(window.RWAPP) return RWAPP.enter(target, arg);
+    const p = RW.pendingEnter;
+    if(target === 'ask' && !arg && p && p.target === 'ask') arg = p.arg;
     RW.pendingEnter = {target, arg};
-    document.getElementById('rwLoad3').textContent = target === 'map' ? 'Drawing the map' : 'Opening the page';
+    const asking = target === 'ask' && !!arg, lq = document.getElementById('rwLoadQ');
+    document.getElementById('rwLoad3').textContent = target === 'map' ? 'Drawing the map' : asking ? 'Opening Ask with your question' : 'Opening the page';
+    lq.hidden = !asking; lq.textContent = asking ? `Your question: “${arg}”` : '';  // shows it was taken, so nobody sends it again
     if(target === 'map') RW.leaflet().catch(() => {});  // alongside the data; drawMap reports a failure
     if(RW.asked){ if(box.hidden) RW.loading(1); return; }
     RW.asked = true; RW.loading(0);
@@ -2250,7 +2242,6 @@ function faqFilter(faq, text){
     const a = e.target.closest('a[href^="#"]'); if(!a) return;
     e.preventDefault();
     const id = a.getAttribute('href').slice(1), el = document.getElementById(id);
-    if(id === 'lask') return toComposer();
     if(id === 'ltop') return scr.scrollTo({top: 0, behavior: behavior()});
     el.scrollIntoView({behavior: behavior(), block: 'start'}); el.focus({preventScroll: true});
   });
