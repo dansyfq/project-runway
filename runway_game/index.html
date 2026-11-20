@@ -1414,7 +1414,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .lover[hidden]{display:none}
 .lok{display:flex;align-items:center;gap:12px;background:var(--ok-soft);color:var(--ok);border-radius:var(--radius-btn);padding:14px 16px;font:700 .944rem var(--font-ui)}
 .lok[hidden]{display:none}
-/* Reviewer view: a pill that stays on every screen while logged in; it opens More, where the reviewer tools are */
+/* Logged in: a pill that stays on every screen and names the role; it opens More, where the admin tools are */
 .revbar{position:fixed;top:calc(10px + env(safe-area-inset-top));right:12px;z-index:150;display:flex;align-items:center;gap:8px;min-height:40px;padding:6px 14px;border:0;border-radius:999px;background:var(--ok);color:var(--snow);font:500 .778rem var(--font-ui);box-shadow:0 8px 24px -8px rgba(17,17,17,.45);cursor:pointer;animation:revIn .5s var(--ease-drawer) both}
 .revbar[hidden]{display:none}
 .revbar .dot{width:9px;height:9px;border-radius:50%;background:var(--sign);box-shadow:0 0 0 3px color-mix(in srgb,var(--sign) 35%,transparent)}
@@ -1813,7 +1813,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
         <button type="button" class="x" id="loginClose" aria-label="Close"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         <div class="lbrand"><svg viewBox="0 0 100 100" aria-hidden="true" class="lmark"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path class="lmk-bg" d="M50 25 73 48 73 62 50 85 27 62 27 48Z"/><path d="M31 52 38 48 38 73 31 66Z" fill="currentColor"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/><path d="M62 50 69 54 69 66 62 73Z" fill="currentColor"/></svg><span>Runway</span></div>
         <h2 id="loginTitle">Log in</h2>
-        <p class="small" style="margin:0">For reviewers. Everyone else can use Runway without an account.</p>
+        <p class="small" style="margin:0">Admin manages the Ask documents and pages. User sees the full About Us and How it works. Everyone else can use Runway without an account.</p>
         <label class="field"><span>Username</span><input class="inp" id="u" autocomplete="username" autocapitalize="none" required></label>
         <div class="field"><label for="pw"><span>Password</span></label><div class="pwbox"><input class="inp" id="pw" type="password" autocomplete="current-password" required><button type="button" class="pweye" id="pwEye" aria-pressed="false" aria-controls="pw">Show</button></div></div>
         <p class="err" id="loginErr" role="alert" hidden>That username and password don't match.</p>
@@ -1822,7 +1822,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
       </form>
     </div>
     <button type="button" class="totop" id="toTop" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
-    <button type="button" class="revbar" id="revBar" hidden><span class="dot" aria-hidden="true"></span><span><b>Reviewer view</b> · <span id="revUser"></span></span></button>
+    <button type="button" class="revbar" id="revBar" hidden><span class="dot" aria-hidden="true"></span><span><b id="revRole">Admin view</b> · <span id="revUser"></span></span></button>
     <div id="sheetHost"></div>
     <div id="toastHost" role="status"></div>
     <div id="rwLoading" class="rwload" role="status" hidden>
@@ -2092,9 +2092,11 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   const overlay = document.getElementById('loginOverlay');
   function loginButtons(){
     const b = document.querySelector('#lLoginBtn .nl'); if(b) b.textContent = RW.me.user ? 'Log out' : 'Log in'; if(RW.navTitles) RW.navTitles();
-    const bar = document.getElementById('revBar'), on = !!RW.me.user;
-    if(bar.hidden === on){ bar.hidden = !on; document.getElementById('revUser').textContent = RW.me.user || ''; }
-    bar.title = on ? 'Logged in as ' + RW.me.user + '. Open More for the reviewer tools.' : '';
+    const bar = document.getElementById('revBar'), on = !!RW.me.user, admin = RW.me.role === 'admin';
+    if(bar.hidden === on) bar.hidden = !on;
+    document.getElementById('revUser').textContent = RW.me.user || '';
+    document.getElementById('revRole').textContent = admin ? 'Admin view' : 'User view';
+    bar.title = on ? 'Logged in as ' + RW.me.user + (admin ? '. Open More for the admin tools.' : '. Open More to log out.') : '';
   }
   document.getElementById('revBar').onclick = () => RW.go('more');
   RW.openLogin = () => { overlay.hidden = false; document.getElementById('loginErr').hidden = true; setTimeout(() => document.getElementById('u').focus(), 30); };
@@ -2119,14 +2121,14 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
         RW.me = {user: r.user, role: r.role}; loginButtons();
         if(window.RWAPP) RWAPP.setUser(r.user, r.role);
         // say so in the dialog before it closes, so a successful log-in can't be missed
-        const ok = document.getElementById('loginOk'); ok.querySelector('span').textContent = `Logged in as ${r.user}. Reviewer view is on.`;
+        const ok = document.getElementById('loginOk'); ok.querySelector('span').textContent = `Logged in as ${r.user}. ${r.role === 'admin' ? 'Admin tools are on.' : 'You see the full pages.'}`;
         ok.hidden = false; form.querySelectorAll('.field, #loginBtn').forEach(x => x.hidden = true);
         setTimeout(() => { closeLogin(); ok.hidden = true; form.querySelectorAll('.field, #loginBtn').forEach(x => x.hidden = false); }, 1600);
       } else { err.textContent = (r && r.error) || "That username and password don't match."; err.hidden = false; }
     }catch(x){ err.textContent = 'Runway did not respond. Try again.'; err.hidden = false; }
     btn.disabled = false; btn.textContent = 'Log in';
   });
-  // the screen first: if the server never hears it, the next render's `me` shows the reviewer view again
+  // the screen first: if the server never hears it, the next render's `me` shows the logged-in view again
   RW.logout = () => { RW.me = {user: null, role: 'brief'}; loginButtons(); if(window.RWAPP) RWAPP.setUser(null, 'brief'); return RW.send('logout').catch(() => {}); };
   window.addEventListener('resize', setHeight);
   if(window.parent === window) document.body.insertAdjacentHTML('afterbegin', '<a href="/" style="position:fixed;z-index:99;inset:12px 12px auto;background:var(--brand-deep);color:var(--on-brand);padding:12px 16px;border-radius:10px;font:600 15px var(--font-ui);text-align:center">This page only works inside the app. Open Runway</a>');
@@ -3399,13 +3401,14 @@ function renderMore(){
   const group=(id,title,rows)=>`<section class="mgrp" aria-labelledby="mg-${id}"><h2 class="label" id="mg-${id}">${title}</h2><div class="list">${rows.join('')}</div></section>`;
   $('#moreBody').innerHTML=`${crumbs('More')}
     <div class="scr-h"><h1>More</h1></div>
-    ${REV()?`<div class="revcard" role="status"><b>Logged in as ${esc(S.user)}: reviewer view is on</b><span class="small">About Us and How it works show the full versions. You can upload Ask documents and edit the pages below.</span></div>
-    ${group('rev','Reviewer tools',[`<button type="button" data-rev="upload"><span>Upload Ask documents<small>Add or replace an official document that Ask Runway searches</small></span>${ICON.chev}</button>`,row('about','Edit About Us','Open the page, then choose Edit this page'),row('method','Edit How it works','Reviewer and public versions'),row('faq','Edit the FAQ','Add, change or remove questions')])}`:''}
+    ${S.user&&!REV()?`<div class="revcard" role="status"><b>Logged in as ${esc(S.user)}</b><span class="small">About Us and How it works show the full versions. Uploading documents and editing pages need the admin account.</span></div>`:''}
+    ${REV()?`<div class="revcard" role="status"><b>Logged in as ${esc(S.user)}: admin tools are on</b><span class="small">About Us and How it works show the full versions. You can upload Ask documents and edit the pages below.</span></div>
+    ${group('rev','Admin tools',[`<button type="button" data-rev="upload"><span>Upload Ask documents<small>Add or replace an official document that Ask Runway searches</small></span>${ICON.chev}</button>`,row('about','Edit About Us','Open the page, then choose Edit this page'),row('method','Edit How it works','Full and public versions'),row('faq','Edit the FAQ','Add, change or remove questions')])}`:''}
     ${group('you','Your settings',[row('details','Your details',`Youngest ${S.age} · average ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}`),row('size','Text size',`${textPx()} px`)])}
     ${group('guides','Guides',[row('faq','FAQ','Common questions, each with its official source'),row('timeline','Buying timeline','The steps from HFE letter to keys, each with its official source'),row('case','Case study','One flat type, two towns, two leases, from real sales')])}
     ${group('about','About Runway',[row('about','About Us','What Runway is, notice, team'),row('method','How it works','Methodology and flowcharts'),row('sources','Sources and credits','Data, map, documents, photos')])}
     ${group('legal','Legal',[row('privacy','Privacy Policy','What happens to what you type or upload'),row('terms','Terms','Educational use, no advice, licences')])}
-    ${S.user?'<button class="btn ghost" type="button" id="outBtn">Log out</button>':'<button class="btn" type="button" id="inBtn">Log in for the reviewer view</button>'}`;
+    ${S.user?'<button class="btn ghost" type="button" id="outBtn">Log out</button>':'<button class="btn" type="button" id="inBtn">Log in as admin or user</button>'}`;
   $$('[data-sub]').forEach(b=>b.onclick=()=>sub(b.dataset.sub));
   const ub=$('[data-rev="upload"]'); if(ub) ub.onclick=openUpload;
   const ob=$('#outBtn'); if(ob) ob.onclick=signOut;
@@ -3469,11 +3472,11 @@ function renderSub(){
 const textPx=()=>Math.round(parseFloat(getComputedStyle(document.documentElement).fontSize)*.944);
 
 const SRCI=(t,d,u)=>`<div class="srcitem"><b>${t}</b>${d}${u?`<br><a href="${u}" target="_blank" rel="noopener">${u.replace(/^https:\/\//,'')}</a>`:''}</div>`;
-const REV = () => S.role === 'full';  // logged in as a reviewer (the server checks this again for every change)
-const FULL = () => REV() && !S.asPublic;  // a reviewer can look at, and edit, the public version too
+const REV = () => S.role === 'admin';  // logged in as admin: the admin tools (the server checks this again for every change)
+const FULL = () => S.role === 'user' || (REV() && !S.asPublic);  // full pages for both accounts; admin can look at, and edit, the public version too
 
-/* ---------- reviewer tools: edit pages, edit the FAQ, upload Ask documents (saved by runway/content.py) ---------- */
-// About Us and How it works have a reviewer and a public version; each page's saved text replaces the built one
+/* ---------- admin tools: edit pages, edit the FAQ, upload Ask documents (saved by runway/content.py) ---------- */
+// About Us and How it works have a full and a public version; each page's saved text replaces the built one
 const PAGEKEY={about:()=>'about.'+(FULL()?'full':'brief'), method:()=>'method.'+(FULL()?'full':'brief'), privacy:()=>'privacy', terms:()=>'terms'};
 const PAGEBUILT={about:()=>aboutHtml(), method:()=>methodHtml(), privacy:()=>privacyHtml(), terms:()=>termsHtml()};
 const edited=k=>((RW.content||{}).pages||{})[k];
@@ -3487,7 +3490,7 @@ function editBar(s){
   if(!REV()) return '';
   const two=s==='about'||s==='method', has=!!edited(PAGEKEY[s]());
   return `<div class="revedit">
-    ${two?`<div class="chips" role="group" aria-label="Version to show and edit"><button type="button" class="chip" data-ver="full" aria-pressed="${!S.asPublic}">Reviewer version</button><button type="button" class="chip" data-ver="brief" aria-pressed="${!!S.asPublic}">Public version</button></div>`:''}
+    ${two?`<div class="chips" role="group" aria-label="Version to show and edit"><button type="button" class="chip" data-ver="full" aria-pressed="${!S.asPublic}">Full version</button><button type="button" class="chip" data-ver="brief" aria-pressed="${!!S.asPublic}">Public version</button></div>`:''}
     <button type="button" class="btn sm" id="edGo">Edit this page</button>
     ${has?'<button type="button" class="btn ghost sm" id="edReset">Restore the original</button>':''}
     <p class="small" id="edMsg" role="status">${has?'Visitors see your edited text.':''}</p></div>`;
@@ -3730,10 +3733,10 @@ function timelineHtml(){
     <p class="small">Source: <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.publisher)} · ${esc(x.title)}${NEWTAB}</a></p></li>`).join('')}</ol>
   <p class="small">Runway is a learning project, not financial advice. HDB's My Flat Dashboard guides you through your own purchase step by step.</p></div>`;
 }
-const LEGAL_DATE='14 November 2026';
+const LEGAL_DATE='20 November 2026';
 function privacyHtml(){
   return `<div class="doctext"><h1>Privacy Policy</h1><p class="small">Last updated: ${LEGAL_DATE}</p>
-  <p>Runway is a free educational prototype with no public accounts, analytics or advertising. Its database, when one is set up, keeps only answer votes and the reviewers' edits and documents, never your session or details. This is what happens to what you type or upload, as the app is built today.</p>
+  <p>Runway is a free educational prototype with no public accounts, analytics or advertising. Its database, when one is set up, keeps only answer votes and the admin's edits and documents, never your session or details. This is what happens to what you type or upload, as the app is built today.</p>
   <h2>Questions</h2><ul>
     <li>A question with an NRIC number, a Singapore phone number or an email address stays in your browser, and Runway asks you to remove it.</li>
     <li>Others go to Runway's server with your last few chat turns, the answer language you chose and, once you set it, the youngest buyer's age. The server checks again and, without the AI, declines personal details, attempts to change its rules, requests for advice and off-topic questions.</li>
@@ -3753,12 +3756,12 @@ function privacyHtml(){
   <h2>Finding flats by budget and map filters</h2><ul>
     <li>The age, cash and CPF amount you give in "Find by budget", and the map's filters, are used in this browser only: they are never put in the page address or sent to Runway's server. The cash amount is forgotten when you leave the page. The age and CPF amount become your details for this visit, and the age can go with later questions as described above.</li></ul>
   <h2>Logging in</h2><ul>
-    <li>Only invited reviewers log in. The server checks the username and password against salted password hashes in the app's private settings, and never stores or logs the password.</li>
+    <li>Only two accounts can log in, admin and user, plus any the app owner adds. Their passwords are handed out by the app owner. The server checks the username and password against salted password hashes in the app's code or private settings, and never stores or logs the password.</li>
     <li>It counts failed attempts per username in memory and pauses that username for one minute after five.</li></ul>
   <h2>Price check on a flat</h2><ul>
     <li>When you open a flat on the map, the page sends Runway's server that sale's town, street, flat type, floor area, remaining lease and price, all from the public sales on the map, to compare it with similar sales. Nothing you typed goes with it: not your age, not your CPF.</li></ul>
   <h2>What the server keeps</h2><ul>
-    <li>Your session, in memory, while the page is open: the replies sent to you, whether you are logged in and whether the map data was sent. The session is never put in a database; it is gone when you reload or close the page. The database keeps only answer votes (above) and the reviewers' page edits and uploaded documents.</li>
+    <li>Your session, in memory, while the page is open: the replies sent to you, whether you are logged in and whether the map data was sent. The session is never put in a database; it is gone when you reload or close the page. The database keeps only answer votes (above) and the admin's page edits and uploaded documents.</li>
     <li>Runway's code writes to the server log when something fails (the kind of request and the error) and when you vote on an answer (the line described under Answer feedback). It does not write your other questions or your files to the log.</li></ul>
   <h2>Cookies and browser storage</h2><ul>
     <li>Runway's own code sets no cookies and keeps two things in your browser, neither of which leaves your device: your Dark mode choice in local storage, under the name runway-theme, and your details for this visit (youngest buyer's age, CPF amount, first town and whether you finished the first questions) in session storage, under the name runway-details, which your browser clears when you close the tab. Your shortlist, chat, income and household entries live only in the open page and are lost on reload, so there is no cookie banner.</li>
@@ -3783,7 +3786,7 @@ function termsHtml(){
     <li>Use Runway to learn how the rules work, not to make real-world decisions on its numbers alone.</li>
     <li>Don't enter anyone's NRIC, phone number, email or other personal details.</li>
     <li>Don't try to make the AI ignore its rules, overload the service or get around its limits, such as the hourly cap on AI answers.</li>
-    <li>Reviewer log-ins are for the invited reviewers only.</li></ul>
+    <li>The admin and user log-ins are only for the people the app owner gave them to.</li></ul>
   <h2>Changes</h2><p>Runway may change, or be taken offline, at any time. This page will show the date it was last updated.</p></div>`;
 }
 // Case study: worked out here from the Trends data and the tested calculator, so it can't go stale. Pure part, tested:

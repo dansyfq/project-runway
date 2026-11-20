@@ -1,9 +1,10 @@
 """Messages between the Runway interface (runway_game/index.html) and Python.
 
 The interface sends one message at a time: {"id", "type", "payload"}. `handle` returns the reply
-value; the host sends it back keyed by id. Everyone can use Runway as a guest (the "demo" view);
-logging in gives the reviewer view (full About Us and How it works) and the reviewer tools: upload Ask documents
-and edit pages and the FAQ (runway/content.py). Passwords, the AI and the documents stay server-side.
+value; the host sends it back keyed by id. Everyone can use Runway as a guest (role "brief");
+logging in as a user (role "user") shows the full About Us and How it works, and as an admin (role "admin") also
+gives the admin tools: upload Ask documents and edit pages and the FAQ (runway/content.py). Roles: runway/auth.py.
+Passwords, the AI and the documents stay server-side.
 """
 
 from __future__ import annotations
@@ -25,7 +26,7 @@ PAGES = {"": "Runway — HDB CPF age-95 checker", "map": "Map", "shortlist": "Sh
          "more": "More", "details": "Your details", "text-size": "Text size", "about": "About Us",
          "how-it-works": "How it works", "sources": "Sources and credits", "privacy": "Privacy Policy", "terms": "Terms",
          "faq": "FAQ", "case-study": "Case study", "timeline": "Buying timeline"}
-REVIEWER_ONLY = {"docs", "upload_doc", "save_page", "save_faq"}  # runway/content.py
+ADMIN_ONLY = {"docs", "upload_doc", "save_page", "save_faq"}  # runway/content.py; role "admin" only
 MAX_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
 # username -> (failed attempts, locked until). Module-level, so a page reload (a new session) can't reset it.
@@ -75,7 +76,7 @@ def situation_from(age) -> str:
     return ""
 
 
-def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, index: Retriever) -> dict:
+def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retriever) -> dict:
     kind, payload = msg.get("type"), msg.get("payload")
     if not isinstance(kind, str):  # the browser is untrusted
         return {"ok": False, "error": "bad message"}
@@ -94,10 +95,11 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
                 LOCKS.clear()
             attempts += 1
             LOCKS[user] = (0, time.time() + LOCKOUT_SECONDS) if attempts >= MAX_ATTEMPTS else (attempts, 0.0)
-        if check_login(user, str(payload.get("p", ""))[:256], users):
+        role = check_login(user, str(payload.get("p", ""))[:256], users)  # "admin" or "user"; None if wrong
+        if role:
             LOCKS.pop(user, None)
-            state.update(user=user, role="full")
-            return {"ok": True, "user": user, "role": "full"}
+            state.update(user=user, role=role)
+            return {"ok": True, "user": user, "role": role}
         return {"ok": False, "error": "That username and password don't match."}
 
     if kind == "logout":
@@ -106,9 +108,9 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
         state.get("replies", []).clear()  # in place: the host appends this reply to the same list
         return {"ok": True, "role": "brief"}
 
-    if kind in REVIEWER_ONLY:  # checked here, not just hidden in the interface: the browser is untrusted
-        if state.get("role") != "full":
-            return {"ok": False, "error": "Log in as a reviewer first."}
+    if kind in ADMIN_ONLY:  # checked here, not just hidden in the interface: the browser is untrusted
+        if state.get("role") != "admin":  # a logged-in "user" is refused too
+            return {"ok": False, "error": "Log in as an admin first."}
         from runway import content
 
         if kind == "docs":
