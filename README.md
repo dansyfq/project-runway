@@ -10,9 +10,12 @@ can put towards a flat depends on whether its lease will last until the youngest
 and the HDB loan are both scaled down. Runway works this out for your own ages and flat, shows what a shorter lease
 costs in each town you're considering, and explains the result in plain English with the official rule quoted.
 
+Runway is a Streamlit app: `app.py` is the Streamlit host, and the whole interface (`runway_game/index.html`) is a
+custom Streamlit component that it runs full-window and exchanges messages with.
+
 ## What's in the app
 
-The interface in `runway_game/index.html` is the approved design hand-off, running full-window inside Streamlit. One left navigation (Home, Map, Shortlist, Trends, Ask, More, Log in) is on every screen: a fixed sidebar on wide screens, a drawer behind the menu button on phones. Every screen has its own address (`/`, `/map`, `/shortlist`, `/trends`, `/ask`, `/more`, and `/details`, `/text-size`, `/about`, `/how-it-works`, `/sources`, `/faq`, `/timeline`, `/case-study`, `/privacy`, `/terms` under More), so reloads, shared links and Back/Forward work; addresses carry page names only, never anything you type. Every inner page has a breadcrumb back to Home, the navigation has a site search (pages, FAQ questions and towns, in the browser only), and an unknown address opens Home with a "Page not found" notice.
+The interface in `runway_game/index.html` is the approved design hand-off, running full-window inside Streamlit. One left navigation (Home, Map, Shortlist, Trends, Ask, More, Log in) is on every screen: a fixed sidebar on wide screens, a drawer behind the menu button on phones. Every screen has its own address (`/`, `/map`, `/shortlist`, `/trends`, `/ask`, `/more`, and `/details`, `/text-size`, `/about`, `/methodology` (the old `/how-it-works` still opens it), `/sources`, `/faq`, `/timeline`, `/case-study`, `/privacy`, `/terms` under More), so reloads, shared links and Back/Forward work; addresses carry page names only, never anything you type. Every inner page has a breadcrumb back to Home, the navigation has a site search (pages, FAQ questions and towns, in the browser only), and an unknown address opens Home with a "Page not found" notice.
 
 | Screen | What it does |
 |---|---|
@@ -23,7 +26,7 @@ The interface in `runway_game/index.html` is the approved design hand-off, runni
 | **Shortlist** | Kept flats recalculated for your details, two or three of them side by side in a table, a printable summary, CSV download, and 26 town stamps with Wikimedia Commons photos. |
 | **Trends** | Public price charts, no login or setup needed. Compare median resale price or price per sqm by town since 1990 (up to 5 places, by flat type and period), and what remaining lease does to price. Numbers are built from `data/resale.parquet` by `runway/trends.py`; each chart has a table view. |
 | **Ask** (use case 2) | Answers from 32 official documents with sources, "Why?" for a flat, chat summary, read-aloud, and document upload that suggests towns. Answers, read-aloud and voice input in English, Chinese, Malay or Tamil (official quotes and figures stay in English; the rest of the interface is English). Helpful / Not helpful under each AI answer: a vote writes one line to the server log and to `data/feedback.jsonl` where the disk is writable, with the question kept only if it has no personal details. |
-| **More** | Your details (with a reset), text size, About Us (with the required notice), How it works (flowcharts), Sources and credits, an FAQ whose answers each cite one document in `data/corpus/`, a buying timeline (`/timeline`) from the HFE letter to completion with a source for every step, a case study worked out live from the Trends data, the Privacy Policy and the Terms. Visitors browse as guests and see short versions; logging in as `reviewer` shows the full About Us and How it works. |
+| **More** | Your details (with a reset), text size, About Us (with the required notice), Methodology (the Ask pipeline, the rules, a requirements checklist and the flowcharts; it was How it works), Sources and credits, an FAQ whose answers each cite one document in `data/corpus/`, a buying timeline (`/timeline`) from the HFE letter to completion with a source for every step, a case study worked out live from the Trends data, the Privacy Policy and the Terms. Visitors browse as guests and see short versions; logging in as `reviewer` shows the full About Us and Methodology. |
 
 Python (`runway/bridge.py`) checks the reviewer login, sends the map data after the home page loads, and answers questions
 (`runway/rag.py` + `runway/llm.py`). The map's calculator runs in the browser and is tested against
@@ -104,6 +107,35 @@ Each commit redeploys the app. Without a token, changes last until the app next 
 3. Paste the contents of your local `.streamlit/secrets.toml` (the `ANTHROPIC_API_KEY` line first, then the `[auth.users]` hashes: a key placed below `[auth.users]` is read as a
    username and the AI stays off) into the app's
    Secrets.
+
+## API and model usage
+
+- **API.** Ask Runway calls Claude through the Anthropic API (the `anthropic` Python SDK) from `runway/llm.py`, on
+  the server only; the browser never talks to Anthropic.
+- **Model.** `claude-opus-5-5` by default (`DEFAULT_CHAT_MODEL` in `runway/config.py`), or the model named in
+  `ANTHROPIC_MODEL`, for example `claude-haiku-5-5`.
+- **Secrets.** `ANTHROPIC_API_KEY` and, optionally, `ANTHROPIC_MODEL`, read from Streamlit secrets first, then from
+  environment variables (`runway/config.py`).
+- **Settings.** `max_tokens` 16,000 (the model's thinking counts towards it; the prompts keep answers short), effort
+  `low`, a 40-second timeout and one retry (`MAX_TOKENS`, `EFFORT` in `runway/llm.py`).
+- **Rate cap.** At most 300 AI calls an hour for the whole app (`AI_CALLS_PER_HOUR` in `runway/llm.py`), since guests
+  can ask without an account. Past the cap, Ask falls back as below.
+- **What is sent.** For an answer: the question, up to six recent chat turns, the youngest buyer's age if set, the
+  answer language and the 5 retrieved passages. "Why?" sends one flat's calculator figures and the rule passages; "Sum
+  up this chat" sends the chat (the last 12 turns are used); a question in Chinese, Malay or Tamil is first sent alone to
+  be put into English for the search. Never sent: files a visitor opens on Ask (read in the browser only), questions
+  with an NRIC, phone number or email (stopped in the browser and again on the server), and income or household details.
+- **Prompts.** The system prompts (answer, "Why?", summary, translation for search) and the question screening are in
+  `runway/llm.py`.
+- **Fallbacks.** No key, the hourly cap reached or an API error: Ask shows the matching official passages, "Why?" a
+  plain template and the summary a list of the questions asked. An answer with a figure that is not in the passages is
+  replaced by the passages too. A request the model declines is re-run on Anthropic's fallback model
+  (`fallbacks="default"`, beta `server-side-fallback-2026-07-01`).
+- **Embeddings.** Document search uses bge-small-en-v1.5 embeddings through fastembed, run on Runway's server: no API
+  call and no key.
+- **Voice.** Read-aloud uses the edge-tts package (Microsoft's free online neural voices, no key) in
+  `runway/voicepack.py`: the server sends the text being read, never the visitor's voice. If it fails, the device's own
+  voices read the answer.
 
 ## Project layout
 

@@ -21,9 +21,10 @@ from runway.llm import AI_BUSY, INVENTED_FIGURE, LLM, language, screen_question
 from runway.rag import Chunk, Retriever
 
 # Every screen's URL path and its name. app.py makes one page per entry; the interface (RW.PATHS) uses the same paths.
+# /how-it-works is the Methodology page's old address, kept so old links still open it.
 PAGES = {"": "Runway — HDB CPF age-95 checker", "map": "Map", "shortlist": "Shortlist", "trends": "Trends", "ask": "Ask",
          "more": "More", "details": "Your details", "text-size": "Text size", "about": "About Us",
-         "how-it-works": "How it works", "sources": "Sources and credits", "privacy": "Privacy Policy", "terms": "Terms",
+         "methodology": "Methodology", "how-it-works": "Methodology", "sources": "Sources and credits", "privacy": "Privacy Policy", "terms": "Terms",
          "faq": "FAQ", "case-study": "Case study", "timeline": "Buying timeline"}
 REVIEWER_ONLY = {"docs", "upload_doc", "save_page", "save_faq"}  # runway/content.py
 MAX_ATTEMPTS = 5

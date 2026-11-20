@@ -1066,6 +1066,8 @@ html[data-input="key"] .spd .who{transition:none}
 .msg.bot .who{font:700 .667rem var(--font-ui);color:var(--green)}
 .msg.bot ul{margin:0;padding-left:1.2em}
 .msg.warn{background:var(--part-soft)}
+.qhist ol{margin:0 0 6px;padding-left:24px}
+.qhist button{display:block;width:100%;min-height:44px;padding:8px 0;border:0;background:none;text-align:left;font:400 .833rem/1.4 var(--font-ui);color:var(--green);text-decoration:underline;text-underline-offset:3px}
 .src{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:12px;background:var(--beige);font:400 .722rem/1.5 var(--font-ui);color:var(--ink-2)}
 .src-h{display:inline-flex;align-items:center;gap:6px;font:700 .611rem var(--font-ui);letter-spacing:.02em;color:var(--green)}
 .src-q{display:block;font:400 .722rem/1.5 var(--font-ui);color:var(--ink-2)}
@@ -1097,6 +1099,7 @@ html[data-input="key"] .spd .who{transition:none}
 .doctext{display:flex;flex-direction:column;gap:14px}
 .doctext h2{margin-top:10px}
 .doctext ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.doctext ol.steps{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:8px}
 .scroll{overflow-x:auto;margin-inline:-4px}
 table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-ui)}
 .tbl th{text-align:left;font:700 .667rem/1.4 var(--font-ui);color:var(--ink-2);background:var(--beige-2);border-bottom:1px solid var(--line);padding:8px;white-space:nowrap}
@@ -1717,7 +1720,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
         <div class="lw lfoot-top">
           <a href="#ltop" class="lbrand" aria-label="Runway home"><svg viewBox="0 0 100 100" class="lmark" aria-hidden="true"><path d="M50 3 97 50 50 97 3 50Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path class="lmk-bg" d="M50 25 73 48 73 62 50 85 27 62 27 48Z"/><path d="M31 52 38 48 38 73 31 66Z" fill="currentColor"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/><path d="M62 50 69 54 69 66 62 73Z" fill="currentColor"/></svg><span class="lwmt">RUNWAY</span></a>
           <nav aria-label="Footer" class="lflinks">
-            <button type="button" class="lfl" data-go="how-it-works">How it works</button>
+            <button type="button" class="lfl" data-go="methodology">Methodology</button>
             <button type="button" class="lfl" data-go="sources">Sources and credits</button>
             <button type="button" class="lfl" data-go="faq">FAQ</button>
             <button type="button" class="lfl" data-go="privacy">Privacy Policy</button>
@@ -1790,6 +1793,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
         </div>
         <div class="chat" id="chat" data-st="st.chat_message"></div><p id="chatLive" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)"></p>
         <div class="chips" id="sugg" data-st="st.pills"></div>
+        <details class="more qhist" id="askHist" hidden><summary id="askHistSum">Your questions</summary><ol id="askHistList"></ol></details>
       </div>
       <form class="composer" id="askForm" data-st="st.audio_input + st.chat_input">
         <button type="button" class="mic" id="micBtn" aria-label="Speak your question" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
@@ -1922,9 +1926,11 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   };
 
   /* One URL per screen. The screen switches here at once; the address bar follows through a 'nav' message.
-     Python checks the same paths (runway/bridge.py PAGES). Value: what RW.enter opens. */
+     Python checks the same paths (runway/bridge.py PAGES). Value: what RW.enter opens.
+     /how-it-works is the Methodology page's old address: it still opens the page and stays in the address bar (an alias,
+     not a redirect, so Back never bounces). Links Runway makes use the first path with that value, /methodology. */
   RW.PATHS = {'': 'home', 'map': 'map', 'shortlist': 'list', 'trends': 'trends', 'ask': 'ask', 'more': 'more',
-    'details': 'more details', 'text-size': 'more size', 'about': 'more about', 'how-it-works': 'more method', 'sources': 'more sources',
+    'details': 'more details', 'text-size': 'more size', 'about': 'more about', 'methodology': 'more method', 'how-it-works': 'more method', 'sources': 'more sources',
     'privacy': 'more privacy', 'terms': 'more terms', 'faq': 'more faq', 'case-study': 'more case', 'timeline': 'more timeline'};
   RW.go = path => {
     if(!Object.hasOwn(RW.PATHS, path)) return;
@@ -1936,7 +1942,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   const nav = document.getElementById('tabs');
   // The app's show() calls this with the screen's RW.PATHS value: mark the nav, then let the address bar follow.
   RW.shown = key => {
-    const path = Object.keys(RW.PATHS).find(p => RW.PATHS[p] === key); if(path === undefined) return;
+    const path = RW.PATHS[RW.page] === key ? RW.page : Object.keys(RW.PATHS).find(p => RW.PATHS[p] === key); if(path === undefined) return;
     const top = key.startsWith('more') ? 'more' : path;  // More's own pages keep More marked
     nav.querySelectorAll(':scope > [data-go]').forEach(b => b.dataset.go === top ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
     toTop.hidden = true; if(key !== 'home') document.getElementById('lMissing').hidden = true;
@@ -1961,7 +1967,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
     ['shortlist', 'Shortlist', 'saved kept flats town stamps file'], ['trends', 'Trends', 'price trends median per square metre history chart'],
     ['ask', 'Ask', 'question chat ai documents upload voice'], ['more', 'More', 'menu settings'],
     ['details', 'Your details', 'youngest buyer age average cpf ordinary account reset'], ['text-size', 'Text size', 'large font bigger'],
-    ['about', 'About Us', 'team notice disclaimer'], ['how-it-works', 'How it works', 'methodology formula flowchart tests'],
+    ['about', 'About Us', 'team notice disclaimer'], ['methodology', 'Methodology', 'how it works rag pipeline retrieval search documents ai formula flowchart requirements tests'],
     ['sources', 'Sources and credits', 'data licences photos credits'], ['privacy', 'Privacy Policy', 'personal data cookies storage anthropic claude'],
     ['terms', 'Terms', 'terms of use licence warranty advice'], ['faq', 'FAQ', 'questions answers'],
     ['case-study', 'Case study', 'example toa payoh yishun lease price'],
@@ -2000,7 +2006,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   });
 
   /* Back to top on the long pages: shows once the open screen (each screen scrolls itself) is well down */
-  const toTop = document.getElementById('toTop'), LONG = new Set(['', 'how-it-works', 'faq', 'sources', 'privacy', 'terms', 'timeline']);
+  const toTop = document.getElementById('toTop'), LONG = new Set(['', 'methodology', 'how-it-works', 'faq', 'sources', 'privacy', 'terms', 'timeline']);
   document.addEventListener('scroll', e => {
     const s = e.target; if(!s.classList || !s.classList.contains('screen')) return;
     toTop.hidden = !(LONG.has(RW.want ?? '') && s.scrollTop > 600);
@@ -3217,21 +3223,55 @@ const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wid
 const INTRO='<p>Hello. Ask me about using CPF, HDB loans, or lease. You can speak or type. I answer from official documents.</p>';
 function renderChat(){
   const all=[{bot:true,html:INTRO}].concat(S.chat);
-  $('#chat').innerHTML = all.map((m,i)=>m.me?`<div class="msg me">${m.html}</div>`:`<div class="msg bot ${m.warn?'warn':''}"><span class="who">Runway</span>${m.lang&&m.lang!=='en'?`<div class="mlang" lang="${LANGS[m.lang].tag}">${m.html}</div>`:m.html}${m.src?srcHtml(m.src):''}<button type="button" class="speakbtn" data-say="${i}" aria-pressed="false">${SPK}Listen</button>${m.fb?fbHtml(m,i):''}</div>`).join('');
+  $('#chat').innerHTML = all.map((m,i)=>m.me?`<div class="msg me" id="cm${i}" tabindex="-1">${m.html}</div>`:`<div class="msg bot ${m.warn?'warn':''}" id="cm${i}" tabindex="-1"><span class="who">Runway</span>${m.lang&&m.lang!=='en'?`<div class="mlang" lang="${LANGS[m.lang].tag}">${m.html}</div>`:m.html}${m.src?srcHtml(m.src):''}<button type="button" class="speakbtn" data-say="${i}" aria-pressed="false">${SPK}Listen</button>${m.fb?fbHtml(m,i):''}</div>`).join('');
   $$('[data-say]').forEach(b=>b.onclick=()=>{const m=all[+b.dataset.say];if(b.getAttribute('aria-pressed')==='true'){stopSpeak();return;}speak(plain(m.html),b,m.lang);});
   $$('[data-fb]').forEach(b=>b.onclick=()=>{const m=all[+b.dataset.fb]; if(m.fb.v===b.dataset.v) return; m.fb.v=b.dataset.v;
     b.parentElement.querySelectorAll('[data-fb]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
     RW.send('feedback',{rating:m.fb.v, lang:m.lang||'en', q:m.fb.q.length<=300?m.fb.q:''}).catch(()=>{});});  // never calls the AI
-  const hasSum=S.chat.some(m=>m.me);
-  $('#sugg').innerHTML = suggestions().map(s=>`<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('') + (hasSum?`<button class="chip" type="button" id="sumBtn" data-st="summarise chain">Sum up this chat</button>`:'');
+  const hasSum=S.chat.some(m=>m.me), qs=all.map((m,i)=>[m,i]).filter(([m])=>m.me&&!m.skip);  // questions, left out as history() leaves them out
+  $('#sugg').innerHTML = suggestions().map(s=>`<button class="chip" type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('') + (hasSum?`<button class="chip" type="button" id="sumBtn" data-st="summarise chain">Sum up this chat</button>`:'')
+    + (qs.length?`<button class="chip" type="button" id="dlBtn" data-st="st.download_button">Download this chat</button>`:'');
   $$('#sugg [data-q]').forEach(c=>c.onclick=()=>ask(c.dataset.q));
-  const sb=$('#sumBtn'); if(sb) sb.onclick=async()=>{sb.disabled=true; try{const r=await RW.send('summary',{history:history(40)}); pushBot({html:'<p><b>In short:</b></p>'+md(r.text)});}catch(e){sb.disabled=false;}};
+  const dl=$('#dlBtn'); if(dl) dl.onclick=saveChat;
+  // "Your questions": this visit's questions, each opening its answer (or the question while the answer is on its way)
+  $('#askHist').hidden=!qs.length; $('#askHistSum').textContent=`Your questions (${qs.length})`;
+  $('#askHistList').innerHTML=qs.map(([m,i])=>`<li><button type="button" data-hq="${i}">${m.html}</button></li>`).join('');
+  $$('[data-hq]').forEach(b=>b.onclick=()=>{const i=+b.dataset.hq, j=all.findIndex((m,k)=>k>i&&!m.me&&!m.typing), nx=all.findIndex((m,k)=>k>i&&m.me);
+    const t=$('#cm'+(j>i&&(nx<0||j<nx)?j:i)); if(!t) return;
+    t.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); t.focus({preventScroll:true});});
+  const sb=$('#sumBtn'); if(sb) sb.onclick=async()=>{sb.disabled=true; try{const r=await RW.send('summary',{history:history(40)}); pushBot({sum:true, html:'<p><b>In short:</b></p>'+md(r.text)});}catch(e){sb.disabled=false;}};
   const sc=$('#scrAsk'); requestAnimationFrame(()=>sc.scrollTop=sc.scrollHeight);
 }
 $('#autoRead').onchange=e=>{ if(!e.target.checked){stopSpeak();return;} const btns=$$('[data-say]'); if(btns.length) btns[btns.length-1].click(); };
 function fbHtml(m,i){return `<div class="fb" role="group" aria-label="Was this answer helpful?">${[['up','Helpful','M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3'],['down','Not helpful','M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17']].map(([v,t,d])=>`<button type="button" class="chip" data-fb="${i}" data-v="${v}" aria-pressed="${m.fb.v===v}" aria-label="${t}" title="${t}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;margin:auto"><path d="${d}"/></svg></button>`).join('')}<p class="small">A vote keeps this question, unless it has personal details, to improve Runway.</p></div>`;}
 function pushBot(b){S.chat.push(b);renderChat();$('#chatLive').textContent=plain(b.html);if(!b.warn)prefetchPack(plain(b.html),b.lang);if($('#autoRead').checked&&!MIC){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1],b.lang);}}
 function plain(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.small').forEach(x=>x.remove());return d.textContent.replace(/\s+/g,' ').trim();}
+// plain(), keeping one line per paragraph and "- " before each list item
+function plainLines(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.small').forEach(x=>x.remove());
+  d.querySelectorAll('li').forEach(x=>x.prepend('- ')); d.querySelectorAll('p,li').forEach(x=>x.append('\n'));
+  return d.textContent.split('\n').map(x=>x.replace(/\s+/g,' ').trim()).filter(Boolean).join('\n');}
+// "Download this chat": the chat as Markdown, made in the browser (text turns an answer's HTML into plain text).
+// It leaves out what history() leaves out: questions with personal details, declined ones and uploads.
+function chatMd(chat, when, text){
+  const out=['# Runway: Ask chat','',`Saved ${when}. Answers come from official documents; Runway is not financial advice. Check your own position with CPF Board and HDB.`];
+  let n=0;
+  chat.filter(m=>!m.typing&&!m.skip).forEach(m=>{
+    if(m.me){ out.push('',`## Question ${++n}`,'',text(m.html)); return; }
+    if(m.sum){ out.push('','## Summary','',text(m.html).replace(/^In short:\s*/,'')); return; }
+    out.push('','### Answer','',text(m.html));
+    const docs=new Map();  // one line per document, with the [n] numbers the answer cites, as under the answer
+    (m.src||[]).forEach((s,i)=>{const k=s.url||s.title; if(!docs.has(k)) docs.set(k,{s,n:[]}); docs.get(k).n.push(i+1);});
+    if(docs.size) out.push('','Sources:',...[...docs.values()].map(({s,n})=>`- ${n.map(x=>`[${x}]`).join('')} ${[s.publisher,s.title].filter(Boolean).join(' · ')}${/^https:\/\//i.test(s.url||'')?': '+s.url:''}`));
+  });
+  return out.join('\n')+'\n';
+}
+function saveChat(){  // nothing goes to the server: the file is made here and saved on this device
+  const d=new Date(), day=[d.getFullYear(),d.getMonth()+1,d.getDate()].map(x=>String(x).padStart(2,'0')).join('-');
+  const text=chatMd(S.chat, d.toLocaleString('en-SG',{day:'numeric',month:'long',year:'numeric',hour:'numeric',minute:'2-digit'}), plainLines);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/markdown;charset=utf-8'})); a.download=`runway_chat_${day}.md`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+  toast(`Chat saved as ${a.download}`);
+}
 
 /* ---------- document upload → profile → town recommendations ---------- */
 const SAMPLE_DOC = `Sample buyer notes (example)
@@ -3403,7 +3443,7 @@ function renderMore(){
     ${group('rev','Reviewer tools',[`<button type="button" data-rev="upload"><span>Upload Ask documents<small>Add or replace an official document that Ask Runway searches</small></span>${ICON.chev}</button>`,row('about','Edit About Us','Open the page, then choose Edit this page'),row('method','Edit How it works','Reviewer and public versions'),row('faq','Edit the FAQ','Add, change or remove questions')])}`:''}
     ${group('you','Your settings',[row('details','Your details',`Youngest ${S.age} · average ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}`),row('size','Text size',`${textPx()} px`)])}
     ${group('guides','Guides',[row('faq','FAQ','Common questions, each with its official source'),row('timeline','Buying timeline','The steps from HFE letter to keys, each with its official source'),row('case','Case study','One flat type, two towns, two leases, from real sales')])}
-    ${group('about','About Runway',[row('about','About Us','What Runway is, notice, team'),row('method','How it works','Methodology and flowcharts'),row('sources','Sources and credits','Data, map, documents, photos')])}
+    ${group('about','About Runway',[row('about','About Us','What Runway is, notice, team'),row('method','Methodology','How it works: the AI pipeline, rules and flowcharts'),row('sources','Sources and credits','Data, map, documents, photos')])}
     ${group('legal','Legal',[row('privacy','Privacy Policy','What happens to what you type or upload'),row('terms','Terms','Educational use, no advice, licences')])}
     ${S.user?'<button class="btn ghost" type="button" id="outBtn">Log out</button>':'<button class="btn" type="button" id="inBtn">Log in for the reviewer view</button>'}`;
   $$('[data-sub]').forEach(b=>b.onclick=()=>sub(b.dataset.sub));
@@ -3412,7 +3452,7 @@ function renderMore(){
   const ib=$('#inBtn'); if(ib) ib.onclick=()=>RW.openLogin();
 }
 function signOut(){closeSheet();RW.logout();}
-const SUBNAME={details:'Your details',size:'Text size',about:'About Us',method:'How it works',sources:'Sources and credits',privacy:'Privacy Policy',terms:'Terms',faq:'FAQ',case:'Case study',timeline:'Buying timeline'};
+const SUBNAME={details:'Your details',size:'Text size',about:'About Us',method:'Methodology',sources:'Sources and credits',privacy:'Privacy Policy',terms:'Terms',faq:'FAQ',case:'Case study',timeline:'Buying timeline'};
 function renderSub(){
   S.editing=false;  // a fresh page is never mid-edit
   const b=$('#subBody'), s=S.sub, top=crumbs(['more','More'],SUBNAME[s]);
@@ -3473,8 +3513,10 @@ const REV = () => S.role === 'full';  // logged in as a reviewer (the server che
 const FULL = () => REV() && !S.asPublic;  // a reviewer can look at, and edit, the public version too
 
 /* ---------- reviewer tools: edit pages, edit the FAQ, upload Ask documents (saved by runway/content.py) ---------- */
-// About Us and How it works have a reviewer and a public version; each page's saved text replaces the built one
-const PAGEKEY={about:()=>'about.'+(FULL()?'full':'brief'), method:()=>'method.'+(FULL()?'full':'brief'), privacy:()=>'privacy', terms:()=>'terms'};
+// About Us and Methodology have a reviewer and a public version; each page's saved text replaces the built one.
+// Methodology's keys are new (the How it works page saved as method.full / method.brief): an edit of the old page would
+// hide the RAG pipeline and the new checklist, so it is no longer shown. It stays in the saved content, unused.
+const PAGEKEY={about:()=>'about.'+(FULL()?'full':'brief'), method:()=>'methodology.'+(FULL()?'full':'brief'), privacy:()=>'privacy', terms:()=>'terms'};
 const PAGEBUILT={about:()=>aboutHtml(), method:()=>methodHtml(), privacy:()=>privacyHtml(), terms:()=>termsHtml()};
 const edited=k=>((RW.content||{}).pages||{})[k];
 const pageHtml=s=>{const o=edited(PAGEKEY[s]()); return o?`<div class="doctext">${o}</div>`:PAGEBUILT[s]();};  // o was cleaned by the server
@@ -3646,7 +3688,7 @@ function aboutHtml(){
 }
 const FLOW_MAP = `<h2>Flowchart · Use case 1: Map</h2>
   <div class="flow">
-    <div class="fn t">Open Runway (guest, or reviewer log-in)</div><div class="ar"></div>
+    <div class="fn t">Open Runway (as a guest, or log in as user or admin)</div><div class="ar"></div>
     <div class="fn">Youngest age, rough CPF, first town</div><div class="ar"></div>
     <div class="fn">Town map: blocks, MRT, ${SPAN} sales</div><div class="ar"></div>
     <div class="fn">Tap a diamond, pick a sale</div><div class="ar"></div>
@@ -3669,24 +3711,68 @@ const FLOW_ASK = `<h2>Flowchart · Use case 2: Ask Runway</h2>
     <div class="fn">AI answers only from the passages, with numbered sources</div><div class="ar"></div>
     <div class="fn t">Answer + "Where this comes from" + Listen</div>
   </div>`;
+/* ---------- Methodology (the page was "How it works"; /how-it-works still opens it) ---------- */
+/* What the Methodology page says about retrieval and accounts, in one place: correct it here if runway/rag.py,
+   runway/llm.py or the login roles change. Used by the pipeline, the Accounts table and the requirements checklist. */
+const METHOD_FACTS = {
+  retrieval: 'Hybrid search: BM25 keyword ranking plus a FAISS vector index of bge-small-en-v1.5 embeddings (made with fastembed on Runway\'s server), fused with reciprocal rank fusion. If the vector index is unavailable, BM25 alone is used.',
+  vector: 'A FAISS vector index of bge-small-en-v1.5 embeddings, made with fastembed on Runway\'s server (no API)',
+  langchain: 'Built on LangChain core interfaces: a LangChain retriever and ChatPromptTemplate prompts, around the Anthropic API',
+  roles: [['Admin', 'Uploads and replaces Ask documents, and edits the pages and the FAQ.'],
+          ['User', 'Logs in to see the full About Us and Methodology, and can ask questions.'],
+          ['Guest', 'No account needed. Uses everything else.']],
+  accounts: 'Two built-in accounts, admin and user. Passwords are kept only as salted PBKDF2-SHA256 hashes (600,000 rounds). The server keeps the role in the session and checks it on every admin action. Five wrong passwords pause a username for a minute.',
+};
+const README_API = 'https://github.com/dansyfq/project-runway#api-and-model-usage';
+// For everyone: how Ask Runway gets from the documents to an answer, and who can do what
+const methodPipeline = () => `<h2>How Ask Runway answers</h2>
+  <p>Ask Runway uses retrieval-augmented generation (RAG): it finds the official passages first, then the AI writes from those passages only.</p>
+  <ol class="steps">
+    <li><b>Documents.</b> 32 official documents from CPF Board, HDB, MND, MOM, IRAS and CEA, each kept as text with its source link. An Admin can upload a new one or replace one.</li>
+    <li><b>Chunking.</b> Each document is split at its headings, then into passages of 160 words. Each passage overlaps the next by 40 words, so a rule is not cut in half.</li>
+    <li><b>Screening.</b> A question with an NRIC, phone number or email, a request for advice, an attempt to change Runway's rules or an off-topic question is declined before any search. No AI is used for this.</li>
+    <li><b>Retrieval.</b> ${METHOD_FACTS.retrieval} The top 5 passages go forward. A question in Chinese, Malay or Tamil is put into English first.</li>
+    <li><b>Prompt.</b> The passages, numbered [1] to [5], go to the AI with the question, the last few chat turns and strict rules: answer only from the passages, cite them, give no advice. ${METHOD_FACTS.langchain}.</li>
+    <li><b>Answer.</b> Claude writes a short answer with numbered citations. "Where this comes from" under the answer links each document.</li>
+    <li><b>Number guard.</b> Every figure in the answer must be in the passages, the question or the chat. If one isn't, Runway shows the passages instead.</li>
+    <li><b>Fallback.</b> With no API key, the hourly limit reached or the AI unavailable, Ask Runway shows the matching official passages instead of an AI answer.</li>
+  </ol>
+  <p class="small">The model, its settings and what is sent to the Anthropic API are in the README, <a href="${README_API}" target="_blank" rel="noopener">API and model usage${NEWTAB}</a>.</p>
+  <h2>Accounts</h2>
+  <div class="scroll"><table class="tbl"><tbody>${METHOD_FACTS.roles.map(([r, t]) => `<tr><td>${r}</td><td>${t}</td></tr>`).join('')}</tbody></table></div>
+  <p class="small">${METHOD_FACTS.accounts}</p>`;
 function methodHtml(){
+  const head = `<h1>Methodology</h1>
+  <p class="small">How it works: where Runway's numbers and answers come from.</p>`;
   if(!FULL()) return `<div class="doctext">
-  <h1>How it works</h1>
+  ${head}
   <p>Runway's calculator does the numbers from HDB's sales records and the official rules. The AI only explains.</p>
   <div class="scroll"><table class="tbl"><tbody>
     <tr><td>Lease reaches age 95</td><td>Full CPF</td></tr>
     <tr><td>Lease ends earlier</td><td>CPF share = (lease − 20) ÷ (95 − age − 20)</td></tr>
     <tr><td>20 years or less left</td><td>No CPF, no HDB loan</td></tr></tbody></table></div>
+  ${methodPipeline()}
   ${FLOW_MAP}${FLOW_ASK}</div>`;
   const t1=(()=>{const a=S.age,v=S.avg;S.age=25;S.avg=25;const r=calc(550000,65);S.age=a;S.avg=v;return r;})();
-  const req=[['Information from several official sources','32 documents + HDB sales data + OneMap'],['Personalised with non-identifying inputs','Ages, rough CPF, town; NRIC and phone blocked'],['Explanations and follow-up questions','Ask Runway, Why?, chat summary'],['Text, tables, charts and forms','Map, verdict card, shortlist, file export'],['At least two use cases','Map (Town Safari) and Ask Runway'],['About Us and Methodology pages','More → About Us, How it works'],['One flowchart per use case','Below'],['Deployed with a password','Streamlit Community Cloud; reviewer log-in with hashed passwords in secrets (guests get the short view)'],['Required disclaimer','About Us → Notice, linked from the map']];
+  const req=[['RAG-based query','Ask Runway: searches the 32 documents, then answers only from the passages found, with numbered sources (How Ask Runway answers, below)'],
+    ['Document management','Admin: More → Upload Ask documents adds or replaces a document; Ask searches it straight away'],
+    ['Vector store',METHOD_FACTS.vector],
+    ['LangChain',METHOD_FACTS.langchain],
+    ['Login with Admin and User roles',METHOD_FACTS.roles.map(([r,t])=>`${r}: ${t}`).join(' ')],
+    ['Summarisation and export','Ask: Sum up this chat, Download this chat (a Markdown file). Shortlist: Save shortlist as a file (CSV), Print summary'],
+    ['Question history','Ask: Your questions lists this visit\'s questions, each opening its answer; Download this chat keeps them'],
+    ['Sample document set','32 official CPF Board, HDB, MND, MOM, IRAS and CEA documents (More → Sources and credits)'],
+    ['Public deployment','<a href="https://runway-hdb.streamlit.app" target="_blank" rel="noopener">runway-hdb.streamlit.app'+NEWTAB+'</a> on Streamlit Community Cloud, open to guests'],
+    ['API and model usage documented','README, <a href="'+README_API+'" target="_blank" rel="noopener">API and model usage'+NEWTAB+'</a>'],
+    ['About Us and Methodology pages','More → About Us, Methodology']];
   return `<div class="doctext">
-  <h1>How it works</h1>
+  ${head}
   <p>Every number comes from plain arithmetic on HDB's transaction records and the published rules. The AI only explains. It never calculates.</p>
   <h2>Requirements checklist</h2>
   <div class="scroll"><table class="tbl"><thead><tr><th>Requirement</th><th>Where</th></tr></thead><tbody>${req.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</tbody></table></div>
+  ${methodPipeline()}
   <h2>Data flow</h2>
-  <ul><li><b>Offline:</b> pandas combines HDB's 5 resale files (986,090 sales), works out each town's lease effect from Jan 2024 – Sep 2026 sales, and geocodes every block with OneMap addresses.</li><li><b>Map:</b> town outlines, roads, MRT and the ${SPAN} sales are drawn with Leaflet. The calculator runs in the app for your age.</li><li><b>Ask:</b> 32 official documents are split into 349 passages. Keyword (BM25) search picks the top 5 passages (a question in another language is put into English first), they go to the AI, Claude, with strict rules, and the answer shows its sources.</li></ul>
+  <ul><li><b>Offline:</b> pandas combines HDB's 5 resale files (986,090 sales), works out each town's lease effect from Jan 2024 – Sep 2026 sales, and geocodes every block with OneMap addresses.</li><li><b>Map:</b> town outlines, roads, MRT and the ${SPAN} sales are drawn with Leaflet. The calculator runs in the app for your age.</li><li><b>Ask:</b> the 32 official documents become 349 passages, searched and answered as set out in How Ask Runway answers, above.</li></ul>
   <h2>The rule</h2>
   <div class="scroll"><table class="tbl"><tbody>
     <tr><td>Lease needed</td><td>95 − youngest buyer's age</td></tr>
@@ -3730,7 +3816,7 @@ function timelineHtml(){
     <p class="small">Source: <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.publisher)} · ${esc(x.title)}${NEWTAB}</a></p></li>`).join('')}</ol>
   <p class="small">Runway is a learning project, not financial advice. HDB's My Flat Dashboard guides you through your own purchase step by step.</p></div>`;
 }
-const LEGAL_DATE='14 November 2026';
+const LEGAL_DATE='20 November 2026';
 function privacyHtml(){
   return `<div class="doctext"><h1>Privacy Policy</h1><p class="small">Last updated: ${LEGAL_DATE}</p>
   <p>Runway is a free educational prototype with no public accounts, analytics or advertising. Its database, when one is set up, keeps only answer votes and the reviewers' edits and documents, never your session or details. This is what happens to what you type or upload, as the app is built today.</p>
@@ -3739,6 +3825,7 @@ function privacyHtml(){
     <li>Others go to Runway's server with your last few chat turns, the answer language you chose and, once you set it, the youngest buyer's age. The server checks again and, without the AI, declines personal details, attempts to change its rules, requests for advice and off-topic questions.</li>
     <li>With the AI on, Anthropic (the maker of Claude) gets your question, up to six recent turns, the age if set and the matching official passages, to write the answer. A question that is not in English also goes there, with your previous one, to be put into English for the document search. With the AI off or busy, nothing goes to Anthropic and you see the official pages.</li>
     <li>"Why?" has the AI explain a flat's calculator figures (age, lease, percentages, the town's lease effect), with no chat history. "Sum up this chat" sends the chat so far; the AI reads the last 12 turns.</li>
+    <li>"Download this chat" makes a Markdown file of your questions, the answers, their sources and any summary, in your browser, and saves it on your device. Questions with personal details, and declined ones, are left out. Nothing is sent to Runway's server for it, and Runway keeps no copy.</li>
     <li>Voice input uses your browser's speech recognition (some browsers, such as Chrome, send the audio to their own speech service); Runway gets only the text. The mic says a short greeting, then listens until you tap it again or stop talking for a few seconds.</li>
     <li>Read aloud is on until you turn it off. It and the mic's greeting use Runway's voice pack: the server sends the words being read (never your voice) to Microsoft's free online voices. If that fails, your device's voices read them.</li></ul>
   <h2>Answer feedback</h2><ul>
