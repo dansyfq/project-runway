@@ -447,6 +447,17 @@ def test_home_numbers_reach_the_app_only_on_purpose():
     assert "under the name runway-theme" in GAME and "under the name runway-details" in GAME
 
 
+def test_home_calculator_and_your_town_section_are_linked():
+    # the calculator's town picker opens that town's card, and the town section repeats the calculator's numbers
+    assert "sel.onchange = () => { if(sel.value) gotoTown(sel.value); else syncHeart(); };" in GAME
+    assert "async function gotoTown(id)" in GAME and "T.list.findIndex(t => t.id === id)" in GAME
+    assert "if(window.RWYours) RWYours();" in GAME and "window.RWYours = syncYours;" in GAME
+    assert 'id="lYours"' in GAME and "Your numbers from the calculator:" in GAME
+    assert "landingVerdict(L.age, L.lease)" in GAME[GAME.index("function syncYours()"):GAME.index("window.RWYours = syncYours;")]
+    # the stand-in used until the towns load is Toa Payoh's value in the data
+    assert "{name: 'Toa Payoh', pct: 1.5, low: false}" in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
