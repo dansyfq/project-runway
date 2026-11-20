@@ -2770,8 +2770,8 @@ const SPD_ITEMS=[
   {k:'marital',t:'Marital status',use:'Whether you buy as a couple or as a single.'},
   {k:'hdb',t:'HDB flat ownership history',use:'Whether you count as a first-timer.'},
   {k:'cit',t:'Citizenship',use:'Grant rules that depend on citizenship.'}];
-// Reviewers only (logged in, reviewer version): the public site carries no demo wording. FULL() is the page's own reviewer check.
-const spdCard=()=>!FULL()?'':`<div class="spdcard"><div><b>Skip the typing?</b><span class="small">Try the Singpass demo. It shows how Runway could fill in your age, CPF and income for you, with your consent. It is not connected to Singpass.</span></div><button type="button" class="btn ghost sm" id="spdOpen">Try the demo</button></div>`;
+// Open to everyone: it is a labelled mock-up (made-up people, nothing sent anywhere), so it needs no reviewer login.
+const spdCard=()=>`<div class="spdcard"><div><b>Skip the typing?</b><span class="small">Try the Singpass demo. It shows how Runway could fill in your age, CPF and income for you, with your consent. It is not connected to Singpass.</span></div><button type="button" class="btn ghost sm" id="spdOpen">Try the demo</button></div>`;
 function spdAge(dob,today){
   const t=today||new Date(), b=new Date(dob+'T00:00:00');  // dob is "YYYY-MM-DD"
   let a=t.getFullYear()-b.getFullYear();
@@ -2798,7 +2798,7 @@ function spdApply(p,keys){
   return got;
 }
 function spdMarkup(name,person,keys,got){
-  const bar='<p class="demobar"><b>Demonstration only.</b> This is not Singpass and is not connected to it. The people shown are made up, and nothing here is sent or stored.</p>';
+  const bar='<p class="demobar"><b>Demonstration only.</b> This is not Singpass and is not connected to it. The people shown are made up. Nothing here is sent to anyone, and what it fills in is forgotten when you close the tab.</p>';
   if(name==='pick') return `<h2 style="font-size:1.6rem">Singpass demo</h2>${bar}
     <p class="small">Pick a made-up person to sign in as. A real version would ask you to approve this in the Singpass app instead.</p>
     ${SPD.map(p=>`<button type="button" class="who" data-p="${p.id}"><b>${p.label}</b><span>${p.blurb} · born ${new Date(p.dob+'T00:00:00').toLocaleDateString('en-SG',{month:'long',year:'numeric'})} · ${p.cit}</span></button>`).join('')}`;
