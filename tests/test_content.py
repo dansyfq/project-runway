@@ -33,12 +33,12 @@ def send(kind, state, **payload):
 
 
 def reviewer():
-    return {"user": "reviewer", "role": "full"}
+    return {"user": "reviewer", "role": "admin"}
 
 
 @pytest.mark.parametrize("kind", ["docs", "upload_doc", "save_page", "save_faq"])
 def test_guests_cannot_use_reviewer_tools(kind):
-    assert send(kind, {}, key="about.full", html="<p>x</p>") == {"ok": False, "error": "Log in as a reviewer first."}
+    assert send(kind, {}, key="about.full", html="<p>x</p>") == {"ok": False, "error": "Log in as an admin first."}
 
 
 def test_clean_html_keeps_formatting_and_drops_scripts():

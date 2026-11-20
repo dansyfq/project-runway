@@ -1,9 +1,9 @@
-"""Reviewer Insights (More > Insights): how Ask Runway is doing, for the person who looks after its documents.
+"""Admin Insights (More > Insights): how Ask Runway is doing, for the admin who looks after its documents.
 
-- Documents: how many official documents and passages Ask searches, and which were uploaded by a reviewer.
+- Documents: how many official documents and passages Ask searches, and which were uploaded by an admin.
 - Quality: the latest eval run (python eval/run_eval.py), including retrieval by search mode.
 - Feedback: Helpful / Not helpful votes, by answer language, and the questions people marked Not helpful (only
-  those that passed screening are ever kept: runway/bridge.py), so a reviewer knows which document to add next.
+  those that passed screening are ever kept: runway/bridge.py), so the admin knows which document to add next.
 - AI use: calls in the last hour against the process-wide cap.
 Reads only what Runway already keeps; nothing here is new personal data.
 """

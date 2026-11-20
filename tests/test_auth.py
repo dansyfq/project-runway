@@ -64,10 +64,15 @@ def test_seed_reads_env(tmp_path, monkeypatch):
 
 
 def test_no_credentials_in_tracked_sources():
-    """Guard: nothing under runway/, pages or app.py may contain an [accounts] table or a hash."""
+    """Guard: nothing under runway/, pages or app.py may contain an [accounts] table or a hash, except the
+    built-in accounts' hashes in runway/auth.py (BUILTIN_USERS)."""
+    from runway.auth import BUILTIN_USERS
+
     for path in [ROOT / "app.py", *ROOT.glob("runway/*.py"), *ROOT.glob("app_pages/*.py")]:
         if path.exists():
             text = path.read_text()
+            for _, stored in BUILTIN_USERS.values():
+                text = text.replace(f'"{stored}"', "") if path.name == "auth.py" else text
             assert "pbkdf2_sha256$" not in text.replace('f"{ALGO}$', "")
             assert "[accounts]" not in text
 

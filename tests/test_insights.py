@@ -1,4 +1,4 @@
-"""More > Insights: the reviewer's view of Ask Runway's documents, quality, feedback and AI use."""
+"""More > Insights: the admin's view of Ask Runway's documents, quality, feedback and AI use."""
 
 import json
 
@@ -23,11 +23,14 @@ def bot(monkeypatch):
     return LLM()
 
 
-def test_insights_needs_the_reviewer_login(bot, index):
-    assert send("insights", {}, bot, index) == {"ok": False, "error": "Log in as a reviewer first."}
+def test_insights_needs_the_admin_role(bot, index):
+    refused = {"ok": False, "error": "Log in as an admin first."}
+    assert send("insights", {}, bot, index) == refused  # a guest
+    assert send("insights", {"user": "user", "role": "user"}, bot, index) == refused  # the user account: no Insights
+    assert send("insights", {"user": "reviewer", "role": "full"}, bot, index) == refused  # the old role name
 
 
-def test_insights_for_a_reviewer(bot, index, tmp_path, monkeypatch):
+def test_insights_for_the_admin(bot, index, tmp_path, monkeypatch):
     import runway.bridge
 
     log = tmp_path / "feedback.jsonl"
@@ -38,7 +41,7 @@ def test_insights_for_a_reviewer(bot, index, tmp_path, monkeypatch):
         {"rating": "down", "question": "", "lang": "ms", "date": "2026-11-04"},  # screened out: no question kept
     ]) + "\nnot json\n")
     monkeypatch.setattr(runway.bridge, "FEEDBACK_FILE", log)
-    r = send("insights", {"role": "full"}, bot, index)
+    r = send("insights", {"user": "admin", "role": "admin"}, bot, index)
     assert r["ok"]
     d = r["data"]
     assert d["corpus"]["docs"] >= 30 and d["corpus"]["passages"] == len(index.chunks) and "vector" in d["corpus"]["mode"]

@@ -1,9 +1,9 @@
 """Runway: how much lease you have left.
 
 The interface (runway_game/index.html, built from the approved design) runs full-window as a
-Streamlit component: landing page, map game, Ask and More. Visitors use it as guests; reviewers
-can log in for the full About Us and How it works. Python checks logins and answers questions
-from the official documents (runway/bridge.py).
+Streamlit component: landing page, map game, Ask and More. Visitors use it as guests; the `user` and
+`admin` accounts see the full About Us and How it works, and `admin` also manages documents and pages.
+Python checks logins and answers questions from the official documents (runway/bridge.py).
 Run locally with:  streamlit run app.py
 """
 
@@ -14,6 +14,7 @@ from urllib.parse import urlparse
 import streamlit as st
 import streamlit.components.v1 as components
 
+from runway.auth import load_users
 from runway.bridge import PAGES, handle
 from runway.config import get_setting
 from runway.content import load_content
@@ -90,11 +91,13 @@ def switch_page(page) -> None:
     st.empty()  # hands control to the rerun just requested, as st.switch_page does
 
 
-def configured_users() -> dict[str, str]:
+def configured_users() -> dict[str, tuple[str, str]]:
+    """The built-in admin and user accounts, then any in Secrets [auth.users] (same name: Secrets wins). runway/auth.py"""
     try:
-        return {k.lower(): v for k, v in st.secrets["auth"]["users"].items()}
+        secret = st.secrets["auth"]["users"]
     except (KeyError, FileNotFoundError):
-        return {}
+        secret = {}
+    return load_users(secret, get_setting("BUILTIN_ACCOUNTS", "admin,user"))
 
 
 state = st.session_state

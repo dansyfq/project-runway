@@ -1,9 +1,10 @@
 """Messages between the Runway interface (runway_game/index.html) and Python.
 
 The interface sends one message at a time: {"id", "type", "payload"}. `handle` returns the reply
-value; the host sends it back keyed by id. Everyone can use Runway as a guest (the "demo" view);
-logging in gives the reviewer view (full About Us and How it works) and the reviewer tools: upload Ask documents
-and edit pages and the FAQ (runway/content.py). Passwords, the AI and the documents stay server-side.
+value; the host sends it back keyed by id. Everyone can use Runway as a guest (role "brief");
+logging in as a user (role "user") shows the full About Us and How it works, and as an admin (role "admin") also
+gives the admin tools: upload Ask documents and edit pages and the FAQ (runway/content.py). Roles: runway/auth.py.
+Passwords, the AI and the documents stay server-side.
 """
 
 from __future__ import annotations
@@ -16,17 +17,19 @@ from collections.abc import MutableMapping
 from pathlib import Path
 
 from runway.auth import check_login
+from runway.chain import retrieve
 from runway.game_data import load_towns, recent_months, town_photo
 from runway.llm import AI_BUSY, INVENTED_FIGURE, LLM, language, screen_question
 from runway.rag import Chunk, Retriever
 
 # Every screen's URL path and its name. app.py makes one page per entry; the interface (RW.PATHS) uses the same paths.
+# /how-it-works is the Methodology page's old address, kept so old links still open it.
 PAGES = {"": "Runway — HDB CPF age-95 checker", "map": "Map", "shortlist": "Shortlist", "trends": "Trends", "ask": "Ask",
          "more": "More", "details": "Your details", "text-size": "Text size", "about": "About Us",
-         "how-it-works": "How it works", "sources": "Sources and credits", "privacy": "Privacy Policy", "terms": "Terms",
-         "faq": "FAQ", "case-study": "Case study", "timeline": "Buying timeline", "lease-explorer": "Lease explorer",
+         "methodology": "Methodology", "how-it-works": "Methodology", "sources": "Sources and credits", "privacy": "Privacy Policy",
+         "terms": "Terms", "faq": "FAQ", "case-study": "Case study", "timeline": "Buying timeline", "lease-explorer": "Lease explorer",
          "insights": "Insights"}
-REVIEWER_ONLY = {"docs", "upload_doc", "save_page", "save_faq", "insights"}  # runway/content.py, runway/insights.py
+ADMIN_ONLY = {"docs", "upload_doc", "save_page", "save_faq", "insights"}  # runway/content.py, runway/insights.py; role "admin" only
 MAX_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
 # username -> (failed attempts, locked until). Module-level, so a page reload (a new session) can't reset it.
@@ -76,7 +79,7 @@ def situation_from(age) -> str:
     return ""
 
 
-def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, index: Retriever) -> dict:
+def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retriever) -> dict:
     kind, payload = msg.get("type"), msg.get("payload")
     if not isinstance(kind, str):  # the browser is untrusted
         return {"ok": False, "error": "bad message"}
@@ -95,10 +98,11 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
                 LOCKS.clear()
             attempts += 1
             LOCKS[user] = (0, time.time() + LOCKOUT_SECONDS) if attempts >= MAX_ATTEMPTS else (attempts, 0.0)
-        if check_login(user, str(payload.get("p", ""))[:256], users):
+        role = check_login(user, str(payload.get("p", ""))[:256], users)  # "admin" or "user"; None if wrong
+        if role:
             LOCKS.pop(user, None)
-            state.update(user=user, role="full")
-            return {"ok": True, "user": user, "role": "full"}
+            state.update(user=user, role=role)
+            return {"ok": True, "user": user, "role": role}
         return {"ok": False, "error": "That username and password don't match."}
 
     if kind == "logout":
@@ -107,9 +111,9 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
         state.get("replies", []).clear()  # in place: the host appends this reply to the same list
         return {"ok": True, "role": "brief"}
 
-    if kind in REVIEWER_ONLY:  # checked here, not just hidden in the interface: the browser is untrusted
-        if state.get("role") != "full":
-            return {"ok": False, "error": "Log in as a reviewer first."}
+    if kind in ADMIN_ONLY:  # checked here, not just hidden in the interface: the browser is untrusted
+        if state.get("role") != "admin":  # a logged-in "user" is refused too
+            return {"ok": False, "error": "Log in as an admin first."}
         from runway import content
 
         if kind == "insights":
@@ -145,14 +149,15 @@ def handle(msg: dict, state: MutableMapping, users: dict[str, str], bot: LLM, in
             if not isinstance(facts, dict) or not REQUIRED_FACTS <= facts.keys():
                 return {"ok": False, "error": "bad facts"}
             facts = {k: str(facts[k])[:60] for k in FACT_KEYS if k in facts}  # only known keys reach the AI
-            sources = index.search(WHY_QUERY[facts.get("Lease covers youngest buyer to age 95") == "yes"], k=4)
+            sources = retrieve(index, WHY_QUERY[facts.get("Lease covers youngest buyer to age 95") == "yes"], k=4)
             text, used_llm = bot.explain(facts, sources, lang=lang)
             return {"text": text, "sources": source_view(sources), "offline": False, "lang": lang if used_llm else "en",
                     "note": NUMBERS_NOTE if used_llm else NUMBERS_NOTE + " Written from a fixed template."}
         history = clean_history(payload.get("history"), 6)
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
         # A question that will be declined must not spend an AI call on the search (the hourly budget is shared).
-        sources = [] if screen_question(question) else index.search(bot.search_query(f"{previous} {question}", lang), k=5)
+        sources = ([] if screen_question(question)
+                   else retrieve(index, bot.search_query(f"{previous} {question}", lang), k=5))
         answer = bot.answer(question, sources, history=history, situation=situation_from(payload.get("age")), lang=lang)
         offline = bool(answer.error) or (not bot.available and not answer.blocked)
         why = {INVENTED_FIGURE: "used a figure not in the documents", AI_BUSY: "has reached its limit for this hour",

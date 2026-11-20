@@ -1,14 +1,16 @@
 """Retrieval over the fixed library of official CPF, HDB and MND documents.
 
 Hybrid search: keyword search (BM25) with a few everyday synonyms, so exact terms ("Valuation Limit", "HFE") and
-common paraphrases ("deposit") find the right passage, merged with a TF-IDF vector store (cosine similarity) by
-weighted reciprocal rank fusion. A question in another language is put into English first
-(runway.llm.LLM.search_query).
+common paraphrases ("deposit") find the right passage, merged with a vector store (cosine similarity) by
+weighted reciprocal rank fusion. The vector store is FAISS over bge-small embeddings (runway/vector.py), with TF-IDF
+vectors (VectorIndex below) as the fallback while it loads or if it can't. A question in another language is put into
+English first (runway.llm.LLM.search_query). runway/chain.py puts this search behind LangChain's retriever interface.
 """
 
 from __future__ import annotations
 
 import re
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -132,8 +134,8 @@ STOPWORDS = set(
 class VectorIndex:
     """A small vector store: every passage is a TF-IDF vector (L2-normalised) and a query is matched by cosine similarity.
 
-    shortcut: sparse term vectors, not neural embeddings (Anthropic has no embeddings service, and a local embedding
-    model is too big for Streamlit Community Cloud); swap `embed` for an embedding call to upgrade.
+    The fallback for runway.vector.FaissStore (neural embeddings): used while that loads, if it can't, or with
+    VECTOR_BACKEND = "tfidf".
     """
 
     def __init__(self, texts: list[str]):
@@ -164,8 +166,9 @@ class VectorIndex:
         return self.matrix @ self.embed(self.words(query))
 
 
-# eval/questions.json (python eval/run_eval.py): at 0.3 hybrid matches BM25 at top 1 (15/19) and beats it at top 3
-# (19 vs 18); at 1.0 top 1 fell to 13. Re-run the eval after changing it.
+# eval/questions.json (python eval/run_eval.py): with TF-IDF vectors, at 0.3 hybrid matches BM25 at top 1 (15/19) and
+# beats it at top 3 (19 vs 18); at 1.0 top 1 fell to 13. With FAISS (bge-small), 0.3 gives 17/19 first (0.5: 17,
+# 1.0: 15). Re-run the eval after changing it.
 VECTOR_WEIGHT = 0.3
 
 
@@ -179,23 +182,60 @@ def fuse(rankings: list[list[int]], weights: list[float] | None = None, k: int =
 
 
 class Retriever:
-    mode = "hybrid (BM25 keywords + TF-IDF vector store)"
+    mode = "hybrid (BM25 keywords + TF-IDF vector store)"  # this instance's mode changes once FAISS is ready
+    FAISS_MODE = "hybrid (BM25 keywords + FAISS vector store, bge-small embeddings)"
 
-    def __init__(self, chunks: list[Chunk]):
+    def __init__(self, chunks: list[Chunk], embedder=None):
+        """embedder: None for the process's bge-small model (unless VECTOR_BACKEND is "tfidf"), False for TF-IDF
+        vectors only, or any object like runway.vector.Embedder."""
         self.chunks = chunks
         texts = [f"{c.title} {c.heading} {c.text}" for c in chunks]
         self.bm25 = BM25Okapi([tokenize(t) for t in texts])
         self.vectors = VectorIndex(texts)
+        self.dense = None  # runway.vector.FaissStore once loaded
+        self.dense_ready = threading.Event()
+        from runway import vector
+
+        if embedder is False or (embedder is None and vector.backend() == "tfidf"):
+            self.dense_ready.set()
+            return
+        # In a thread, so a slow model download or a big re-embed can't hold up the app: TF-IDF until it is done.
+        threading.Thread(target=self._load_dense, args=(embedder,), daemon=True).start()
+        self.dense_ready.wait(vector.WAIT_SECONDS)
+
+    def _load_dense(self, embedder) -> None:
+        from runway import vector
+
+        try:
+            emb = embedder if embedder is not None else vector.embedder()
+            if emb is not None:
+                self.dense = vector.FaissStore(self.chunks, emb)
+                self.mode = self.FAISS_MODE
+        except Exception as exc:
+            print(f"[runway] vector search falls back to TF-IDF: {type(exc).__name__}: {exc}"[:300], flush=True)
+        finally:
+            self.dense_ready.set()
+
+    def vector_ranking(self, query: str) -> list[int]:
+        dense = self.dense
+        if dense is not None:
+            try:
+                return dense.search(query, POOL)  # the question as asked: the embedding model knows synonyms
+            except Exception as exc:  # this question only
+                print(f"[runway] vector search failed, using TF-IDF: {type(exc).__name__}: {exc}"[:300], flush=True)
+        vector = self.vectors.scores(expand_query(query))
+        return [int(i) for i in np.argsort(-vector)[:POOL] if vector[i] > 0]
+
+    def as_langchain(self, k: int = 5, mode: str = "hybrid"):
+        """This search as a LangChain retriever (runway.chain.RunwayRetriever), returning Documents."""
+        from runway.chain import RunwayRetriever
+
+        return RunwayRetriever(index=self, k=k, mode=mode)
 
     def rankings(self, query: str) -> tuple[list[int], list[int]]:
         """(BM25 order, vector order) of passage numbers for one query, best first. A passage that scores 0 is not a match."""
-        expanded = expand_query(query)
-        keyword = self.bm25.get_scores(tokenize(expanded))
-        vector = self.vectors.scores(expanded)
-        return (
-            [int(i) for i in np.argsort(-keyword)[:POOL] if keyword[i] > 0],
-            [int(i) for i in np.argsort(-vector)[:POOL] if vector[i] > 0],
-        )
+        keyword = self.bm25.get_scores(tokenize(expand_query(query)))
+        return [int(i) for i in np.argsort(-keyword)[:POOL] if keyword[i] > 0], self.vector_ranking(query)
 
     def search(self, query: str, k: int = 5, mode: str = "hybrid") -> list[Chunk]:
         keyword, vector = self.rankings(query)

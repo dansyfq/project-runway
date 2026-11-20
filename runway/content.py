@@ -1,4 +1,4 @@
-"""Reviewer changes: page text (About Us, How it works, Privacy, Terms), the FAQ and uploaded Ask documents.
+"""Admin changes: page text (About Us, Methodology, Privacy, Terms), the FAQ and uploaded Ask documents.
 
 Each change is written to data/runtime/ at once, so it takes effect without a restart, and, when GITHUB_TOKEN is
 set, committed to the repo (data/content.json, data/corpus/<slug>.md), so it survives the redeploys that wipe the
@@ -30,7 +30,8 @@ CONTENT_FILE = ROOT / "data" / "content.json"
 RUNTIME = ROOT / "data" / "runtime"
 RUNTIME_CORPUS = RUNTIME / "corpus"
 RUNTIME_CONTENT = RUNTIME / "content.json"
-PAGE_KEYS = {"about.full", "about.brief", "method.full", "method.brief", "privacy", "terms"}
+# Methodology's keys replaced How it works' (method.full, method.brief), so an edit of the old page can't hide the new one.
+PAGE_KEYS = {"about.full", "about.brief", "methodology.full", "methodology.brief", "privacy", "terms"}
 MAX_PAGE_CHARS = 100_000
 MAX_FAQ = 100
 MAX_UPLOAD_BYTES = 6 * 1024 * 1024
