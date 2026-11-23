@@ -159,7 +159,7 @@ Each commit redeploys the app. Without a token, changes last until the app next 
 - **Rate cap.** At most 300 AI calls an hour for the whole app (`AI_CALLS_PER_HOUR` in `runway/llm.py`), since guests
   can ask without an account. Past the cap, Ask falls back as below.
 - **What is sent.** For an answer: the question, up to six recent chat turns, the youngest buyer's age if set, the
-  answer language, the 5 retrieved passages and the definitions of Runway's 3 calculator tools; when Claude calls a tool,
+  answer language, the 5 retrieved passages and the definitions of Runway's 3 calculator tools and its price lookup; when Claude calls a tool,
   its result (worked out on Runway's server from figures the visitor typed) goes back too. "Why?" sends one flat's calculator figures and the rule passages; "Sum
   up this chat" sends the chat (the last 12 turns are used); a question in Chinese, Malay or Tamil is first sent alone to
   be put into English for the search. Never sent: files a visitor opens on Ask (read in the browser only), questions
@@ -192,7 +192,7 @@ runway/rag.py          chunking and hybrid search (BM25 keywords + vector store,
 runway/vector.py       the FAISS vector store: bge-small embeddings, saved in data/index/ (TF-IDF fallback in rag.py)
 runway/chain.py        LangChain layer: the search as a retriever (Documents), prompt templates to Anthropic messages
 runway/llm.py          prompts, question screening, number guard, Claude calls and the tool loop (Anthropic API)
-runway/agent.py        the calculator tools Ask's AI can call (lease check, loan length, stamp duty)
+runway/agent.py        the tools Ask's AI can call (lease check, loan length, stamp duty, and the price lookup)
 runway/insights.py     the admin-only Insights page: votes, eval by search mode, documents, AI use
 runway/auth.py         built-in accounts, roles, password hashing and checks
 runway/game_data.py    map data and town photos; town list and one photo at a time for the home page
