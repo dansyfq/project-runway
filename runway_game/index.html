@@ -3209,17 +3209,22 @@ const EXIT_AGE=30;  // an example next buyer, not a rule
 function exitView(f){
   const box=$('#exitBox'); if(!box) return;
   box.innerHTML=`<h3 id="exitH" style="font-size:1.05rem;color:var(--ink)">When you sell</h3>
-    <p>A short lease also limits whoever buys the flat from you. How many years until you sell?</p>
+    <p>A short lease also limits your buyer. When do you sell?</p>
     <div class="chips" role="group" aria-labelledby="exitH">${[5,10,15,20].map(n=>`<button type="button" class="chip" data-exit="${n}" aria-pressed="${n===5}">In ${n} years</button>`).join('')}</div>
     <div id="exitOut" aria-live="polite"></div>
-    <p class="small">Rule: CPF Board, “How much CPF savings can I use … lease does not cover the youngest buyer to age 95?” and HDB, “Housing loan from HDB”. The buyer aged ${EXIT_AGE} is only an example. Most flats can be sold on the open market only after the 5-year minimum occupation period (HDB, “Conditions after buying a resale flat”).</p>`;
+    <details class="more"><summary>Why?</summary><p class="small" style="margin-top:8px">Rule: CPF Board, “How much CPF savings can I use … lease does not cover the youngest buyer to age 95?” and HDB, “Housing loan from HDB”. The buyer aged ${EXIT_AGE} is only an example. Most flats can be sold on the open market only after the 5-year minimum occupation period (HDB, “Conditions after buying a resale flat”).</p></details>`;
   const upd=y=>{
-    const e=resaleExit(f.lease,y,EXIT_AGE), left=Math.floor(e.left);
+    const e=resaleExit(f.lease,y,EXIT_AGE), left=Math.floor(e.left), need=95-EXIT_AGE;
     box.querySelectorAll('[data-exit]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.exit===y));
-    $('#exitOut').innerHTML = e.left<=20
-      ? `<p><b style="color:var(--ink)">Only ${left} year${left===1?'':'s'} would be left.</b> With 20 years or less, a buyer can't use CPF or take an HDB loan for this flat.</p>`
-      : `<dl class="kv"><dt>Lease left when you sell</dt><dd>${left} years</dd><dt>Full CPF for a buyer aged</dt><dd>${Math.ceil(e.full)} or older</dd>
-        <dt>A buyer aged ${EXIT_AGE} can use CPF</dt><dd>${e.share>=1?'in full':Math.floor(e.share*100)+'% of the Valuation Limit'}</dd><dt>Their HDB loan, up to</dt><dd>${Math.floor(e.ltv*100)}% of the price</dd></dl>`;
+    if(e.left<=20){ $('#exitOut').innerHTML=`<p><b style="color:var(--ink)">Only ${left} year${left===1?'':'s'} would be left.</b> With 20 years or less, a buyer can't use CPF or take an HDB loan for this flat.</p>`; return; }
+    const w=v=>Math.max(0,Math.min(100,v/99*100)).toFixed(1), full=e.share>=1, col=full?'var(--ok)':'var(--part)';
+    const cpf=full?'CPF in full':`CPF ${Math.floor(e.share*100)}% of the limit`, loan=`HDB loan up to ${Math.floor(e.ltv*100)}%`;
+    $('#exitOut').innerHTML=`<p style="margin:10px 0 6px"><b style="color:var(--ink)">${left} years of lease left</b> when you sell. A buyer aged ${EXIT_AGE} needs ${need} for full CPF.</p>
+      <div role="img" aria-label="Bar: ${left} years of lease left when you sell; a buyer aged ${EXIT_AGE} needs ${need} years to use CPF in full" style="position:relative;height:14px;border-radius:7px;background:var(--tint)">
+        <div style="height:100%;width:${w(left)}%;border-radius:7px;background:${col}"></div>
+        <div style="position:absolute;top:-4px;bottom:-4px;left:${w(need)}%;width:2px;background:var(--ink)"></div></div>
+      <div class="small" style="position:relative;height:1.3em;margin-top:4px"><span style="position:absolute;left:${w(need)}%;transform:translateX(-50%);white-space:nowrap">${need} needed</span></div>
+      <div class="chips" style="margin-top:6px"><span class="chip" style="cursor:default;color:${col}">${full?'✓':'!'} ${cpf}</span><span class="chip" style="cursor:default">${loan}</span></div>`;
   };
   box.querySelectorAll('[data-exit]').forEach(b=>b.onclick=()=>upd(+b.dataset.exit));
   upd(5);
