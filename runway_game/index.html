@@ -3073,6 +3073,7 @@ function openEnc(f){
     <div class="pad" style="padding-top:12px" data-st="st.dialog">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span class="price">${exact(f.price)}</span><span class="small">sold ${esc(f.m)}</span></div>
       <div class="notice" id="priceChk" aria-live="polite" style="margin:10px 0 14px">Checking recent sales of similar flats…</div>
+      <div class="notice" id="histChk" aria-live="polite" style="margin:0 0 14px">Looking up what this lease did to prices…</div>
       <div class="leasebar"><div class="lh"><span class="label">Lease left</span><span class="lv">${Math.floor(f.lease)} years</span></div><div class="hp" role="img" aria-label="${Math.floor(f.lease)} of 99 years"><i style="width:0" data-w="${lpct}"></i></div><span class="small">Started ${esc(f.lc)}. Leases are 99 years.</span></div>
       <div id="encResult"><button class="btn primary" id="checkBtn" data-st="st.button → rules.py" style="width:100%">Check for age ${S.age}</button></div>
     </div>`, ()=>{
@@ -3080,6 +3081,7 @@ function openEnc(f){
       $('#checkBtn').onclick=showResult;
     });
   priceCheck(f);
+  historyCheck(f);
 }
 // Price check: the median comes from runway/price_check.py (HDB resale prices, data.gov.sg), never from the AI.
 // Only this public sale's town, street, flat type, size, lease and price go to the server.
@@ -3094,6 +3096,22 @@ function priceCheck(f){
         <span class="small">Within 5% counts as in line. From HDB resale prices (data.gov.sg). Not a valuation.</span>`
       : `<span class="label">Price check</span><span>Not enough recent sales to compare: ${r.n} sale${r.n===1?'':'s'} of ${like} in the last ${r.months} months.</span><span class="small">From HDB resale prices (data.gov.sg).</span>`;
   }).catch(()=>{const b=box(); if(b) b.textContent='Price check is unavailable right now.';});
+}
+// Price history: what this flat's lease band did to price in its town. The figures are Trends' (HDB resale prices), never the AI's;
+// only the public flat's town, flat type and lease are used, and the request carries nothing the user typed.
+function historyCheck(f){
+  const box=()=>S.enc===f&&$('#histChk');  // the buyer may have moved on to another flat
+  window.RWTRENDS.history({town:f.town,type:f.ft,lease:f.lease}).then(h=>{
+    const b=box(); if(!b) return;
+    if(!h){ b.hidden=true; return; }
+    const span=monthSpan([h.since,h.last]), flats=`${esc(h.type)} flats in ${esc(h.town)} with ${esc(h.band)} years of lease left`;
+    const gap=h.psm==null||h.refPsm==null?null:Math.round((h.refPsm-h.psm)/h.refPsm*100);
+    b.innerHTML = h.psm==null
+      ? `<span class="label">Price history</span><span>Too few sales of ${flats} (${span}) to give a median.</span>`
+      : `<span class="label">Price history</span><span>${flats} sold for a median ${exact(h.psm)} per sqm (${span})${gap==null?`. Too few sales with ${esc(h.ref)} years left to compare.`:gap===0?`, the same as those with ${esc(h.ref)} years left (${exact(h.refPsm)}).`:`, ${Math.abs(gap)}% ${gap>0?'less':'more'} than those with ${esc(h.ref)} years left (${exact(h.refPsm)}).`}</span>`;
+    b.innerHTML += `<span class="small">Different flats, so not lease alone. From HDB resale prices (data.gov.sg). <button type="button" class="llink" id="histLink">See the trend →</button></span>`;
+    $('#histLink').onclick=()=>go('trends',{town:f.town,type:f.ft,lease:f.lease});
+  }).catch(()=>{const b=box(); if(b) b.textContent='Price history is unavailable right now.';});
 }
 // Resale exit: the same age-95 rule as calc() (runway/cpf_rules.py resale_exit), applied to whoever buys from you later.
 function resaleExit(lease, yrs, age){const left=Math.max(0,lease-yrs), share=left<=20?0:age+left>=95?1:(left-20)/(95-age-20); return {left, full:95-left, share, ltv:.75*share};}
@@ -4443,6 +4461,17 @@ if(RW.pendingEnter){ const p=RW.pendingEnter; RW.pendingEnter=null; RWAPP.enter(
       st.data ? (applyProfile(), build()) : message('The price history did not load. Try again in a moment.', true, st.error);
     });
   }
-  window.RWTRENDS = {render, load};
+  // The Map's flat result: what this flat's lease band did to price in its town, from the figures behind the lease chart.
+  // Resolves to null when Trends does not know the town or flat type; a figure is null where a band had too few sales.
+  function history(p){
+    return load().then(d => {
+      const town = d.towns.find(n => norm(n) === norm(p.town)), t = String(p.type || '').toUpperCase().replace('-', ' ');
+      if(!town || !d.types.includes(t) || !(p.lease >= 1)) return null;
+      const cells = (d.lease_psm[t] || {})[town] || d.bands.map(() => null);
+      const pos = bandOf(p.lease), ref = pos < 4 ? 4 : 1;  // compare with the 80 to 89 band, or with 50 to 59 for a flat that already has 80 or more
+      return {town, type: TYPE[t], band: d.bands[pos], ref: d.bands[ref], psm: cells[pos] ?? null, refPsm: cells[ref] ?? null, since: d.since_month, last: d.last_month};
+    });
+  }
+  window.RWTRENDS = {render, load, history};
 })();
 </script>
