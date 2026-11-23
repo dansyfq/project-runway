@@ -2,7 +2,10 @@
 
 import pandas as pd
 
-from runway.trends import ALL_TOWNS, BAND_LABELS, MIN_SALES, build_trends
+import numpy as np
+import pytest
+
+from runway.trends import ALL_TOWNS, BAND_LABELS, BAND_STARTS, MIN_SALES, build_trends, lease_band, lease_price_gap
 
 
 def sales(town, flat_type, year, n, price, lease=70.0, month=1):
@@ -71,3 +74,31 @@ def test_trends_message_reports_a_failure_instead_of_crashing(monkeypatch):
     monkeypatch.setattr(bridge, "load_trends", boom)
     reply = bridge.handle({"id": "x", "type": "trends", "payload": {}}, {}, {}, None, None)
     assert reply == {"ok": False, "error": "ValueError: bad data"}
+
+
+def test_lease_band_matches_how_sales_are_banded():
+    for lease in (1, 49.9, 50, 59.9, 60, 79.99, 80, 89.9, 90, 99):
+        assert lease_band(lease) == int(np.searchsorted(BAND_STARTS, lease, side="right"))
+
+
+def test_lease_price_gap_compares_with_the_far_band():
+    t = build_trends(pd.concat([
+        sales("Bedok", "4 ROOM", 2026, MIN_SALES, 500_000, lease=55.0, month=8),
+        sales("Bedok", "4 ROOM", 2026, MIN_SALES, 800_000, lease=85.0, month=9),
+        sales("Bedok", "4 ROOM", 2026, MIN_SALES - 1, 650_000, lease=70.0, month=9),
+    ], ignore_index=True))
+    short = lease_price_gap(t, "bedok", "4-room", 55.0)  # case and the hyphen do not matter
+    assert (short["band"], short["psm"], short["ref_band"], short["ref_psm"]) == ("50 to 59", 5000, "80 to 89", 8000)
+    assert (short["town"], short["flat_type"]) == ("Bedok", "4-room")
+    long_ = lease_price_gap(t, "Bedok", "4 ROOM", 85.0)  # a lease of 80 or more is compared with the 50 to 59 band
+    assert (long_["band"], long_["psm"], long_["ref_band"], long_["ref_psm"]) == ("80 to 89", 8000, "50 to 59", 5000)
+    assert lease_price_gap(t, "Bedok", "4-room", 70.0)["psm"] is None  # too few sales: no median, never a guess
+    assert (short["since"], short["last"]) == (t["since_month"], t["last_month"])
+
+
+def test_lease_price_gap_rejects_unknown_towns_and_flat_types():
+    t = build_trends(frame())
+    with pytest.raises(ValueError, match="unknown town"):
+        lease_price_gap(t, "Nowhere", "4-room", 60.0)
+    with pytest.raises(ValueError, match="unknown flat type"):
+        lease_price_gap(t, "Bishan", "2-room", 60.0)
