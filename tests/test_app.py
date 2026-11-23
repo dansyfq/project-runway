@@ -512,9 +512,32 @@ def test_every_built_in_suggestion_passes_the_topic_filter():
     from runway.llm import screen_question
     sugg = re.search(r"const SUGG=\[(.*?)\];", GAME, re.S).group(1)
     follow = re.search(r"const FOLLOW=\[(.*?)\]\];", GAME, re.S).group(1)
-    questions = re.findall(r"'([^']*)'", sugg) + re.findall(r",\s*'([^']*)'\]", follow)
-    assert len(questions) >= 19
+    key = re.search(r"const KEY_CHIPS = \[(.*?)\];", GAME, re.S).group(1)
+    questions = re.findall(r"'([^']*)'", sugg) + re.findall(r",\s*'([^']*)'\]", follow) + re.findall(r"'([^']*)'", key)
+    assert len(questions) >= 23
     assert [q for q in questions if screen_question(q)] == []
+
+
+def test_key_is_an_assistant_button_that_asks_the_same_server_question():
+    assert 'id="keyBtn"' in GAME and 'aria-controls="keyPanel"' in GAME and ">KEY</button>" in GAME
+    assert 'id="keyPanel" role="dialog" aria-label="KEY, Runway\'s assistant" hidden' in GAME
+    assert 'for="keyIn"' in GAME and 'id="keyForm"' in GAME
+    # fixed at the bottom right, above the Streamlit badge, and the chat fits a phone
+    assert ".keybtn{position:fixed;right:16px;bottom:calc(84px" in GAME and "width:min(380px,calc(100vw - 32px))" in GAME
+    js = GAME[GAME.index("/* ---------- KEY: the assistant button"):GAME.index("/* ---------- your town: Toa Payoh")]
+    # the same server question as the Ask page, with the same refusal of NRIC, phone and email before anything is sent
+    assert "RW.send('ask', {q, facts: null, history: prior," in js and "lang: RW.lang || 'en'" in js
+    assert js.index("if(personal(q))") < js.index("RW.send('ask'")
+    assert "mine.skip = true" in js and "skip: true" in js  # questions with personal details never join the history
+    # answers show their sources as links, opening in a new tab; Escape closes; the Ask page has its own chat
+    assert 'target="_blank" rel="noopener"' in js and "e.key === 'Escape'" in js
+    assert "document.getElementById('scrAsk')" in js and "kb.hidden = onAsk" in js
+
+
+def test_home_ask_box_and_mic_ask_key():
+    hero = GAME[GAME.index("$('#lAskForm').addEventListener"):GAME.index("/* ---------- your town")]
+    assert "KEY.open(q)" in hero and "RW.enter('ask', q)" not in hero
+    assert hero.count("KEY.open(q)") == 2  # typed and spoken
 
 
 def test_one_h1_on_the_home_page_and_described_ratings():
@@ -687,7 +710,7 @@ def test_both_mics_dictate_through_pauses_and_greet_first():
     # listening starts only once the greeting is over, so the greeting is never written into the box
     assert "greet(lang).then(() => {" in shared and "phase = 'listen'" in shared[shared.index("greet(lang).then"):]
     assert "const base = o.input.value.trim()" in shared and "joinSpeech(base, heard())" in shared  # typed text is kept in front
-    assert "dictate({btn: mic, input: inp, lang: RW.lang," in hero and "RW.enter('ask', q)" in hero
+    assert "dictate({btn: mic, input: inp, lang: RW.lang," in hero and "KEY.open(q)" in hero
     assert "dictate({btn:mb, input:$('#askIn'), lang:S.lang," in ask and "ask(v)" in ask
     assert "The microphone is blocked, so I could not hear you." in ask and "is not available in this browser" in ask
     # leaving the page or the screen stops the mic without asking
