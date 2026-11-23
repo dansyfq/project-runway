@@ -482,6 +482,19 @@ def test_trends_follow_what_the_customer_entered():
     assert "the town, flat type and lease you last looked at" in GAME
 
 
+def test_flat_result_shows_the_price_history_of_its_lease_band():
+    # Trends' figures for the flat's town, type and lease band, on the sheet under the price check
+    assert 'id="histChk"' in GAME and "function historyCheck(f)" in GAME and "historyCheck(f);" in GAME
+    assert "window.RWTRENDS = {render, load, history};" in GAME and "function history(p)" in GAME
+    assert "window.RWTRENDS.history({town:f.town,type:f.ft,lease:f.lease})" in GAME
+    # it compares with the 80 to 89 band (index 4), or with 50 to 59 (index 1) for a flat that already has 80 or more
+    from runway.trends import BAND_LABELS
+
+    assert (BAND_LABELS[4], BAND_LABELS[1]) == ("80 to 89", "50 to 59")
+    assert "const pos = bandOf(p.lease), ref = pos < 4 ? 4 : 1;" in GAME
+    assert "Different flats, so not lease alone." in GAME and "go('trends',{town:f.town,type:f.ft,lease:f.lease})" in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
