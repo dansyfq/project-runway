@@ -504,6 +504,10 @@ def test_ask_suggests_a_question_built_from_the_customers_details():
     assert "and a price lookup (the figures behind Trends)" in GAME
 
 
+def test_a_clarifying_reply_is_not_rated_like_an_ai_answer():
+    assert "if(!r.blocked && !r.offline && !r.clarify) b.fb = {q, v:null};" in GAME  # and it stays in the chat history
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
