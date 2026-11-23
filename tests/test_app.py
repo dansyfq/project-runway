@@ -495,6 +495,15 @@ def test_flat_result_shows_the_price_history_of_its_lease_band():
     assert "Different flats, so not lease alone." in GAME and "go('trends',{town:f.town,type:f.ft,lease:f.lease})" in GAME
 
 
+def test_ask_suggests_a_question_built_from_the_customers_details():
+    assert "function profileSuggestion()" in GAME
+    assert "What does ${Math.floor(p.lease)} years of lease left do to the price of a ${p.pickType} flat in ${t.name}?" in GAME
+    assert "(mine&&fresh(mine)?[mine]:[])" in GAME  # first in the list, unless the customer already asked it
+    # the question carries the figures itself: nothing extra about the customer is sent to the server
+    assert "RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior, age: (S.onbDone||S.ageSet) ? S.age : null, lang: S.lang})" in GAME
+    assert "and a price lookup (the figures behind Trends)" in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1

@@ -10,6 +10,7 @@ Kept deliberately simple: four group-bys over the ~1M rows, then plain Python to
 from __future__ import annotations
 
 import functools
+import re
 from pathlib import Path
 
 import numpy as np
@@ -85,3 +86,34 @@ def build_trends(df: pd.DataFrame) -> dict:
 def load_trends() -> dict:
     """Built once per server process, then reused for every visitor."""
     return build_trends(pd.read_parquet(PARQUET, columns=COLUMNS))
+
+
+COMPARE_WITH = (4, 1)  # positions in BAND_LABELS: a lease under 80 years is compared with "80 to 89", a longer one with "50 to 59"
+TYPE_LABELS = {"3 ROOM": "3-room", "4 ROOM": "4-room", "5 ROOM": "5-room", "EXECUTIVE": "Executive"}
+
+
+def lease_band(lease: float) -> int:
+    """Position in BAND_LABELS of a remaining lease: the same banding build_trends() gives every sale."""
+    return sum(1 for start in BAND_STARTS if lease >= start)
+
+
+def _town_key(text) -> str:
+    return re.sub(r"\s*/\s*", "/", str(text or "").strip().upper())  # "Kallang / Whampoa" and "KALLANG/WHAMPOA" are one town
+
+
+def lease_price_gap(data: dict, town, flat_type, lease: float) -> dict:
+    """What one lease band did to price per sqm in a town, from the same figures as Trends' lease chart (last two years).
+
+    Returns the median for the lease's own band and for the band it is compared with; either is None where the band
+    had fewer than MIN_SALES sales. Raises ValueError for a town or flat type Trends does not have."""
+    name = next((t for t in data["towns"] if _town_key(t) == _town_key(town)), None)
+    if name is None:
+        raise ValueError("unknown town; use one of: " + ", ".join(data["towns"]))
+    ftype = str(flat_type or "").strip().upper().replace("-", " ")
+    if ftype not in data["types"]:
+        raise ValueError("unknown flat type; use " + ", ".join(TYPE_LABELS[t] for t in data["types"]))
+    pos = lease_band(lease)
+    ref = COMPARE_WITH[0] if pos < COMPARE_WITH[0] else COMPARE_WITH[1]
+    cells = data["lease_psm"][ftype].get(name) or [None] * len(BAND_LABELS)
+    return {"town": name, "flat_type": TYPE_LABELS[ftype], "band": BAND_LABELS[pos], "psm": cells[pos],
+            "ref_band": BAND_LABELS[ref], "ref_psm": cells[ref], "since": data["since_month"], "last": data["last_month"]}

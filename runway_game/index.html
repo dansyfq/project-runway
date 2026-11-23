@@ -3273,12 +3273,20 @@ const FOLLOW=[
   [/town|mature|estate/, 'Which towns have longer leases left?'],
   [/age|older|55|retire/, 'Can I use CPF after age 55?'],
   [/income|ceiling|eligib/, 'Am I eligible for an HDB loan?']];
+// A question built from the town, flat type and lease the customer has already entered on Home or the map. Clicking it sends
+// exactly this text, so the figures the AI's price lookup may use are ones the customer can see in their own question.
+function profileSuggestion(){
+  const p=RW.prof.get(), t=typeof p.pickTown==='string'?TBY[p.pickTown]:null;
+  if(!t||!/^(3-room|4-room|5-room|Executive)$/.test(p.pickType||'')||typeof p.lease!=='number'||!(p.lease>=1&&p.lease<=99)) return null;
+  return `What does ${Math.floor(p.lease)} years of lease left do to the price of a ${p.pickType} flat in ${t.name}?`;
+}
 function suggestions(){
   const asked = new Set(S.chat.filter(m=>m.me).map(m=>plain(m.html).toLowerCase()));
   const last = S.chat.filter(m=>!m.typing).slice(-2).map(m=>plain(m.html)).join(' ').toLowerCase();
   const fresh = q => !asked.has(q.toLowerCase());
   const hits = last ? FOLLOW.filter(([re,q])=>re.test(last) && fresh(q)).map(([,q])=>q) : [];
-  return [...new Set(hits.concat(SUGG.filter(fresh), FOLLOW.map(([,q])=>q).filter(fresh)))].slice(0,4);
+  const mine = profileSuggestion();
+  return [...new Set((mine&&fresh(mine)?[mine]:[]).concat(hits, SUGG.filter(fresh), FOLLOW.map(([,q])=>q).filter(fresh)))].slice(0,4);
 }
 function srcHtml(src){
   if(!src || !src.length) return '';
@@ -3858,7 +3866,7 @@ const methodPipeline = () => `<h2>How Ask Runway answers</h2>
     <li><b>Screening.</b> A question with an NRIC, phone number or email, a request for advice, an attempt to change Runway's rules or an off-topic question is declined before any search. No AI is used for this.</li>
     <li><b>Retrieval.</b> ${METHOD_FACTS.retrieval}. Vector store: ${METHOD_FACTS.vectors}. The top 5 passages go forward. A question in Chinese, Malay or Tamil is put into English first.</li>
     <li><b>Prompt.</b> The passages, numbered [1] to [5], go to the AI with the question, the last few chat turns and strict rules: answer only from the passages, cite them, give no advice. ${METHOD_FACTS.langchain}.</li>
-    <li><b>Calculator tools.</b> When the question gives an age, a lease or a price, Claude calls Runway's calculator tools (lease check, HDB loan length, Buyer's Stamp Duty) and quotes their figures. It never does the sums itself.</li>
+    <li><b>Calculator tools.</b> When the question gives an age, a lease or a price, Claude calls Runway's calculator tools (lease check, HDB loan length, Buyer's Stamp Duty) and quotes their figures. It never does the sums itself. For what a shorter lease does to prices in a town, it can also look up the median price per square metre for that lease band from HDB's resale prices (the figures behind Trends) and quote them in the same way.</li>
     <li><b>Answer.</b> Claude writes a short answer with numbered citations. "Where this comes from" under the answer links each document.</li>
     <li><b>Number guard.</b> Every figure in the answer must be in the passages, the question, the chat or a tool result. If one isn't, Runway shows the passages instead.</li>
     <li><b>Fallback.</b> With no API key, the hourly limit reached or the AI unavailable, Ask Runway shows the matching official passages instead of an AI answer.</li>
@@ -3897,7 +3905,7 @@ function methodHtml(){
     ['Explanations and follow-up questions','Ask Runway, Why?, chat summary'],
     ['Text, tables, charts and forms','Map, verdict card, shortlist, lease explorer chart, file and chat export'],
     ['At least two use cases','Map (Town Safari), Ask Runway and Lease explorer'],
-    ['Agent with tools','Ask Runway calls 3 calculator tools (lease check, HDB loan length, Buyer\'s Stamp Duty) for questions with your own figures'],
+    ['Agent with tools','Ask Runway calls 3 calculator tools (lease check, HDB loan length, Buyer\'s Stamp Duty) and a price lookup (the figures behind Trends) for questions with your own figures'],
     ['Evaluation and monitoring','Insights (admin only): answer feedback, eval by search mode, documents and AI use; eval/run_eval.py'],
     ['One flowchart per use case','Below'],
     ['Required disclaimer','About Us → Notice, linked from the map; also at the top of Download this chat']];
