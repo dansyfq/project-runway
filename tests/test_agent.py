@@ -136,3 +136,78 @@ def test_no_passages_means_no_ai_call():
     bot, calls = scripted(text_turn("unused"))
     result = bot.answer("What is the HDB loan limit?", [])
     assert calls == [] and result.text == llm_mod.offline_answer([])
+
+
+# ---- the price lookup (Trends' figures) ----
+
+TRENDS = {  # the part of runway.trends.build_trends() output the lookup reads
+    "towns": ["Bedok", "Kallang / Whampoa"], "types": ["3 ROOM", "4 ROOM", "5 ROOM", "EXECUTIVE"],
+    "since_month": "2024-10", "last_month": "2026-09",
+    "lease_psm": {"3 ROOM": {}, "5 ROOM": {}, "EXECUTIVE": {},
+                  "4 ROOM": {"Bedok": [5842, 5848, 6671, 7368, 9711, 9409], "Kallang / Whampoa": [None] * 6}},
+}
+ASK = {"town": "Bedok", "flat_type": "4-room", "remaining_lease_years": 55}
+
+
+@pytest.fixture
+def trends_data(monkeypatch):
+    import runway.trends
+
+    monkeypatch.setattr(runway.trends, "load_trends", lambda: TRENDS)
+
+
+def test_price_lookup_returns_trends_figures_and_the_gap(trends_data):
+    out, err = agent.run("price_by_lease", ASK)
+    data = json.loads(out)
+    assert not err and data["lease_band_years"] == "50 to 59" and data["median_price_per_sqm_in_this_band"] == "$5,848"
+    assert data["compared_with_lease_band_years"] == "80 to 89" and data["median_price_per_sqm_in_compared_band"] == "$9,711"
+    assert data["percent_difference"] == "40" and data["this_band_price_is"] == "lower"  # (9711 - 5848) / 9711 = 39.8%
+    assert data["sales_window"] == "October 2024 to September 2026" and "Trends" in data["source"]
+    assert "calculator" not in data["source"] and "not the lease alone" in data["how_to_say_it"]
+
+
+def test_price_lookup_for_a_long_lease_compares_with_the_short_band(trends_data):
+    data = json.loads(agent.run("price_by_lease", {**ASK, "remaining_lease_years": 85})[0])
+    assert data["lease_band_years"] == "80 to 89" and data["compared_with_lease_band_years"] == "50 to 59"
+    assert data["percent_difference"] == "66" and data["this_band_price_is"] == "higher"  # (5848 - 9711) / 5848 = -66.1%
+    assert json.loads(agent.run("price_by_lease", {**ASK, "town": "BEDOK", "remaining_lease_years": 95})[0])["percent_difference"] == "61"
+
+
+@pytest.mark.parametrize("args", [
+    {**ASK, "town": "Nowhere"},                    # not a town Trends has
+    {**ASK, "flat_type": "2-room"},                # not a flat type Trends has
+    {**ASK, "remaining_lease_years": 0},           # no lease left
+    {**ASK, "remaining_lease_years": 150},
+    {**ASK, "remaining_lease_years": True},
+    {**ASK, "town": None},
+    {**ASK, "town": "Kallang / Whampoa"},          # every band too thin: no median to give
+])
+def test_price_lookup_errors_instead_of_guessing(trends_data, args):
+    out, err = agent.run("price_by_lease", args)
+    assert err and "error" in json.loads(out) and "$" not in out
+
+
+def test_answer_may_quote_the_price_lookup(trends_data):
+    bot, calls = scripted(tool_turn("price_by_lease", ASK),
+                          text_turn("In Bedok, 4-room flats with 50 to 59 years of lease left sold for a median $5,848 per sqm, "
+                                    "40% lower than the $9,711 for 80 to 89 years left (October 2024 to September 2026). These are "
+                                    "different flats, so it is a market pattern, not the lease alone [1]."))
+    result = bot.answer("What does 55 years of lease left do to the price of a 4-room flat in Bedok?", [SOURCE])
+    assert result.error is None and "$5,848" in result.text  # 5,848 is in no passage or question: it came from the tool
+    assert any(t["name"] == "price_by_lease" for t in calls[0]["tools"])
+    assert "price_by_lease" in llm_mod.ANSWER_SYSTEM and "never guess it" in llm_mod.ANSWER_SYSTEM
+    block = calls[1]["messages"][-1]["content"][0]
+    assert not block["is_error"] and "Trends" in block["content"]
+
+
+def test_a_price_not_in_the_lookup_is_still_caught(trends_data):
+    bot, _ = scripted(tool_turn("price_by_lease", ASK), text_turn("Flats there cost about $6,200 per sqm [1]."))
+    result = bot.answer("What does 55 years of lease left do to the price of a 4-room flat in Bedok?", [SOURCE])
+    assert result.error == llm_mod.INVENTED_FIGURE
+
+
+def test_the_price_lookup_only_takes_a_lease_the_user_gave(trends_data):
+    bot, calls = scripted(tool_turn("price_by_lease", {**ASK, "remaining_lease_years": 65}), text_turn("unused [1]"))
+    bot.answer("What does 55 years of lease left do to the price of a 4-room flat in Bedok?", [SOURCE])
+    refused = calls[1]["messages"][-1]["content"][0]
+    assert refused["is_error"] and "figures the user gave" in refused["content"][0]
