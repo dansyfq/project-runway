@@ -67,7 +67,7 @@ ADVICE_PATTERNS = [
     r"best (time|town|estate|flat) to buy",
 ]
 TOPIC_WORDS = {
-    "hdb", "cpf", "lease", "flat", "resale", "loan", "grant", "valuation", "ltv", "hfe", "otp", "option",
+    "hdb", "cpf", "lease", "leases", "flat", "resale", "loan", "grant", "valuation", "ltv", "hfe", "otp", "option",
     "buy", "buyer", "purchase", "age", "95", "mortgage", "stamp", "duty", "levy", "mop", "occupation",
     "eip", "quota", "town", "price", "partner", "spouse", "couple", "single", "singles", "refund", "ordinary",
     "account", "oa", "bank", "housing", "home", "property", "downpayment", "cash", "years", "remaining",
