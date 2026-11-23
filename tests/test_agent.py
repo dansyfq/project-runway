@@ -210,4 +210,4 @@ def test_the_price_lookup_only_takes_a_lease_the_user_gave(trends_data):
     bot, calls = scripted(tool_turn("price_by_lease", {**ASK, "remaining_lease_years": 65}), text_turn("unused [1]"))
     bot.answer("What does 55 years of lease left do to the price of a 4-room flat in Bedok?", [SOURCE])
     refused = calls[1]["messages"][-1]["content"][0]
-    assert refused["is_error"] and "figures the user gave" in refused["content"][0]
+    assert refused["is_error"] and "figures the user gave" in refused["content"]
