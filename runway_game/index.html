@@ -1513,6 +1513,32 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 }
 /* a key press gets no motion: html[data-input="key"] holds until the next pointer press */
 [data-input="key"] :is(.tabs,.sheet .panel,.sheet .scrim,.toast,.lover,.pinwrap,.stamp,.hp i,.tabs .count,.lnotice summary svg),[data-input="key"] .tg::after{transition:none!important;animation:none!important}
+/* KEY: the round assistant button at the bottom right of every page but Ask, and the small chat it opens */
+.keybtn{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:120;display:flex;align-items:center;gap:8px;min-height:48px;padding:0 18px 0 14px;border:0;border-radius:999px;background:var(--brand);color:var(--on-brand);font:800 .95rem/1 var(--font-ui);letter-spacing:.08em;cursor:pointer;box-shadow:var(--shadow-card)}
+.keybtn:hover{background:var(--brand-deep)}
+.keybtn svg{width:20px;height:20px;flex:none}
+.keypanel{position:fixed;right:16px;bottom:calc(142px + env(safe-area-inset-bottom));z-index:121;display:flex;flex-direction:column;width:min(380px,calc(100vw - 32px));height:min(520px,calc(100vh - 170px));border:1px solid var(--line);border-radius:var(--radius-card);background:var(--page);color:var(--ink);box-shadow:var(--shadow-composer);overflow:hidden}
+.keypanel[hidden],.keybtn[hidden]{display:none}
+.keyhead{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--brand);color:var(--on-brand)}
+.keyhead b{font-size:1.05rem;letter-spacing:.08em}
+.keyhead small{display:block;font-size:.75rem;opacity:.85;letter-spacing:0}
+.keyhead .keyfull{margin-left:auto;border:1px solid color-mix(in srgb,var(--on-brand) 45%,transparent);border-radius:999px;background:transparent;color:inherit;font:600 .75rem var(--font-ui);padding:6px 10px;min-height:32px;cursor:pointer}
+.keyhead .keyx{border:0;background:transparent;color:inherit;font-size:1.5rem;line-height:1;min-width:36px;min-height:36px;cursor:pointer}
+.keylog{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--beige-2)}
+.kmsg{max-width:88%;padding:10px 12px;border-radius:14px;font-size:.92rem;line-height:1.4;overflow-wrap:anywhere}
+.kmsg p{margin:0 0 .5em}.kmsg p:last-child{margin-bottom:0}
+.kmsg.me{align-self:flex-end;background:var(--brand);color:var(--on-brand)}
+.kmsg.bot{align-self:flex-start;background:var(--page);border:1px solid var(--line)}
+.kmsg.warn{border-color:var(--part);background:var(--part-soft);color:var(--ink)}
+.ksrc{margin-top:8px;font-size:.78rem;color:var(--ink-2)}
+.ksrc ul{margin:4px 0 0;padding-left:18px}
+.ksrc a{color:var(--green-mid)}
+.keychips{display:flex;flex-wrap:wrap;gap:6px}
+.keychips button{border:1px solid var(--line);border-radius:var(--radius-chip);background:var(--page);color:var(--ink);font:600 .82rem var(--font-ui);padding:8px 10px;text-align:left;cursor:pointer}
+.keyform{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:var(--page)}
+.keyform input{flex:1;min-width:0;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--radius-btn);background:var(--field);color:var(--ink);font:1rem var(--font-ui)}
+.keyform button{min-width:48px;min-height:44px;border:0;border-radius:var(--radius-btn);background:var(--brand);color:var(--on-brand);font:700 .9rem var(--font-ui);cursor:pointer}
+.keyform button:disabled{opacity:.55;cursor:default}
 </style>
 
 <div class="stage">
@@ -1859,6 +1885,15 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 
   
 </div>
+
+<!-- KEY: the assistant on every page but Ask. It asks the same server question as the Ask page (the same document
+     search, figure check and NRIC / phone / email refusal) but keeps its own short chat, so Home never has to load the app. -->
+<button type="button" class="keybtn" id="keyBtn" aria-expanded="false" aria-controls="keyPanel" aria-label="Open KEY, Runway's assistant"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8 92 50 50 92 8 50Z" fill="currentColor"/><path d="M50 30 70 50 50 70 30 50Z" fill="var(--brand)"/></svg>KEY</button>
+<section class="keypanel" id="keyPanel" role="dialog" aria-label="KEY, Runway's assistant" hidden>
+  <div class="keyhead"><div><b>KEY</b><small>Reads CPF · HDB · MND documents</small></div><button type="button" class="keyfull" id="keyFull">Full Ask page</button><button type="button" class="keyx" id="keyClose" aria-label="Close KEY">×</button></div>
+  <div class="keylog" id="keyLog" aria-live="polite"></div>
+  <form class="keyform" id="keyForm"><label for="keyIn" class="lsr">Ask KEY a question</label><input id="keyIn" type="text" autocomplete="off" maxlength="1000" placeholder="Ask about CPF, lease or loans"><button type="submit" id="keySend">Ask</button></form>
+</section>
 
 <script>
 /* Bridge to the Streamlit host (custom component protocol). Python checks sign-in, answers
@@ -2469,8 +2504,8 @@ function faqFilter(faq, text){
     $('#lConvo').innerHTML = `<p class="lme sq">${esc(x.q)}</p><div class="lbot sq"><div class="lanst"><p>${esc(x.a)}</p></div>
       <div class="lrbox"><span class="lrbox-h">${SHIELD}The rule it relied on</span><span class="lrbox-q">“${esc(x.quote)}”</span>
       <span class="lrbox-s">Read the page: <a href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.title)}">${esc(x.publisher)}<span class="lsr"> (opens in a new tab)</span></a></span></div></div>`; }
-  // the Ask page asks it in the full chat (which refuses NRIC, phone and email); an empty box just opens the page
-  $('#lAskForm').addEventListener('submit', e => { e.preventDefault(); const i = $('#lAskIn'), q = i.value.trim(); i.value = ''; RW.enter('ask', q); });
+  // KEY asks it (it refuses NRIC, phone and email, as the Ask page does)
+  $('#lAskForm').addEventListener('submit', e => { e.preventDefault(); const i = $('#lAskIn'), q = i.value.trim(); i.value = ''; KEY.open(q); });  // KEY answers here; an empty box just opens it
 
   /* voice: as on the Ask page (dictate, in the shared script): greets in the answer language chosen on the Ask page this
      visit (RW.lang; English until then), listens through pauses, then asks what was said on the Ask page */
@@ -2480,12 +2515,67 @@ function faqFilter(faq, text){
   mic.onclick = () => {
     if(!SR) return;
     if(mine()){ MIC.stop(true); return; }
-    dictate({btn: mic, input: inp, lang: RW.lang, hint: HINT, done: q => { inp.value = ''; RW.enter('ask', q); },
+    dictate({btn: mic, input: inp, lang: RW.lang, hint: HINT, done: q => { inp.value = ''; KEY.open(q); },
       fail: e => { inp.placeholder = e === 'language-not-supported' ? "Voice input in this language isn't available here. Type your question." : 'The microphone is blocked. Allow it, or type your question.'; }});
   };
   // leaving Home (another screen, or the loading panel over it) stops the mic and keeps what was heard in the box
   const away = () => { if(mine() && ($('#scrLanding').hidden || !$('#rwLoading').hidden)) MIC.stop(false); };
   ['#scrLanding', '#rwLoading'].forEach(id => new MutationObserver(away).observe($(id), {attributes: true, attributeFilter: ['hidden']}));
+
+  /* ---------- KEY: the assistant button (see its markup near the top) ---------- */
+  const KEY_CHIPS = ['Can I still use CPF for an old flat?', 'How long can my loan be?', 'What is the Valuation Limit?', 'How much cash do I need upfront?'];
+  const KEY_INTRO = 'Hello, I am KEY. Ask me about using CPF, HDB loans or lease. I answer from official documents.';
+  const K = {chat: [], busy: false};
+  const kb = document.getElementById('keyBtn'), kp = document.getElementById('keyPanel'), kl = document.getElementById('keyLog'), ki = document.getElementById('keyIn'), ks = document.getElementById('keySend');
+  const kPlain = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent.replace(/\s+/g, ' ').trim(); };
+  const kSources = src => {
+    const seen = new Set(), li = [];
+    (src || []).forEach(s => { if(!/^https:\/\//i.test(s.url || '') || seen.has(s.url)) return; seen.add(s.url); li.push(`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc([s.publisher, s.title].filter(Boolean).join(' · '))}<span class="lsr"> (opens in a new tab)</span></a></li>`); });
+    return li.length ? `<div class="ksrc"><b>Where this comes from</b><ul>${li.join('')}</ul></div>` : '';
+  };
+  function kRender(){
+    const all = [{bot: true, html: `<p>${esc(KEY_INTRO)}</p>`}].concat(K.chat);
+    kl.innerHTML = all.map(m => `<div class="kmsg ${m.me ? 'me' : 'bot'}${m.warn ? ' warn' : ''}">${m.html}${m.src ? kSources(m.src) : ''}</div>`).join('')
+      + (K.chat.some(m => m.me) ? '' : `<div class="keychips">${KEY_CHIPS.map(q => `<button type="button" data-kq="${esc(q)}">${esc(q)}</button>`).join('')}</div>`);
+    kl.querySelectorAll('[data-kq]').forEach(b => b.onclick = () => kAsk(b.dataset.kq));
+    kl.scrollTop = kl.scrollHeight;
+  }
+  const kHistory = (n = 7) => K.chat.filter(m => !m.typing && !m.skip).slice(-n).map(m => ({role: m.me ? 'user' : 'assistant', content: kPlain(m.html)}));
+  async function kAsk(q){
+    q = String(q).trim().slice(0, 1000);
+    if(!q || K.busy) return;
+    const prior = kHistory(), mine = {me: true, html: `<p>${esc(q)}</p>`};
+    K.chat.push(mine);
+    if(personal(q)){  // never kept or sent: the chat history goes to the server
+      mine.html = `<p>${esc(redact(q).txt)}</p>`; mine.skip = true;
+      K.chat.push({warn: true, skip: true, html: '<p>Please remove your NRIC, phone number or email. Runway never needs them.</p>'}); kRender(); return;
+    }
+    const typing = {typing: true, skip: true, html: '<p>Checking the official documents…</p>'};
+    K.chat.push(typing); K.busy = true; ks.disabled = true; kRender();
+    let b;
+    try{
+      const d = RW.prof.get(), r = await RW.send('ask', {q, facts: null, history: prior, age: (d.onbDone || d.ageSet) && Number.isFinite(d.age) ? d.age : null, lang: RW.lang || 'en'});
+      if(typeof r.text !== 'string') throw new Error(r.error || 'no answer');
+      b = {html: md(r.text) + (r.note ? `<p><small>${esc(r.note)}</small></p>` : ''), src: r.sources, warn: r.blocked === 'personal', skip: !!r.blocked};
+      if(r.blocked) mine.skip = true;
+    }catch(e){ b = {warn: true, skip: true, html: '<p>KEY could not reach the documents just now. Try again in a moment.</p>'}; }
+    K.chat.splice(K.chat.indexOf(typing), 1); K.chat.push(b); K.busy = false; ks.disabled = false; kRender();
+  }
+  function keyOpen(q){
+    kp.hidden = false; kb.hidden = true; kb.setAttribute('aria-expanded', 'true'); kRender();
+    if(q) kAsk(q); else ki.focus({preventScroll: true});
+  }
+  function keyClose(){ kp.hidden = true; kb.hidden = false; kb.setAttribute('aria-expanded', 'false'); kb.focus({preventScroll: true}); }
+  window.KEY = {open: keyOpen, close: keyClose};
+  kb.onclick = () => keyOpen();
+  document.getElementById('keyClose').onclick = keyClose;
+  document.getElementById('keyFull').onclick = () => { kp.hidden = true; kb.hidden = false; RW.enter('ask'); };
+  document.getElementById('keyForm').addEventListener('submit', e => { e.preventDefault(); const q = ki.value; ki.value = ''; kAsk(q); });
+  kp.addEventListener('keydown', e => { if(e.key === 'Escape'){ e.stopPropagation(); keyClose(); } });
+  // the Ask page has the full chat, so KEY steps aside there
+  const kSide = () => { const onAsk = !document.getElementById('scrAsk').hidden; if(onAsk){ kp.hidden = true; } kb.hidden = onAsk || !kp.hidden; };
+  new MutationObserver(kSide).observe(document.getElementById('scrAsk'), {attributes: true, attributeFilter: ['hidden']});
+  kSide();
 
   /* ---------- your town: Toa Payoh as written, the other 25 from the data ---------- */
   const feat = $('#lFeat'), TP_HTML = feat.innerHTML, sel = $('#lTown');
