@@ -12,6 +12,7 @@ from __future__ import annotations
 import calendar
 import json
 import math
+import re
 
 from runway.costs import stamp_duty
 from runway.cpf_rules import HDB_LTV, check_lease, lease_needed_for_full_cpf, max_loan_tenure
@@ -201,3 +202,41 @@ def run(name: str, args) -> tuple[str, bool]:
         return json.dumps({"error": str(exc)}), True
     out["source"] = source
     return json.dumps(out), False
+
+
+# A question about what a shorter lease does to prices in one town, without the flat type or the years of lease left, is
+# answered here with a request for the missing detail: no AI call is spent, and there is no answer in which a figure could be
+# invented (the price lookup needs both, and only takes figures the user gave).
+_TYPE_RE = re.compile(r"\b(?:[345][\s-]?room|executive)\b", re.I)
+_YEARS_RE = re.compile(r"\b\d{1,2}(?:\.\d+)?[\s-]*(?:years?|yrs?)\b", re.I)
+_PRICE_RE = re.compile(r"\b(?:price|prices|pricing|cost|costs|cheaper|expensive)\b", re.I)
+_LEASE_RE = re.compile(r"\bleases?\b", re.I)
+_EFFECT_RE = re.compile(r"\b(?:affect|affects|effect|impact|difference|cheaper|lower|discount|drop)\b|\bdo(?:es)? to\b"
+                        r"|\bcosts? (?:less|more)\b|\bhow much (?:less|more|lower|cheaper)\b", re.I)
+
+
+def lease_price_needs(question: str, earlier: list[str], towns: list[str]) -> str | None:
+    """The reply asking for the missing flat type and/or years of lease, or None when the question is something else.
+
+    Only for a question that names exactly one town and asks what lease does to price. "Why ..." questions are about the
+    rules and are answered from the documents. `earlier` is the user's earlier questions: a type or lease given there counts."""
+    q = question.strip()
+    if q.lower().startswith("why") or not (_PRICE_RE.search(q) and _LEASE_RE.search(q) and _EFFECT_RE.search(q)):
+        return None
+    named = [t for t in towns if re.search(rf"(?<!\w){re.escape(t.lower())}(?!\w)", q.lower())]
+    if len(named) != 1:
+        return None
+    context = " ".join([*earlier, q])
+    need_type, need_years = not _TYPE_RE.search(context), not _YEARS_RE.search(context)
+    town = named[0]
+    if need_type and need_years:
+        return (f"To look up what lease length does to prices in {town}, I need two things: the flat type (3-room, 4-room, "
+                f"5-room or Executive) and how many years of lease are left. For example: \"What does 55 years of lease left "
+                f"do to the price of a 4-room flat in {town}?\"")
+    if need_type:
+        return (f"I have the lease, but to look up prices in {town} I also need the flat type (3-room, 4-room, 5-room or "
+                "Executive). Reply with it, for example: \"4-room flat\".")
+    if need_years:
+        return (f"I have the flat type, but to look up prices in {town} I also need how many years of lease are left. "
+                "Reply with it, for example: \"55 years of lease left\".")
+    return None
