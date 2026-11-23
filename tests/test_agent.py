@@ -211,3 +211,50 @@ def test_the_price_lookup_only_takes_a_lease_the_user_gave(trends_data):
     bot.answer("What does 55 years of lease left do to the price of a 4-room flat in Bedok?", [SOURCE])
     refused = calls[1]["messages"][-1]["content"][0]
     assert refused["is_error"] and "figures the user gave" in refused["content"]
+
+
+# ---- asking for the flat type or lease instead of letting the AI guess ----
+
+TOWNS = ["Ang Mo Kio", "Bedok", "Clementi", "Yishun"]
+
+
+def needs(question, earlier=()):
+    return agent.lease_price_needs(question, list(earlier), TOWNS)
+
+
+def test_a_vague_lease_price_question_asks_for_both_details():
+    reply = needs("What does a shorter lease do to HDB resale prices in Bedok?")
+    assert "in Bedok" in reply and "flat type" in reply and "years of lease" in reply
+    assert "3-room, 4-room, 5-room or Executive" in reply and "55 years of lease left" in reply
+
+
+def test_it_asks_only_for_what_is_missing():
+    only_type = needs("How does 55 years of lease affect prices in Bedok?")
+    assert only_type and "flat type" in only_type and "years of lease are left" not in only_type
+    only_years = needs("How does lease affect the price of a 4-room flat in Bedok?")
+    assert only_years and "how many years of lease" in only_years and "flat type (3-room" not in only_years
+    assert "flat" in only_type.lower() and "years" in only_years.lower()  # a reply written like the example passes the topic filter
+
+
+def test_details_given_earlier_in_the_chat_count():
+    assert needs("What does a shorter lease do to prices in Bedok?", ["I'm looking at a 4-room flat with 55 years left"]) is None
+    only = needs("What does a shorter lease do to prices in Bedok?", ["I'm looking at a 4-room flat"])
+    assert only and "how many years of lease" in only
+
+
+@pytest.mark.parametrize("question", [
+    "What does 55 years of lease left do to the price of a 4-room flat in Bedok?",  # everything is there
+    "Why do short leases cost more in Clementi than Yishun?",                       # a "why" question: answered from the documents
+    "What does a shorter lease do to HDB resale prices?",                           # no town
+    "What does a shorter lease do to prices in Bedok and Yishun?",                  # two towns
+    "Can I use CPF for a short lease flat in Bedok?",                               # not about price
+    "What is the price of a flat in Bedok?",                                        # not about lease
+    "How is the HDB loan affected by a short lease in Bedok?",                      # not about price
+    "I'm 30 and the flat has 55 years left. How much CPF can I use?",
+])
+def test_other_questions_are_left_to_the_ai(question):
+    assert needs(question) is None
+
+
+def test_a_town_name_inside_another_word_is_not_a_town():
+    assert agent.lease_price_needs("What does a shorter lease do to prices in Bedokland?", [], TOWNS) is None

@@ -3326,7 +3326,7 @@ async function ask(q, ctx){
     const r = await RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior, age: (S.onbDone||S.ageSet) ? S.age : null, lang: S.lang});
     if(typeof r.text !== 'string') throw new Error(r.error || 'no answer');  // the server failed: say so, never an empty answer
     b = {html: md(r.text) + (r.note ? `<p class="small">${esc(r.note)}</p>` : ''), src: r.sources, open: !!r.offline, warn: r.blocked === 'personal', skip: !!r.blocked}; if(r.blocked) mine.skip = true;
-    b.lang = LANGS[r.lang] ? r.lang : 'en'; if(!r.blocked && !r.offline) b.fb = {q, v:null};  // only AI answers get Helpful / Not helpful
+    b.lang = LANGS[r.lang] ? r.lang : 'en'; if(!r.blocked && !r.offline && !r.clarify) b.fb = {q, v:null};  // only AI answers get Helpful / Not helpful
   }catch(e){ b = {warn:true, html:'<p>Runway could not reach its documents just now. Try again in a moment.</p>'}; }
   S.chat.splice(S.chat.indexOf(typing), 1);
   pushBot(b);

@@ -16,6 +16,7 @@ import traceback
 from collections.abc import MutableMapping
 from pathlib import Path
 
+from runway.agent import lease_price_needs
 from runway.auth import check_login
 from runway.chain import retrieve
 from runway.game_data import load_towns, recent_months, town_photo
@@ -155,6 +156,12 @@ def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retri
                     "note": NUMBERS_NOTE if used_llm else NUMBERS_NOTE + " Written from a fixed template."}
         history = clean_history(payload.get("history"), 6)
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
+        if lang == "en" and not screen_question(question):
+            need = lease_price_needs(question, [h["content"] for h in history if h["role"] == "user"],
+                                     [t["name"] for t in load_towns()])
+            if need:  # ask for the missing flat type or lease: no AI call, nothing to invent
+                return {"text": need, "sources": [], "blocked": None, "offline": False, "note": None, "lang": "en",
+                        "clarify": True}
         # A question that will be declined must not spend an AI call on the search (the hourly budget is shared).
         sources = ([] if screen_question(question)
                    else retrieve(index, bot.search_query(f"{previous} {question}", lang), k=5))

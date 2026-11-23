@@ -195,6 +195,35 @@ def test_ask_passes_the_known_age_to_the_ai(bot, index, monkeypatch):
         assert seen["situation"] == ""
 
 
+def test_a_vague_lease_price_question_gets_a_clarifying_reply_without_the_ai(bot, index, monkeypatch):
+    def boom(self, *a, **k):
+        raise AssertionError("no AI call for a request to clarify")
+
+    monkeypatch.setattr(LLM, "answer", boom)
+    monkeypatch.setattr(LLM, "search_query", boom)
+    reply = send("ask", {}, bot, index, q="What does a shorter lease do to HDB resale prices in Bedok?")
+    assert reply["clarify"] is True and reply["blocked"] is None and not reply["offline"] and reply["sources"] == []
+    assert "flat type" in reply["text"] and "Bedok" in reply["text"]
+
+
+def test_the_clarifying_reply_does_not_replace_other_checks_or_languages(bot, index, monkeypatch):
+    seen = []
+
+    def fake(self, question, sources, history=None, situation="", lang="en"):
+        seen.append(question)
+        return Answer(text="ok", sources=sources)
+
+    monkeypatch.setattr(LLM, "answer", fake)
+    q = "What does a shorter lease do to HDB resale prices in Bedok?"
+    assert "clarify" not in send("ask", {}, bot, index, q=q, lang="zh")  # other languages go to the AI as before
+    assert seen == [q]
+    advice = "Is it a good buy in Bedok? What does a short lease do to the price?"  # screen_question() calls this advice
+    reply = send("ask", {}, bot, index, q=advice)
+    assert "clarify" not in reply and seen[-1] == advice  # a question the screen declines goes the normal way, to be declined there
+    full = send("ask", {}, bot, index, q="What does 55 years of lease left do to the price of a 4-room flat in Bedok?")
+    assert "clarify" not in full and len(seen) == 3
+
+
 def test_towns_lists_every_town_with_its_recent_sales(bot, index):
     reply = send("towns", {}, bot, index)
     towns, names = {t["id"]: t for t in reply["towns"]}, [t["name"] for t in reply["towns"]]
