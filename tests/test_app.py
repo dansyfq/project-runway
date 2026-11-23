@@ -462,7 +462,24 @@ def test_home_calculator_and_your_town_section_are_linked():
     # the written cards stay as the fallback until the towns load
     assert "<h3 class=\"lh3\">Woodlands</h3>" in GAME and "<h3 class=\"lh3\">Sembawang</h3>" in GAME
     # the stand-in used until the towns load is Toa Payoh's value in the data
-    assert "{name: 'Toa Payoh', pct: 1.5, low: false}" in GAME
+    assert "{id: 'TOA PAYOH', name: 'Toa Payoh', pct: 1.5, low: false}" in GAME
+
+
+def test_trends_follow_what_the_customer_entered():
+    from runway.trends import BAND_STARTS
+
+    assert f"const BAND_FROM = {BAND_STARTS};" in GAME  # the page's lease bands are the data's bands
+    # one place to read it from: Trends' context(), fed by Home, the map and the links
+    assert "function context()" in GAME and "function applyProfile()" in GAME and "if(key === st.key) return;" in GAME
+    assert "RW.prof.set({pickTown:f.town, pickType:f.ft, lease:Math.floor(f.lease)});" in GAME
+    assert "if(k === 'lease') RW.prof.set({lease: L.lease});" in GAME
+    assert "RW.prof.set({pickTown: sel.value || null})" in GAME
+    # links from Home and from a flat on the map, and the marker on the lease chart
+    assert "const trendTownId = () => T.list ? T.list[T.i].id : (sel.value || 'TOA PAYOH');" in GAME  # the picked town, even before the towns load
+    assert "RW.enter('trends', {town: trendTownId(), type: $('#lType').value, lease: L.lease})" in GAME
+    assert 'id="lTrendLink"' in GAME and 'id="trendBtn"' in GAME and "go('trends',{town:f.town,type:f.ft,lease:f.lease})" in GAME
+    assert "spec.mark" in GAME and "' (your lease)'" in GAME
+    assert "the town, flat type and lease you last looked at" in GAME
 
 
 def test_one_h1_on_the_home_page_and_described_ratings():
