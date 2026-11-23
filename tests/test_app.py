@@ -508,6 +508,15 @@ def test_a_clarifying_reply_is_not_rated_like_an_ai_answer():
     assert "if(!r.blocked && !r.offline && !r.clarify) b.fb = {q, v:null};" in GAME  # and it stays in the chat history
 
 
+def test_every_built_in_suggestion_passes_the_topic_filter():
+    from runway.llm import screen_question
+    sugg = re.search(r"const SUGG=\[(.*?)\];", GAME, re.S).group(1)
+    follow = re.search(r"const FOLLOW=\[(.*?)\]\];", GAME, re.S).group(1)
+    questions = re.findall(r"'([^']*)'", sugg) + re.findall(r",\s*'([^']*)'\]", follow)
+    assert len(questions) >= 19
+    assert [q for q in questions if screen_question(q)] == []
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
