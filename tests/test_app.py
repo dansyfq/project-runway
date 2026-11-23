@@ -540,6 +540,16 @@ def test_home_ask_box_and_mic_ask_key():
     assert hero.count("KEY.open(q)") == 2  # typed and spoken
 
 
+def test_when_you_sell_shows_a_lease_bar_with_the_rule_behind_why():
+    i = GAME.index("function exitView(f){")
+    view = GAME[i:GAME.index("function showResult(){", i)]
+    assert "<summary>Why?</summary>" in view and "Rule: CPF Board" in view  # the sources stay, behind Why?
+    assert 'role="img" aria-label="Bar:' in view and "need=95-EXIT_AGE" in view  # the bar and the years a buyer aged 30 needs
+    assert "${full?'✓':'!'}" in view  # not colour alone
+    assert "or older" not in view and "A short lease also limits your buyer. When do you sell?" in view
+    assert "e.left<=20" in view  # 20 years or less keeps the plain message
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
