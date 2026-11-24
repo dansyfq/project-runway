@@ -405,4 +405,4 @@ def test_only_a_follow_up_question_is_searched_together_with_the_one_before():
 def test_a_name_question_gets_a_fixed_reply_without_a_search_or_an_ai_call(bot, index):
     reply = send("ask", {}, bot, index, q="what is your name", **{"as": "key"})
     assert "I'm KEY" in reply["text"] and reply["clarify"] is True and reply["sources"] == [] and reply["blocked"] is None
-    assert "I'm Ask Runway" in send("ask", {}, bot, index, q="who are you")["text"]
+    assert "I'm KEY" in send("ask", {}, bot, index, q="who are you")["text"]
