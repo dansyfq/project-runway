@@ -270,7 +270,7 @@ def test_landing_look_and_copy():
                  "what buyers need to know.", "not from the AI"):
         assert text in GAME, text
     # the closing "Have more questions?" band is gone: its "Start asking" only jumped back up to the hero's ask box
-    for text in ("Have more questions? Ask Runway.", "Start asking", 'href="#lask"', "lband"):
+    for text in ("Have more questions? Ask KEY.", "Start asking", 'href="#lask"', "lband"):
         assert text not in GAME, text
     # the system font everywhere; Google Fonts loads only Anton, for the RUNWAY wordmark
     assert re.findall(r'href="https://fonts\.googleapis\.com/css2\?([^"]*)"', GAME) == ["family=Anton&display=swap"]
