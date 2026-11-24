@@ -742,8 +742,8 @@ def test_mic_greeting_in_each_answer_language():
 
     voice = GAME[GAME.index("const VOICE = {"):GAME.index("const TTS = ")]
     greet = {k: a or b for k, a, b in re.findall(r"(\w+): \{rec: '[\w-]+', hi: (?:\"([^\"]+)\"|'([^']+)')", voice)}
-    assert set(greet) == set(LANGUAGES) and all("Runway" in g for g in greet.values())  # the name stays "Runway"
-    assert greet["en"] == "Hi, I'm Runway. How are you?" and greet["ms"] == "Hai, saya Runway. Apa khabar?"
+    assert set(greet) == set(LANGUAGES) and all("KEY" in g and "Runway" not in g for g in greet.values())  # the mic introduces the assistant as KEY
+    assert greet["en"] == "Hi, I'm KEY. How are you?" and greet["ms"] == "Hai, saya KEY. Apa khabar?"
     assert re.findall(r"rec: '([\w-]+)'", voice) == ["en-SG", "zh-CN", "ms-MY", "ta-SG"]
     assert "rec:" not in GAME[GAME.index("const LANGS={"):GAME.index("S.lang='en';")]  # one list of recognition tags
     assert "RW.lang = S.lang" in GAME  # the Home mic uses the language chosen on the Ask page
