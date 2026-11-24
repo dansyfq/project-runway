@@ -258,3 +258,30 @@ def test_other_questions_are_left_to_the_ai(question):
 
 def test_a_town_name_inside_another_word_is_not_a_town():
     assert agent.lease_price_needs("What does a shorter lease do to prices in Bedokland?", [], TOWNS) is None
+
+
+def price_needs(question, earlier=()):
+    return agent.price_ask_needs(question, list(earlier), TOWNS)
+
+
+def test_a_plain_price_question_asks_for_the_lease():
+    reply = price_needs("What is the latest HDB resale price for a 4-room flat in Bedok?")
+    assert "in Bedok" in reply and "how many years of lease are left" in reply and "flat type" not in reply
+    assert "the town" not in reply
+
+
+def test_a_price_question_with_nothing_given_asks_for_town_type_and_lease():
+    reply = price_needs("What is the average resale price?")
+    assert "the town" in reply and "flat type" in reply and "years of lease" in reply
+
+
+def test_a_price_question_with_everything_given_goes_on_to_the_price_lookup():
+    assert price_needs("What is the price of a 4-room flat in Bedok with 60 years of lease left?") is None
+    assert price_needs("And what about the price of a flat?", ["4-room in Bedok, 60 years of lease left"]) is None
+
+
+def test_rules_and_comparison_questions_that_mention_a_price_are_left_alone():
+    for q in ("How is the loan limit worked out from the purchase price?", "How much stamp duty do I pay on a $600,000 flat?",
+              "What is the minimum occupation period?", "Compare resale prices in Bedok and Yishun",
+              "Why do resale prices fall with lease?"):
+        assert price_needs(q) is None, q

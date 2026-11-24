@@ -215,6 +215,48 @@ _EFFECT_RE = re.compile(r"\b(?:affect|affects|effect|impact|difference|cheaper|l
                         r"|\bcosts? (?:less|more)\b|\bhow much (?:less|more|lower|cheaper)\b", re.I)
 
 
+# A plain "what does a flat cost" question: the price depends on the town, the flat type and the years of lease left, and
+# the lookup (price_by_lease) needs all three, so ask for whatever is missing instead of sending links. Rules questions that
+# mention a price ("75% of the purchase price", "stamp duty on $600,000", loans, grants) are left to the documents.
+_PRICE_WORD_RE = re.compile(r"\b(?:price|prices|cost|costs|how much)\b", re.I)
+_FLAT_WORD_RE = re.compile(r"\b(?:flat|flats|room|rooms|hdb|resale|executive|home|homes)\b", re.I)
+_LEVEL_RE = re.compile(r"\b(?:latest|current|recent|average|median|typical|going|market|asking|resale)\s+(?:resale\s+)?prices?\b"
+                       r"|\bprices?\s+(?:of|for|in|at)\b|\bhow much (?:is|are|does|do|would|will)\b.{0,40}\b(?:flat|room|executive|home)s?\b"
+                       r"|\bhow much\b.{0,30}\bcosts?\b|\bwhat(?:'s| is| are)\b.{0,25}\bprices?\b", re.I)
+_RULES_RE = re.compile(r"\b(?:stamp|duty|bsd|absd|loan|loans|ltv|valuation|grant|grants|cpf|mortgage|tenure|interest|fee|fees|"
+                       r"legal|solicitor|downpayment|deposit|otp|levy|quota|eligib\w*)\b|\$\s?\d|\b\d{3},\d{3}\b|\bpurchase price\b|^\s*why\b", re.I)
+
+
+def _towns_in(text: str, towns: list[str]) -> list[str]:
+    return [t for t in towns if re.search(rf"(?<!\w){re.escape(t.lower())}(?!\w)", text.lower())]
+
+
+def price_ask_needs(question: str, earlier: list[str], towns: list[str]) -> str | None:
+    """The reply asking for the missing town, flat type and years of lease when someone asks what a flat costs, or None
+    when the question is something else or has all three. Earlier questions count: a detail given there is not asked again."""
+    q = question.strip()
+    if _RULES_RE.search(q) or not (_PRICE_WORD_RE.search(q) and _FLAT_WORD_RE.search(q) and _LEVEL_RE.search(q)):
+        return None
+    named = _towns_in(q, towns)
+    if len(named) > 1:  # a comparison of towns: the documents or the Trends page, not one lookup
+        return None
+    context = " ".join([*earlier, q])
+    in_context = named or _towns_in(" ".join(earlier), towns)
+    missing = []
+    if len(in_context) != 1:
+        missing.append("the town")
+    if not _TYPE_RE.search(context):
+        missing.append("the flat type (3-room, 4-room, 5-room or Executive)")
+    if not _YEARS_RE.search(context):
+        missing.append("how many years of lease are left")
+    if not missing:
+        return None
+    where = f" in {in_context[0]}" if len(in_context) == 1 else ""
+    what = missing[0] if len(missing) == 1 else ", ".join(missing[:-1]) + " and " + missing[-1]
+    return (f"To look up resale prices{where}, I need {what}. The lease matters because a flat with less lease left usually "
+            f"sells for less. For example: \"What do 4-room flats with 60 years of lease left cost in {in_context[0] if len(in_context) == 1 else 'Tampines'}?\"")
+
+
 def lease_price_needs(question: str, earlier: list[str], towns: list[str]) -> str | None:
     """The reply asking for the missing flat type and/or years of lease, or None when the question is something else.
 

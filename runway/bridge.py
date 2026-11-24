@@ -16,7 +16,7 @@ import traceback
 from collections.abc import MutableMapping
 from pathlib import Path
 
-from runway.agent import lease_price_needs
+from runway.agent import lease_price_needs, price_ask_needs
 from runway.auth import check_login
 from runway.chain import retrieve
 from runway.game_data import load_towns, recent_months, town_photo
@@ -157,8 +157,8 @@ def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retri
         history = clean_history(payload.get("history"), 6)
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
         if lang == "en" and not screen_question(question):
-            need = lease_price_needs(question, [h["content"] for h in history if h["role"] == "user"],
-                                     [t["name"] for t in load_towns()])
+            earlier_q, town_names = [h["content"] for h in history if h["role"] == "user"], [t["name"] for t in load_towns()]
+            need = lease_price_needs(question, earlier_q, town_names) or price_ask_needs(question, earlier_q, town_names)
             if need:  # ask for the missing flat type or lease: no AI call, nothing to invent
                 return {"text": need, "sources": [], "blocked": None, "offline": False, "note": None, "lang": "en",
                         "clarify": True}
