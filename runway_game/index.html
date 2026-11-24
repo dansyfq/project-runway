@@ -3729,6 +3729,27 @@ function packChunks(t){
   return out;
 }
 function prefetchPack(text,lang='en'){if(LANGS[lang])packFetch(packChunks(packText(text,lang))[0],lang);}  // an answer's first sentence is ready before Listen is pressed
+// Loudness matching: the voice makes each clip of a reply separately, so one clip can come out louder or quieter than the
+// one before it (a short first sentence is often the quiet one). Each clip is decoded and played at the gain that brings
+// its speech to the same level; never past what would clip, and never more than 3x or less than half.
+const LEVEL=.15, GAIN_MIN=.5, GAIN_MAX=3, PEAK_MAX=.98;
+let AC=null;
+function clipGain(ch){  // ch: the clip's samples (-1..1); speech only, so the pauses between words do not count
+  let s=0, n=0, peak=0;
+  for(let i=0;i<ch.length;i++){const v=Math.abs(ch[i]); if(v>peak) peak=v; if(v>.02){s+=v*v; n++;}}
+  if(n<2000||!peak) return 1;  // too little sound to measure
+  return Math.max(GAIN_MIN, Math.min(GAIN_MAX, LEVEL/Math.sqrt(s/n), PEAK_MAX/peak));
+}
+async function decodeClip(b64){  // the clip as an AudioBuffer, or null when it cannot be decoded or the page cannot play audio yet
+  try{
+    const C=window.AudioContext||window.webkitAudioContext; if(!C) return null;
+    AC=AC||new C();
+    if(AC.state!=='running') await Promise.race([AC.resume(), new Promise(r=>setTimeout(r,300))]);
+    if(AC.state!=='running') return null;
+    const bin=atob(b64), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+    return await AC.decodeAudioData(u.buffer);
+  }catch(e){ return null; }
+}
 let speakingBtn=null;
 function stopSpeak(){PACKRUN++;if(AUD){AUD.pause();AUD=null;}if(TTS)TTS.cancel();if(speakingBtn){speakingBtn.setAttribute('aria-pressed','false');speakingBtn.lastChild.textContent='Listen';}speakingBtn=null;}
 async function speakPack(text,btn,lang){
@@ -3739,8 +3760,18 @@ async function speakPack(text,btn,lang){
     const b64=await next; if(PACKRUN!==my) return true;  // stopped or replaced while loading
     if(!b64){stopSpeak(); return i>0;}  // nothing played yet: the caller falls back to device voices
     if(i+1<cs.length) next=packFetch(cs[i+1],lang);
-    const a=AUD=new Audio('data:audio/mpeg;base64,'+b64), done=new Promise(r=>{a.onended=a.onerror=a.onpause=r;});
-    try{await a.play();}catch(e){AUD=null;stopSpeak();return i>0;}
+    const buf=await decodeClip(b64); if(PACKRUN!==my) return true;  // stopped while decoding
+    let done;
+    if(buf){  // at the gain that brings its speech to the common level, so no clip is louder than the one before
+      try{
+        const src=AC.createBufferSource(), gn=AC.createGain(); src.buffer=buf; gn.gain.value=clipGain(buf.getChannelData(0));
+        src.connect(gn); gn.connect(AC.destination); done=new Promise(r=>{src.onended=r;});
+        AUD={pause(){try{src.stop();}catch(e){}}}; src.start();
+      }catch(e){AUD=null;stopSpeak();return i>0;}
+    }else{  // it cannot be decoded here: play it as it is
+      const a=AUD=new Audio('data:audio/mpeg;base64,'+b64); done=new Promise(r=>{a.onended=a.onerror=a.onpause=r;});
+      try{await a.play();}catch(e){AUD=null;stopSpeak();return i>0;}
+    }
     await done; if(PACKRUN!==my) return true;
   }
   stopSpeak(); return true;
