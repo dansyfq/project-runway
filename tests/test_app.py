@@ -728,7 +728,7 @@ def test_both_mics_dictate_through_pauses_and_greet_first():
     hero = GAME[GAME.index("  /* voice: as on the Ask page"):GAME.index("/* ---------- your town")]
     ask = GAME[GAME.index("/* ---------- voice: speech to text (in the answer language"):GAME.index("/* ---------- more ----------")]
     assert "r.continuous = true" in shared and "r.interimResults = true" in shared
-    assert "const SILENCE_MS = 2500, HUSH_MS = 7000" in shared  # a short thinking pause never ends it, but sending is no longer slow
+    assert "const SILENCE_MS = 1500, HUSH_MS = 7000" in shared  # 1.5 s of quiet sends (it was 2.5 s, which felt slow); a person who says nothing still gets 7 s
     assert "10000);" not in hero + ask and "new SR(" not in hero + ask  # no fixed 10-second cut-off; one dictation for both
     # a session the browser ends restarts unless the user stopped, an error ended it, or it keeps ending at once
     assert "if(phase !== 'listen' || err) return end();" in shared and "if(quick >= 3) return end();" in shared
