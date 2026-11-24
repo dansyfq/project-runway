@@ -75,7 +75,7 @@ def test_compare_marks_best_with_text_only_where_flats_differ(tmp_path):
 def test_compare_selection_is_capped_and_in_memory():
     assert "const CMP=new Set();" in GAME
     assert "You can compare up to three flats" in GAME and 'id="cmpMsg" role="status"' in GAME
-    block = between("function renderList(){", "/* ---------- Ask Runway")
+    block = between("function renderList(){", "/* ---------- Ask KEY")
     assert "localStorage" not in block and "history." not in block and "location" not in block
 
 
