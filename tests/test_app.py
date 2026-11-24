@@ -834,3 +834,11 @@ def test_when_you_sell_says_from_what_buyer_age_cpf_is_in_full():
     game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
     assert "const minAge=95-left;" in game
     assert "Who gets full CPF:" in game and "if the youngest buyer is ${minAge} or older (95 minus ${left} years of lease left)" in game
+
+
+def test_an_age_changed_elsewhere_reaches_when_you_sell_home_and_the_lease_explorer():
+    game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
+    assert "const EXIT=S.ageSet?S.age:EXIT_AGE" in game and "resaleExit(f.lease,y,EXIT)" in game  # the example buyer is the age you set
+    assert "A buyer aged ${EXIT}${mine} needs at least" in game
+    assert "if(st.fromAge!==S.age){ st.age=S.age; st.fromAge=S.age; }" in game  # the Lease explorer
+    assert "observe($('#scrLanding'), {attributes: true, attributeFilter: ['hidden']})" in game  # Home takes the age back

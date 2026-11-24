@@ -2500,6 +2500,13 @@ function faqFilter(faq, text){
   $('#lReset').onclick = () => {  // back to the page's starting numbers; nothing else on the page or in the app changes
     L.lease = 55; L.age = 52; $('#lTown').value = ''; $('#lType').value = '4-room'; RW.prof.set({pickTown: null, pickType: null, lease: null}); renderRule(); syncHeart();
   };
+  // The age can change elsewhere once the app has loaded (Your details, the map's age chip, the first-visit questions).
+  // saveDetails() has already put it in RW.prof when Home is shown again, so take it from there.
+  new MutationObserver(() => {
+    if($('#scrLanding').hidden) return;
+    const d = RW.prof.get();
+    if(d.ageSet && d.age >= 21 && d.age <= 85 && Math.round(d.age) !== L.age){ L.age = Math.round(d.age); renderRule(); }
+  }).observe($('#scrLanding'), {attributes: true, attributeFilter: ['hidden']});
   $('#lSee').onclick = () => RW.enter('map', {town: $('#lTown').value || null, ft: $('#lType').value, age: L.age});
   $('#lWhy').onclick = () => prefill(`${{full: 'Why can I use CPF in full', part: 'Why is my CPF use pro-rated', none: "Why can't I use CPF"}[landingVerdict(L.age, L.lease).status]} for a flat with ${yrs(L.lease)} of lease left and a youngest buyer aged ${L.age}?`);
   renderRule();
@@ -3246,23 +3253,24 @@ function historyCheck(f){
 }
 // Resale exit: the same age-95 rule as calc() (runway/cpf_rules.py resale_exit), applied to whoever buys from you later.
 function resaleExit(lease, yrs, age){const left=Math.max(0,lease-yrs), share=left<=20?0:age+left>=95?1:(left-20)/(95-age-20); return {left, full:95-left, share, ltv:.75*share};}
-const EXIT_AGE=30;  // an example next buyer, not a rule
+const EXIT_AGE=30;  // the example buyer's age until you give yours; not a rule
 function exitView(f){
   const box=$('#exitBox'); if(!box) return;
+  const EXIT=S.ageSet?S.age:EXIT_AGE, mine=S.ageSet?' (the age you set)':'';  // the example buyer follows the youngest-buyer age you set
   box.innerHTML=`<h3 id="exitH" style="font-size:1.05rem;color:var(--ink)">When you sell</h3>
     <p>A short lease also limits your buyer. When do you sell?</p>
     <div class="chips" role="group" aria-labelledby="exitH">${[5,10,15,20].map(n=>`<button type="button" class="chip" data-exit="${n}" aria-pressed="${n===5}">In ${n} years</button>`).join('')}</div>
     <div id="exitOut" aria-live="polite"></div>
-    <details class="more"><summary>Why?</summary><p class="small" style="margin-top:8px">Rule: CPF Board, “How much CPF savings can I use … lease does not cover the youngest buyer to age 95?” and HDB, “Housing loan from HDB”. The buyer aged ${EXIT_AGE} is only an example. Most flats can be sold on the open market only after the 5-year minimum occupation period (HDB, “Conditions after buying a resale flat”).</p></details>`;
+    <details class="more"><summary>Why?</summary><p class="small" style="margin-top:8px">Rule: CPF Board, “How much CPF savings can I use … lease does not cover the youngest buyer to age 95?” and HDB, “Housing loan from HDB”. The buyer aged ${EXIT} is only an example${S.ageSet?', taken from the youngest-buyer age you set':''}. Most flats can be sold on the open market only after the 5-year minimum occupation period (HDB, “Conditions after buying a resale flat”).</p></details>`;
   const upd=y=>{
-    const e=resaleExit(f.lease,y,EXIT_AGE), left=Math.floor(e.left), need=95-EXIT_AGE;
+    const e=resaleExit(f.lease,y,EXIT), left=Math.floor(e.left), need=95-EXIT;
     box.querySelectorAll('[data-exit]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.exit===y));
     if(e.left<=20){ $('#exitOut').innerHTML=`<p><b style="color:var(--ink)">Only ${left} year${left===1?'':'s'} would be left.</b> With 20 years or less, a buyer can't use CPF or take an HDB loan for this flat.</p>`; return; }
     const w=v=>Math.max(0,Math.min(100,v/99*100)).toFixed(1), full=e.share>=1, col=full?'var(--ok)':'var(--part)';
     const minAge=95-left;  // the youngest buyer's age from which lease left + age reaches 95, so CPF and the 75% loan are in full
     const cpf=full?'CPF in full':`CPF ${Math.floor(e.share*100)}% of the limit`, loan=`HDB loan up to ${Math.floor(e.ltv*100)}%`;
-    $('#exitOut').innerHTML=`<p style="margin:10px 0 6px"><b style="color:var(--ink)">${left} years of lease left</b> when you sell. A buyer aged ${EXIT_AGE} needs at least ${need} years of lease left to use CPF in full (95 minus ${EXIT_AGE}).</p>
-      <div role="img" aria-label="Bar: ${left} years of lease left when you sell; a buyer aged ${EXIT_AGE} needs ${need} years to use CPF in full" style="position:relative;height:14px;border-radius:7px;background:var(--tint)">
+    $('#exitOut').innerHTML=`<p style="margin:10px 0 6px"><b style="color:var(--ink)">${left} years of lease left</b> when you sell. A buyer aged ${EXIT}${mine} needs at least ${need} years of lease left to use CPF in full (95 minus ${EXIT}).</p>
+      <div role="img" aria-label="Bar: ${left} years of lease left when you sell; a buyer aged ${EXIT} needs ${need} years to use CPF in full" style="position:relative;height:14px;border-radius:7px;background:var(--tint)">
         <div style="height:100%;width:${w(left)}%;border-radius:7px;background:${col}"></div>
         <div style="position:absolute;top:-4px;bottom:-4px;left:${w(need)}%;width:2px;background:var(--ink)"></div></div>
       <div class="small" style="position:relative;height:1.3em;margin-top:4px"><span style="position:absolute;left:${w(need)}%;transform:translateX(-50%);white-space:nowrap">${need} years of lease needed</span></div>
@@ -4184,6 +4192,7 @@ function cpfPct(age,lease){ if(lease<=20) return 0; if(age+lease>=95) return 100
 const pctText=p=>p>=100?'Full':p>0?Math.round(p)+'%':'None';
 function leaseExplorer(b,top){
   const st=S.ex||(S.ex={age:S.age,lease:60});
+  if(st.fromAge!==S.age){ st.age=S.age; st.fromAge=S.age; }  // an age changed elsewhere (Details, the map, Home) carries over; your own slider move stays until then
   b.innerHTML=`${top}<div class="doctext"><h1>Lease explorer</h1>
     <p>How much of a flat's Valuation Limit CPF can pay, for each age of the youngest buyer and each lease left. Worked out in this page with the official rule. Nothing is sent anywhere.</p>
     <span class="label">Try your own</span>
