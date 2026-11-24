@@ -578,6 +578,23 @@ def test_the_reply_label_says_key_not_runway():
     assert '<span class="who">KEY</span>' in GAME and '<span class="who">Runway</span>' not in GAME
 
 
+def test_key_popup_layout_placeholder_and_thumb_votes():
+    # the header button and the quick actions stay on one line each (no clipped chips), text is one font, left aligned
+    assert ".keypanel{font-family:var(--font-ui);text-align:left;position:fixed;" in GAME
+    assert ".keyhead small{display:block;font-size:.75rem;" in GAME and "white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" in GAME  # the subtitle stays on one line
+    assert ".keyhead .keyfull{flex:none;white-space:nowrap;" in GAME and ".keyacts{display:flex;flex-wrap:wrap;" in GAME
+    assert "height:min(600px,calc(100vh - 160px));" in GAME and "<small>CPF · HDB · MND documents</small>" in GAME  # room for the chat; the subtitle fits on one line
+    assert 'id="keyFull" aria-label="Open the full Ask page">Ask page</button>' in GAME  # a short label, so the subtitle is not cut off
+    assert ".ksrc ul{margin:6px 0;padding:0;list-style:none}" in GAME
+    # the box says "Type your question": the header already says what KEY reads, and a long hint was cut off
+    assert 'id="keyIn" type="text" autocomplete="off" maxlength="1000" placeholder="Type your question"' in GAME
+    assert "const KEY_INTRO = 'Hello, I am KEY. How can I help?';" in GAME
+    # Helpful / Not helpful are thumbs up and down icons with names for screen readers
+    block = GAME[GAME.index("const THUMBS = {up:"):GAME.index("kl.innerHTML = all.map(")]
+    assert "<svg width=\"20\" height=\"20\"" in block and 'aria-label="${t}" title="${t}"' in block and ">${t}</button>" not in block
+    assert "data-kv=" in block and "aria-pressed=" in block  # the vote handler is unchanged
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
