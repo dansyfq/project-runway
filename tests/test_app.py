@@ -550,6 +550,14 @@ def test_when_you_sell_shows_a_lease_bar_with_the_rule_behind_why():
     assert "e.left<=20" in view  # 20 years or less keeps the plain message
 
 
+def test_the_voice_is_not_slowed_down():
+    # the server voice and every device voice (the mic greeting, read aloud, the voice test) run a little faster than
+    # normal: they were set slower than normal (-8%, 0.92) and sounded too slow
+    assert re.findall(r"u\.rate ?= ?([\d.]+)", GAME) == ["1.1", "1.1", "1.1"]
+    pack = (ROOT / "runway" / "voicepack.py").read_text(encoding="utf-8")
+    assert 'rate="+10%"' in pack and 'rate="-' not in pack
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
