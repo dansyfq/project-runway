@@ -244,3 +244,16 @@ def test_search_query_translates_only_other_languages():
     offline = LLM.__new__(LLM)
     offline._client = None
     assert offline.search_query("公积金能用多少", "zh") == "公积金能用多少"
+
+
+def test_step_numbers_in_a_list_are_not_figures():
+    answer = "The steps:\n1. Get your HFE letter [1]\n2. Look for a flat [2]\n3) Apply for the loan\nStep 4: Complete the sale."
+    assert invented_numbers(answer, "HFE letter, flat search, loan and completion.") == set()
+    assert invented_numbers("1. The HDB loan limit is 90% [1]\n2. Pay in 8 weeks", "Loan limit 75%.") == {"90", "8"}  # real figures still count
+
+
+def test_without_list_numbers_leaves_other_numbers_alone():
+    from runway.llm import without_list_numbers
+
+    assert "75%" in without_list_numbers("1. Up to 75% of the price [1]") and "Step" not in without_list_numbers("Step 3: sign")
+    assert "20" in without_list_numbers("A lease of 20 years or less")
