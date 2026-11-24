@@ -106,10 +106,10 @@ def test_stored_edits_of_the_old_page_cannot_hide_the_new_one():
 def test_guests_see_the_rag_pipeline_and_the_flowcharts(tmp_path):
     guest = method_pages(tmp_path)["guest"]
     assert "<h1>Methodology</h1>" in guest and "How it works:" in guest
-    for words in ["How Ask Runway answers", "32 official documents", "160 words", "40 words", "BM25", "vector store",
+    for words in ["How Ask KEY answers", "32 official documents", "160 words", "40 words", "BM25", "vector store",
                   "weighted reciprocal rank fusion", "FAISS index of bge-small-en-v1.5 embeddings", "TF-IDF vectors stand in", "LangChain retriever", "Anthropic SDK",
                   "Calculator tools", "a tool result", "numbered citations", "PBKDF2-SHA256", "Number guard", "Fallback",
-                  "Insights", "Flowchart · Use case 1: Map", "Flowchart · Use case 2: Ask Runway",
+                  "Insights", "Flowchart · Use case 1: Map", "Flowchart · Use case 2: Ask KEY",
                   "Flowchart · Use case 3: Lease explorer", "AI calls Runway's calculator tools"]:
         assert words in guest, words
     roles = re.search(r"<h2>Accounts</h2>(.*?)</table>", guest, re.S).group(1)
@@ -132,7 +132,7 @@ def test_checklist_names_each_item_of_the_brief(tmp_path):
     for words in ["3 calculator tools", "Insights (admin only)", "Lease explorer", "Notice"]:
         assert words in more, words
     assert "Markdown" not in section and "LangChain is not used" not in section
-    assert "How Ask Runway answers" in full and "Test cases" in full and "Flowchart" in full
+    assert "How Ask KEY answers" in full and "Test cases" in full and "Flowchart" in full
 
 
 def test_retrieval_and_roles_are_described_in_one_place():
@@ -169,7 +169,7 @@ SAMPLE_CHAT = [
 
 NOTICE_STUB = "<p><b>IMPORTANT NOTICE:</b> A prototype.</p><p>Always consult with qualified professionals.</p>"
 
-EXPECTED_TXT = """Runway: Ask Runway chat
+EXPECTED_TXT = """Runway: Ask KEY chat
 Saved 20 November 2026, 3:04 pm
 
 IMPORTANT NOTICE: A prototype.
