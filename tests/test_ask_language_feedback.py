@@ -215,7 +215,7 @@ def test_a_key_vote_is_marked_and_an_ask_vote_is_not(feedback_file, no_ai):
 
 
 def test_key_has_action_chips_a_mic_and_votes():
-    assert "KEY_ACTIONS" in GAME and 'id="keyMic"' in GAME and "src: 'key'" in GAME
+    assert "KEY_ACTIONS" not in GAME and 'id="keyMic"' in GAME and "src: 'key'" in GAME  # the shortcut buttons were removed; the mic and the votes stay
 
 
 def test_opening_ask_does_not_say_hello():
