@@ -2331,7 +2331,7 @@ function greet(lang){
       if(over) return; if(!TTS || (lang !== 'en' && !voice)) return end();
       const u = new SpeechSynthesisUtterance(VOICE[lang].hi); let began = false;
       if(voice){ u.voice = voice; u.lang = voice.lang; } else u.lang = 'en-SG';
-      u.rate = .92; u.onstart = () => { began = true; }; u.onend = u.onerror = end;
+      u.rate = 1.1; u.onstart = () => { began = true; }; u.onend = u.onerror = end;
       window._utter = u; HIOFF = () => { TTS.cancel(); end(); };
       if(TTS.speaking || TTS.pending){ TTS.cancel(); setTimeout(() => { if(!over) TTS.speak(u); }, 60); } else TTS.speak(u);
       setTimeout(() => { if(!began) end(); }, 1500);  // a device that never starts (Chrome can drop it) must not hold the mic
@@ -3686,7 +3686,7 @@ async function speak(text,btn,lang='en'){
   if(lang!=='en' && !voice){ if(btn) btn.lastChild.textContent=`No ${LANGS[lang].name} voice on this device`; return; }
   const u=new SpeechSynthesisUtterance(packText(text,lang));
   if(voice){u.voice=voice;u.lang=voice.lang;} else u.lang='en-SG';
-  u.rate=.92;
+  u.rate=1.1;
   if(btn){speakingBtn=btn;btn.setAttribute('aria-pressed','true');btn.lastChild.textContent='Stop';}
   u.onend=u.onerror=()=>{if(speakingBtn===btn)stopSpeak();};
   window._utter=u;  // Chrome drops utterances it garbage-collects mid-speech
@@ -3712,7 +3712,7 @@ function welcomeAsk(){
   stopSpeak();
   const u=new SpeechSynthesisUtterance(VOICE[lang].hi);
   if(voice){u.voice=voice;u.lang=voice.lang;} else u.lang='en-SG';
-  u.rate=.92; window._utter=u;
+  u.rate=1.1; window._utter=u;
   setTimeout(()=>{ if(!$('#scrAsk').hidden && !MIC) TTS.speak(u); },60);  // Chrome skips a speak() right after cancel()
 }
 // leaving the Ask page stops the mic (what was heard stays in the box)
