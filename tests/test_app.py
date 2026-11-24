@@ -529,8 +529,8 @@ def test_key_is_an_assistant_button_that_asks_the_same_server_question():
     assert "RW.send('ask', {q, facts: null, history: prior," in js and "lang: RW.lang || 'en'" in js
     assert js.index("if(personal(q))") < js.index("RW.send('ask'")
     assert "mine.skip = true" in js and "skip: true" in js  # questions with personal details never join the history
-    # answers show their sources as links, opening in a new tab; Escape closes; the Ask page has its own chat
-    assert 'target="_blank" rel="noopener"' in js and "e.key === 'Escape'" in js
+    # Escape closes it; the Ask page has its own chat
+    assert "e.key === 'Escape'" in js and "target=\"_blank\"" not in js  # Escape closes; the pop-up has no document links, only a plain "Based on" line
     assert "document.getElementById('scrAsk')" in js and "kb.hidden = onAsk" in js
 
 
@@ -585,7 +585,6 @@ def test_key_popup_layout_placeholder_and_thumb_votes():
     assert ".keyhead .keyfull{flex:none;white-space:nowrap;" in GAME and ".keyacts{display:flex;flex-wrap:wrap;" in GAME
     assert "height:min(600px,calc(100vh - 160px));" in GAME and "<small>CPF · HDB · MND documents</small>" in GAME  # room for the chat; the subtitle fits on one line
     assert 'id="keyFull" aria-label="Open the full Ask page">Ask page</button>' in GAME  # a short label, so the subtitle is not cut off
-    assert ".ksrc ul{margin:6px 0;padding:0;list-style:none}" in GAME
     # the box says "Type your question": the header already says what KEY reads, and a long hint was cut off
     assert 'id="keyIn" type="text" autocomplete="off" maxlength="1000" placeholder="Type your question"' in GAME
     assert "const KEY_INTRO = 'Hello, I am KEY. How can I help?';" in GAME
@@ -609,10 +608,11 @@ def test_key_suggestions_look_unlike_messages_and_sources_are_tucked_away():
     assert '<p class="keychips-h">Suggested questions</p><div class="keychips">' in GAME
     assert ".keychips button{border:1.5px solid var(--green-mid);border-radius:999px;background:transparent;" in GAME
     assert ".kmsg.bot{align-self:flex-start;background:var(--page);border:1px solid var(--line)}" in GAME  # the bubble they must differ from
-    # the document links sit under a closed "Sources (n)" line: the Home page already links the documents, and a long list buried the answer
-    assert "<details class=\"ksrc\"><summary>Sources (${li.length})</summary>" in GAME and "Where this comes from" not in GAME[GAME.index("const kSources = src =>"):GAME.index("function kRender(){")]
-    assert "rel=\"noopener\"" in GAME[GAME.index("const kSources = src =>"):GAME.index("function kRender(){")]  # the links are still there, one tap away
-    assert "Rules and amounts can change after these dates." in GAME  # and so is the reminder to confirm them
+    # no document links in the pop-up (the Home and Ask pages have them): one plain line says who the answer is based on and when
+    ks = GAME[GAME.index("const kSources = src =>"):GAME.index("function kRender(){")]
+    assert "<a " not in ks and "<details" not in ks and "href" not in ks and "noopener" not in ks
+    assert "Based on ${esc(who.join(', '))}" in ks and "' · checked ' + esc(on)" in ks and "confirm on the official site." in ks
+    assert ".ksrc a{" not in GAME and ".ksrc summary{" not in GAME and ".ksrc ul{" not in GAME  # the link styles are gone too
 
 
 def test_one_h1_on_the_home_page_and_described_ratings():
