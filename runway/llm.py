@@ -84,7 +84,7 @@ TOPIC_TERMS = (
     "房", "屋", "வீடு", "வீட்ட", "வீடமைப்பு", "வீவக", "மசேநி", "கடன்", "குத்தகை", "மானிய",
 )
 
-ANSWER_SYSTEM = """You are Ask Runway, an assistant that explains Singapore HDB resale rules in plain English.
+ANSWER_SYSTEM = """You are KEY, an assistant that explains Singapore HDB resale rules in plain English.
 
 Rules you must follow:
 1. Answer ONLY from the numbered passages provided. If they don't contain the answer, say you don't know and suggest checking with CPF Board or HDB.
@@ -217,7 +217,7 @@ _THANKS_RE = re.compile(r"^(?:thanks|thank you|thank u|thx|ty|cheers|ok thanks|g
 _CAN_DO_RE = re.compile(r"\b(?:what (?:can|do) you (?:do|help)|how can you help|what do you do|what can i ask|how do you work|help me)\b")
 
 
-def small_talk(question: str, name: str = "Ask Runway") -> str | None:
+def small_talk(question: str, name: str = "KEY") -> str | None:
     """A fixed reply to a greeting, thanks, or a question about the assistant, or None for anything else."""
     q = unicodedata.normalize("NFKC", question).lower().strip()
     q = re.sub(r"[\s!.?,]+$", "", q)

@@ -263,8 +263,8 @@ def test_small_talk_answers_greetings_thanks_and_who_are_you():
     from runway.llm import small_talk
 
     assert "I'm KEY" in small_talk("What is your name?", "KEY") and "HDB resale flat" in small_talk("what is your name", "KEY")
-    assert "I'm Ask Runway" in small_talk("Who are you?")
-    assert small_talk("Hello!").startswith("Hello! I'm Ask Runway")
+    assert "I'm KEY" in small_talk("Who are you?")
+    assert small_talk("Hello!").startswith("Hello! I'm KEY")
     assert small_talk("Thank you!").startswith("You're welcome")
     assert "How long can my HDB loan be?" in small_talk("What can you do?")
 

@@ -1591,7 +1591,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
           <div class="lmiss-links"><button type="button" data-go="map">Map</button><button type="button" data-go="trends">Trends</button><button type="button" data-go="ask">Ask</button><button type="button" data-go="faq">FAQ</button><button type="button" data-go="more">More</button></div>
         </div>
       </section>
-      <section class="lhero" aria-label="Ask Runway">
+      <section class="lhero" aria-label="Ask KEY">
         <!-- shortcut: the two home photos are embedded (from runway_game/assets, a test keeps them identical) because
              Streamlit Community Cloud answers 500 for image files in the component folder under Streamlit 1.58;
              go back to src="assets/..." once image files load there. -->
@@ -1605,10 +1605,10 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
           </div>
           <p class="llead">How much CPF you can use for a flat depends on the years left on its lease and your age.</p>
           <form class="lcomp sq" id="lAskForm">
-            <label for="lAskIn" class="lsr">Ask Runway a question</label>
+            <label for="lAskIn" class="lsr">Ask KEY a question</label>
             <input id="lAskIn" type="text" autocomplete="off" placeholder="e.g. Can I use CPF for a 58-year lease if I'm 28?">
             <button type="button" class="lb lb-out lmic sq" id="lMic" aria-label="Ask by voice" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
-            <button type="submit" class="lb lb-g lb-send sq">Ask Runway<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+            <button type="submit" class="lb lb-g lb-send sq">Ask KEY<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           </form>
         </div>
       </section>
@@ -1620,7 +1620,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
             <div class="lchat-h">
               <div class="lchat-id">
                 <span class="lav sq" aria-hidden="true"><svg viewBox="0 0 100 100" width="24" height="24"><path d="M50 15 85 50 50 85 15 50Z" fill="currentColor"/><path class="lmk-bg" d="M50 25 73 48 73 62 50 85 27 62 27 48Z"/><path d="M41 46 48.5 42 48.5 83.5 41 76Z" fill="currentColor"/><path d="M51.5 40 59 44 59 76 51.5 83.5Z" fill="currentColor"/></svg></span>
-                <span class="lstack"><span class="lchat-t">Ask Runway</span><span class="lchat-s">Reads CPF · HDB · MND documents</span></span>
+                <span class="lstack"><span class="lchat-t">Ask KEY</span><span class="lchat-s">Reads CPF · HDB · MND documents</span></span>
               </div>
               <span class="lonline">Example</span>
             </div>
@@ -1700,7 +1700,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
               <p class="lformula sq" id="lFormula"></p>
               <div class="lvacts">
                 <button type="button" class="lb lb-g lb-50 sq" id="lSee">See flats that pass</button>
-                <button type="button" class="lb lb-out lb-50 sq" id="lWhy" style="flex-basis:150px">Ask Runway why</button>
+                <button type="button" class="lb lb-out lb-50 sq" id="lWhy" style="flex-basis:150px">Ask KEY why</button>
               </div>
             </div>
           </div>
@@ -1832,7 +1832,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
     <section class="screen" id="scrAsk" hidden>
       <div class="pad" style="flex:1">
         <nav aria-label="Breadcrumb" class="crumbs"><ol><li><button type="button" data-go="">Home</button></li><li aria-current="page">Ask</li></ol></nav>
-        <div class="scr-h"><h1>Ask Runway</h1></div>
+        <div class="scr-h"><h1>Ask KEY</h1></div>
         <div class="voicebar" data-st="Singapore voice pack; device voices as a fallback"><label><input type="checkbox" id="autoRead" checked> Read answers aloud</label><span class="lang"><label for="askLang">Answer language</label><span class="lselw"><select class="lsel" id="askLang"><option value="en" lang="en">English</option><option value="zh" lang="zh-Hans">中文</option><option value="ms" lang="ms">Bahasa Melayu</option><option value="ta" lang="ta">தமிழ்</option></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></span></div>
         <div class="upcard" data-st="st.file_uploader → extract → recommend">
           <b class="ui" style="font-size:1rem;color:var(--ink)">Have a document? I can suggest towns.</b>
@@ -1965,7 +1965,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
       set: o => { Object.assign(mem, o); try { sessionStorage.setItem('runway-details', JSON.stringify(mem)); } catch(e) { /* storage off */ } }
     };
   })();
-  /* Callers (the home page's ask box, typed or spoken; the FAQ's "Ask Runway instead") may call this twice for one question.
+  /* Callers (the home page's ask box, typed or spoken; the FAQ's "Ask KEY instead") may call this twice for one question.
      A question already on its way is not asked again, and while the data loads a repeat without one (a second Enter on
      the emptied box, the send button after Enter) keeps the question waiting instead of replacing it. */
   RW.enter = (target, arg) => {
@@ -2511,7 +2511,7 @@ function faqFilter(faq, text){
   $('#lWhy').onclick = () => prefill(`${{full: 'Why can I use CPF in full', part: 'Why is my CPF use pro-rated', none: "Why can't I use CPF"}[landingVerdict(L.age, L.lease).status]} for a flat with ${yrs(L.lease)} of lease left and a youngest buyer aged ${L.age}?`);
   renderRule();
 
-  /* ---------- Ask Runway: the box opens the Ask page with the question; the card shows one worked example ---------- */
+  /* ---------- Ask KEY: the box opens the Ask page with the question; the card shows one worked example ---------- */
   const LANDING_QA = [
     {q: 'Why is your CPF usage reduced?',
      a: 'If the lease runs out before the youngest buyer turns 95, CPF use is pro-rated: (lease left − 20) ÷ (years needed − 20). A 58-year lease with a 28-year-old buyer works out to about 81% of the Valuation Limit.',
@@ -3409,7 +3409,7 @@ function renderList(){
   };
 }
 
-/* ---------- Ask Runway ---------- */
+/* ---------- Ask KEY ---------- */
 // Answer language: AI answers, read-aloud and voice input only; like Text size it lasts for the visit and is not stored.
 const LANGS={en:{tag:'en',name:'English'}, zh:{tag:'zh-Hans',name:'Chinese'},
   ms:{tag:'ms',name:'Malay'}, ta:{tag:'ta',name:'Tamil'}};  // read-aloud voices: VPREF; voice input and the mic's greeting: VOICE
@@ -3530,7 +3530,7 @@ function plainLines(h){const d=document.createElement('div');d.innerHTML=h;d.que
 // that answer's sources and links, and the summary if one was made. It leaves out what history() leaves out: questions
 // with personal details, declined ones and uploads (m.skip), and the "Checking…" placeholders (m.typing).
 function chatText(chat=S.chat, when=new Date().toLocaleString('en-SG',{day:'numeric',month:'long',year:'numeric',hour:'numeric',minute:'2-digit'}), text=plainLines, notice=NOTICE){
-  const out=['Runway: Ask Runway chat',`Saved ${when}`,'',text(notice)];
+  const out=['Runway: Ask KEY chat',`Saved ${when}`,'',text(notice)];
   let n=0;
   chat.filter(m=>!m.typing&&!m.skip).forEach(m=>{
     if(m.me){ out.push('',`Question ${++n}: ${text(m.html).replace(/\n/g,' ')}`); return; }
@@ -3727,7 +3727,7 @@ function renderMore(){
     <div class="scr-h"><h1>More</h1></div>
     ${S.user&&!REV()?`<div class="revcard" role="status"><b>Logged in as ${esc(S.user)}</b><span class="small">About Us and Methodology show the full versions. Uploading documents and editing pages need the admin account.</span></div>`:''}
     ${REV()?`<div class="revcard" role="status"><b>Logged in as ${esc(S.user)}: admin tools are on</b><span class="small">About Us and Methodology show the full versions. You can upload Ask documents and edit the pages below.</span></div>
-    ${group('rev','Admin tools',[`<button type="button" data-rev="upload"><span>Upload Ask documents<small>Add or replace an official document that Ask Runway searches</small></span>${ICON.chev}</button>`,row('about','Edit About Us','Open the page, then choose Edit this page'),row('method','Edit Methodology','Full and public versions'),row('faq','Edit the FAQ','Add, change or remove questions'),row('insights','Insights','Answer feedback, documents, quality checks and AI use')])}`:''}
+    ${group('rev','Admin tools',[`<button type="button" data-rev="upload"><span>Upload Ask documents<small>Add or replace an official document that Ask KEY searches</small></span>${ICON.chev}</button>`,row('about','Edit About Us','Open the page, then choose Edit this page'),row('method','Edit Methodology','Full and public versions'),row('faq','Edit the FAQ','Add, change or remove questions'),row('insights','Insights','Answer feedback, documents, quality checks and AI use')])}`:''}
     ${group('you','Your settings',[row('details','Your details',`Youngest ${S.age} · average ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}`),row('size','Text size',`${textPx()} px`)])}
     ${group('guides','Guides',[row('explorer','Lease explorer','CPF use for every age and lease, in one chart'),row('faq','FAQ','Common questions, each with its official source'),row('timeline','Buying timeline','The steps from HFE letter to keys, each with its official source'),row('case','Case study','One flat type, two towns, two leases, from real sales')])}
     ${group('about','About Runway',[row('about','About Us','What Runway is, notice, team'),row('method','Methodology','How it works: the AI pipeline, rules and flowcharts'),row('sources','Sources and credits','Data, map, documents, photos')])}
@@ -3888,7 +3888,7 @@ function openFaqEditor(list=FAQ){
 }
 function openUpload(){
   openSheet(`<div class="pad fsheet"><h2 style="font-size:1.6rem">Upload Ask documents</h2>
-    <p class="small">PDF, web page (HTML), Markdown or text, up to 6 MB. Ask Runway searches it as soon as it is added. Use official pages only: answers quote them.</p>
+    <p class="small">PDF, web page (HTML), Markdown or text, up to 6 MB. Ask KEY searches it as soon as it is added. Use official pages only: answers quote them.</p>
     <label class="field"><span>File</span><input class="inp" id="upFile" type="file" accept=".pdf,.html,.htm,.md,.txt,application/pdf,text/html,text/markdown,text/plain" style="padding-top:12px"></label>
     <label class="field"><span>Title</span><input class="inp" id="upTitle" maxlength="200" placeholder="As the page calls itself"></label>
     <label class="field"><span>Publisher</span><input class="inp" id="upPub" maxlength="80" placeholder="HDB, CPF Board, MND…"></label>
@@ -3918,7 +3918,7 @@ function openUpload(){
         RW.send('noop').catch(()=>{});  // Streamlit keeps the last message sent: don't keep the whole file in it
         go.disabled=false;
         if(!r||!r.ok){msg.textContent=(r&&r.error)||'Not uploaded. Try again.'; return;}
-        msg.textContent=`${r.replaced?'Replaced':'Added'}: ${r.words.toLocaleString('en-SG')} words. Ask Runway searches it from the next question. `
+        msg.textContent=`${r.replaced?'Replaced':'Added'}: ${r.words.toLocaleString('en-SG')} words. Ask KEY searches it from the next question. `
           +keptMsg(r)+(r.original?' The original file is in R2.':'');
         $('#upFile').value=''; ['upTitle','upPub','upUrl'].forEach(id=>$('#'+id).value=''); list();
       }).catch(()=>{msg.textContent='Runway did not respond. The file may be too big; try a smaller one.'; go.disabled=false;});
@@ -3933,7 +3933,7 @@ function sourcesHtml(){
   return `<div class="doctext"><h1>Sources and credits</h1>
 <p>Every number comes from the public data below. The AI only explains.</p>
 <h2>Rules and answers</h2><div class="srclist">
-${SRCI('32 official documents','CPF Board, HDB, MND and MOM, IRAS and CEA pages on CPF use, the age-95 rule, HDB loans, grants and the resale process. Ask Runway searches these and shows the passage it used.','')}
+${SRCI('32 official documents','CPF Board, HDB, MND and MOM, IRAS and CEA pages on CPF use, the age-95 rule, HDB loans, grants and the resale process. Ask KEY searches these and shows the passage it used.','')}
 ${SRCI('MND · Annex A: Updated rules on CPF usage and HDB housing loan','The age-95 rule, CPF pro-rating and loan length (May 2019). Its HDB loan limit of 90% was the limit in 2019; it is 75% today (next item).','https://www.mnd.gov.sg')}
 ${SRCI('HDB · Housing Loan from HDB','The HDB loan limit today: up to 75% for complete resale applications received from 20 August 2024, pro-rated the same way when the lease does not reach age 95.','https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-hdb')}
 ${SRCI('CPF Board · Lease not covering the youngest buyer to 95','The 20-year floor and CPF\'s worked example.','https://www.cpf.gov.sg')}</div>
@@ -3963,12 +3963,12 @@ function aboutHtml(){
   <p>A runway is how far you can go before you run out of ground. For an HDB buyer, the lease is the runway.</p>
   <h2>Scope</h2><p>Buying an HDB flat in the resale market: how the lease left and the youngest buyer's age decide how much CPF and HDB loan you can use, and what a shorter lease costs in each town.</p>
   <h2>Objectives</h2><ul><li>Bring together the rules from CPF Board, HDB and the Ministry of National Development.</li><li>Personalise with generic details only: ages, a rough CPF figure and a town. No names or NRIC.</li><li>Explain, not just calculate, with the source shown.</li><li>Present it as a map, verdict cards, a shortlist, a file and a chat.</li></ul>
-  <h2>Features</h2><ul><li><b>Map (Town Safari)</b>: every HDB block, MRT lines and the flats sold in ${SPAN} at their real addresses. Check each one for your age, keep the ones you like and collect town stamps.</li><li><b>Ask Runway</b>: questions answered from 32 official documents with sources, "Why?" for any flat, a chat summary, chat download, read-aloud, and document upload that suggests towns. Questions with your own age, lease or price are worked out with Runway's calculator tools.</li><li><b>Lease explorer</b>: CPF use for every age and lease in one chart, with sliders for your own case.</li><li><b>Admin tools</b>: upload Ask documents, edit pages and the FAQ, and Insights on answer feedback, search quality and AI use.</li><li><b>Safeguards</b>: numbers come from Runway's calculator, never the AI. An AI explanation with a number the calculator didn't produce is replaced by a plain one. NRIC and phone numbers are blocked or removed.</li></ul>
+  <h2>Features</h2><ul><li><b>Map (Town Safari)</b>: every HDB block, MRT lines and the flats sold in ${SPAN} at their real addresses. Check each one for your age, keep the ones you like and collect town stamps.</li><li><b>Ask KEY</b>: questions answered from 32 official documents with sources, "Why?" for any flat, a chat summary, chat download, read-aloud, and document upload that suggests towns. Questions with your own age, lease or price are worked out with Runway's calculator tools.</li><li><b>Lease explorer</b>: CPF use for every age and lease in one chart, with sliders for your own case.</li><li><b>Admin tools</b>: upload Ask documents, edit pages and the FAQ, and Insights on answer feedback, search quality and AI use.</li><li><b>Safeguards</b>: numbers come from Runway's calculator, never the AI. An AI explanation with a number the calculator didn't produce is replaced by a plain one. NRIC and phone numbers are blocked or removed.</li></ul>
   <h2>Data sources</h2>
   <div class="scroll"><table class="tbl"><thead><tr><th>Source</th><th>Used for</th></tr></thead><tbody>
     <tr><td>HDB resale flat prices, 1990 – Sep 2026 (986,090 sales, data.gov.sg)</td><td>Flats on the map, town lease effect</td></tr>
-    <tr><td>MND Annex A and CPF Board guidance on the age-95 rule</td><td>Rule engine, Ask Runway</td></tr>
-    <tr><td>32 official CPF, HDB, MND/MOM, IRAS and CEA documents</td><td>Ask Runway</td></tr>
+    <tr><td>MND Annex A and CPF Board guidance on the age-95 rule</td><td>Rule engine, Ask KEY</td></tr>
+    <tr><td>32 official CPF, HDB, MND/MOM, IRAS and CEA documents</td><td>Ask KEY</td></tr>
     <tr><td>OneMap (SLA) addresses, URA Master Plan 2014, LTA bus data, OpenStreetMap</td><td>Map</td></tr>
     <tr><td>Wikimedia Commons (CC licences)</td><td>Town stamps</td></tr></tbody></table></div>
   ${NOTICE_BLOCK()}
@@ -3987,9 +3987,9 @@ const FLOW_MAP = `<h2>Flowchart · Use case 1: Map</h2>
     <div class="ar jn"></div>
     <div class="fn">Verdict, CPF and cash numbers</div><div class="ar"></div>
     <div class="fn d">What next?</div><div class="sp"></div>
-    <div class="br"><div><div class="bl"><span>Keep</span></div><div class="fn t">Shortlist + town stamp</div></div><div><div class="bl"><span>Why?</span></div><div class="fn t">Ask Runway explains this flat</div></div></div>
+    <div class="br"><div><div class="bl"><span>Keep</span></div><div class="fn t">Shortlist + town stamp</div></div><div><div class="bl"><span>Why?</span></div><div class="fn t">Ask KEY explains this flat</div></div></div>
   </div>`;
-const FLOW_ASK = `<h2>Flowchart · Use case 2: Ask Runway</h2>
+const FLOW_ASK = `<h2>Flowchart · Use case 2: Ask KEY</h2>
   <div class="flow">
     <div class="fn t">Type, speak, tap a question, or upload a document</div><div class="ar"></div>
     <div class="fn d">Document uploaded?</div><div class="sp"></div>
@@ -4012,7 +4012,7 @@ const FLOW_EXPLORER = `<h2>Flowchart · Use case 3: Lease explorer</h2>
       <div class="br"><div><div class="bl"><span>Yes</span></div><div class="fn o">CPF: full use</div><div class="ln"></div></div><div><div class="bl"><span>No</span></div><div class="fn o">CPF: (lease − 20) ÷ (95 − age − 20)</div><div class="ln"></div></div></div><div class="ln jn"></div></div></div>
     <div class="ar jn"></div>
     <div class="fn">CPF share, HDB loan limit, lease needed for full CPF; nearest cell outlined in the age × lease chart</div><div class="ar"></div>
-    <div class="fn t">Ask Runway about this flat (calculator tool + official sources)</div>
+    <div class="fn t">Ask KEY about this flat (calculator tool + official sources)</div>
   </div>`;
 /* ---------- Methodology (the page was "How it works"; /how-it-works still opens it) ---------- */
 /* What the Methodology page says about retrieval, LangChain and accounts, in one place: correct it here if runway/rag.py,
@@ -4029,9 +4029,9 @@ const METHOD_FACTS = {
   accounts: 'Two built-in accounts, admin and user. Passwords are kept only as salted PBKDF2-SHA256 hashes (600,000 rounds). The server keeps the role in the session and checks it on every admin message, Insights included. Five wrong passwords pause a username for a minute.',
 };
 const README_API = 'https://github.com/dansyfq/project-runway#api-and-model-usage';
-// For everyone: how Ask Runway gets from the documents to an answer, and who can do what
-const methodPipeline = () => `<h2>How Ask Runway answers</h2>
-  <p>Ask Runway uses retrieval-augmented generation (RAG): it finds the official passages first, then the AI writes from those passages only.</p>
+// For everyone: how Ask KEY gets from the documents to an answer, and who can do what
+const methodPipeline = () => `<h2>How Ask KEY answers</h2>
+  <p>Ask KEY uses retrieval-augmented generation (RAG): it finds the official passages first, then the AI writes from those passages only.</p>
   <ol class="steps">
     <li><b>Documents.</b> 32 official documents from CPF Board, HDB, MND, MOM, IRAS and CEA, each kept as text with its source link. An Admin can upload a new one or replace one.</li>
     <li><b>Chunking.</b> Each document is split at its headings, then into passages of 160 words. Each passage overlaps the next by 40 words, so a rule is not cut in half.</li>
@@ -4041,7 +4041,7 @@ const methodPipeline = () => `<h2>How Ask Runway answers</h2>
     <li><b>Calculator tools.</b> When the question gives an age, a lease or a price, Claude calls Runway's calculator tools (lease check, HDB loan length, Buyer's Stamp Duty) and quotes their figures. It never does the sums itself. For what a shorter lease does to prices in a town, it can also look up the median price per square metre for that lease band from HDB's resale prices (the figures behind Trends) and quote them in the same way.</li>
     <li><b>Answer.</b> Claude writes a short answer with numbered citations. "Where this comes from" under the answer links each document.</li>
     <li><b>Number guard.</b> Every figure in the answer must be in the passages, the question, the chat or a tool result. If one isn't, Runway shows the passages instead.</li>
-    <li><b>Fallback.</b> With no API key, the hourly limit reached or the AI unavailable, Ask Runway shows the matching official passages instead of an AI answer.</li>
+    <li><b>Fallback.</b> With no API key, the hourly limit reached or the AI unavailable, Ask KEY shows the matching official passages instead of an AI answer.</li>
   </ol>
   <p class="small">The model, its settings and what is sent to the Anthropic API are in the README, <a href="${README_API}" target="_blank" rel="noopener">API and model usage${NEWTAB}</a>.</p>
   <h2>Accounts</h2>
@@ -4061,9 +4061,9 @@ function methodHtml(){
   ${FLOW_MAP}${FLOW_ASK}${FLOW_EXPLORER}</div>`;
   const t1=(()=>{const a=S.age,v=S.avg;S.age=25;S.avg=25;const r=calc(550000,65);S.age=a;S.avg=v;return r;})();
   // The course brief's list (group of 4), item by item, then the rest of the earlier checklist, so nothing it named is lost
-  const req=[['RAG-based query','Ask Runway: searches the 32 documents, then answers only from the passages found, with numbered sources (How Ask Runway answers, below)'],
+  const req=[['RAG-based query','Ask KEY: searches the 32 documents, then answers only from the passages found, with numbered sources (How Ask KEY answers, below)'],
     ['Document management','Admin: More → Upload Ask documents adds or replaces a document; Ask searches it straight away. Admin also edits the pages and the FAQ'],
-    ['Vector store','Ask Runway\'s vector store: '+METHOD_FACTS.vectors+'. '+METHOD_FACTS.retrieval],
+    ['Vector store','Ask KEY\'s vector store: '+METHOD_FACTS.vectors+'. '+METHOD_FACTS.retrieval],
     ['LangChain or similar',METHOD_FACTS.langchain],
     ['Login with Admin and User roles',METHOD_FACTS.roles.map(([r,t])=>`${r}: ${t}`).join(' ')],
     ['Summarisation and export','Ask: Sum up this chat, Download this chat (a text file with each answer\'s sources). Shortlist: Save shortlist as a file (CSV), Print summary'],
@@ -4074,10 +4074,10 @@ function methodHtml(){
     ['About Us and Methodology pages','More → About Us, Methodology (/methodology; the old /how-it-works still opens it)']];
   const reqMore=[['Information from several official sources','32 documents + HDB sales data + OneMap'],
     ['Personalised with non-identifying inputs','Ages, rough CPF, town; NRIC and phone blocked'],
-    ['Explanations and follow-up questions','Ask Runway, Why?, chat summary'],
+    ['Explanations and follow-up questions','Ask KEY, Why?, chat summary'],
     ['Text, tables, charts and forms','Map, verdict card, shortlist, lease explorer chart, file and chat export'],
-    ['At least two use cases','Map (Town Safari), Ask Runway and Lease explorer'],
-    ['Agent with tools','Ask Runway calls 3 calculator tools (lease check, HDB loan length, Buyer\'s Stamp Duty) and a price lookup (the figures behind Trends) for questions with your own figures'],
+    ['At least two use cases','Map (Town Safari), Ask KEY and Lease explorer'],
+    ['Agent with tools','Ask KEY calls 3 calculator tools (lease check, HDB loan length, Buyer\'s Stamp Duty) and a price lookup (the figures behind Trends) for questions with your own figures'],
     ['Evaluation and monitoring','Insights (admin only): answer feedback, eval by search mode, documents and AI use; eval/run_eval.py'],
     ['One flowchart per use case','Below'],
     ['Required disclaimer','About Us → Notice, linked from the map; also at the top of Download this chat']];
@@ -4091,7 +4091,7 @@ function methodHtml(){
     <tbody><tr><th colspan="2" scope="rowgroup">Also met</th></tr>${reqRows(reqMore)}</tbody></table></div>
   ${methodPipeline()}
   <h2>Data flow</h2>
-  <ul><li><b>Offline:</b> pandas combines HDB's 5 resale files (986,090 sales), works out each town's lease effect from Jan 2024 – Sep 2026 sales, and geocodes every block with OneMap addresses.</li><li><b>Map:</b> town outlines, roads, MRT and the ${SPAN} sales are drawn with Leaflet. The calculator runs in the app for your age.</li><li><b>Ask:</b> the 32 official documents become 349 passages, searched and answered as set out in How Ask Runway answers, above. When the question gives an age, a lease or a price, Claude calls Runway's calculator tools (lease check, loan length, stamp duty) rather than doing sums, and every figure in the answer must come from the passages, the question or a tool result.</li><li><b>Lease explorer:</b> the same rule worked out in the browser for every age and lease, with nothing sent to the server.</li><li><b>Insights (admin):</b> answer votes, the eval run by search mode, documents and AI use, read from what Runway already keeps.</li></ul>
+  <ul><li><b>Offline:</b> pandas combines HDB's 5 resale files (986,090 sales), works out each town's lease effect from Jan 2024 – Sep 2026 sales, and geocodes every block with OneMap addresses.</li><li><b>Map:</b> town outlines, roads, MRT and the ${SPAN} sales are drawn with Leaflet. The calculator runs in the app for your age.</li><li><b>Ask:</b> the 32 official documents become 349 passages, searched and answered as set out in How Ask KEY answers, above. When the question gives an age, a lease or a price, Claude calls Runway's calculator tools (lease check, loan length, stamp duty) rather than doing sums, and every figure in the answer must come from the passages, the question or a tool result.</li><li><b>Lease explorer:</b> the same rule worked out in the browser for every age and lease, with nothing sent to the server.</li><li><b>Insights (admin):</b> answer votes, the eval run by search mode, documents and AI use, read from what Runway already keeps.</li></ul>
   <h2>The rule</h2>
   <div class="scroll"><table class="tbl"><tbody>
     <tr><td>Lease needed</td><td>95 − youngest buyer's age</td></tr>
@@ -4122,7 +4122,7 @@ function faqHtml(){
   <div class="faqq" role="search"><label for="faqQ" class="lsr">Search the FAQ</label>
     <div class="navq-box"><svg class="navq-ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="faqQ" class="inp" type="search" placeholder="Search the FAQ" autocomplete="off" spellcheck="false" aria-describedby="faqN"></div>
     <p id="faqN" class="small" role="status"></p></div>
-  <div class="empty" id="faqNone" hidden><p>No questions match.</p><button type="button" class="btn primary" id="faqAsk">Ask Runway instead</button></div>
+  <div class="empty" id="faqNone" hidden><p>No questions match.</p><button type="button" class="btn primary" id="faqAsk">Ask KEY instead</button></div>
   ${FAQ.map((x,i)=>`<section aria-labelledby="faq${i}" data-faq="${i}"><h2 id="faq${i}" tabindex="-1">${esc(x.q)}</h2><p>${esc(x.a)}</p>
     ${x.url?`<p class="small">Source: <a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.publisher)} · ${esc(x.title)}${NEWTAB}</a></p>`
       :x.title?`<p class="small">Source: ${esc(x.publisher)} · ${esc(x.title)}</p>`:''}</section>`).join('')}
@@ -4215,7 +4215,7 @@ function leaseExplorer(b,top){
     ${sliderHtml('exA',"Youngest buyer's age",21,85,st.age)}
     ${sliderHtml('exL','Lease left',1,99,st.lease,' years')}
     <div id="exOut" class="exout" role="status" aria-live="polite"></div>
-    <button type="button" class="btn ghost sm" id="exAsk">Ask Runway about this flat</button>
+    <button type="button" class="btn ghost sm" id="exAsk">Ask KEY about this flat</button>
     <h2>Every age and lease</h2>
     <p class="small">Rows: youngest buyer's age. Columns: years of lease left. Full: CPF can be used in full. A percentage: the share of the Valuation Limit CPF can pay. None: 20 years or less left. The outlined cell is the nearest to your choice above.</p>
     <div class="scroll"><table class="tbl extbl"><caption class="lsr">CPF usable as a share of the Valuation Limit, by youngest buyer's age (rows) and years of lease left (columns)</caption>
@@ -4233,13 +4233,13 @@ function leaseExplorer(b,top){
     $$('.extbl td').forEach(td=>td.classList.toggle('on',+td.dataset.a===ca&&+td.dataset.l===cl));
   };
   bindSlider('exA',v=>{st.age=v;out();}); bindSlider('exL',v=>{st.lease=v;out();});
-  // Ask Runway works the same figures out with its calculator tool (runway/agent.py), then explains the rule
+  // Ask KEY works the same figures out with its calculator tool (runway/agent.py), then explains the rule
   $('#exAsk').onclick=()=>RW.enter('ask',`I'm ${st.age} and the flat has ${st.lease} years of lease left. How much CPF can I use?`);
   out();
 }
 /* ---------- Insights (admin only; the server checks the role again): runway/insights.py ---------- */
 function insightsPage(b,top){
-  if(!REV()){ b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1><p>Insights is for the admin account. Log in as admin to see how Ask Runway is doing.</p>${S.user?'':'<button class="btn" type="button" id="insIn">Log in</button>'}</div>`; const ib=$('#insIn'); if(ib) ib.onclick=()=>RW.openLogin(); return; }
+  if(!REV()){ b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1><p>Insights is for the admin account. Log in as admin to see how Ask KEY is doing.</p>${S.user?'':'<button class="btn" type="button" id="insIn">Log in</button>'}</div>`; const ib=$('#insIn'); if(ib) ib.onclick=()=>RW.openLogin(); return; }
   b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1><p role="status">Loading…</p></div>`;
   RW.send('insights').then(r=>{
     if(S.sub!=='insights') return;
@@ -4248,7 +4248,7 @@ function insightsPage(b,top){
     const stat=(v,l)=>`<div class="stat"><b>${esc(v)}</b><span class="small">${esc(l)}</span></div>`;
     const modes=e&&e.by_mode?Object.entries(e.by_mode):[];
     b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1>
-      <p>How Ask Runway is doing, from what Runway already keeps. Updated ${esc(d.generated)}.</p>
+      <p>How Ask KEY is doing, from what Runway already keeps. Updated ${esc(d.generated)}.</p>
       <div class="stats">${stat(c.docs,'official documents')}${stat(c.passages,'passages searched')}${stat(f.helpful_pct==null?'–':f.helpful_pct+'%',`helpful, all answers (${f.total} vote${f.total===1?'':'s'})`)}${stat(fk.helpful_pct==null?'–':fk.helpful_pct+'%',`helpful, KEY (${fk.total} vote${fk.total===1?'':'s'})`)}${stat(ai.calls_last_hour+' / '+ai.cap,'AI calls in the last hour')}</div>
       <h2>Answers people marked Not helpful</h2>
       ${f.low_rated.length?`<ul>${f.low_rated.map(x=>`<li>${esc(x.q)} <span class="small">${esc(x.date)}</span></li>`).join('')}</ul><p class="small">A question here may need a document Ask doesn't have yet: add it with Upload Ask documents. Only questions with no NRIC, phone number or email are ever kept.</p>`:'<p>None yet.</p>'}
