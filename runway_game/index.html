@@ -2306,11 +2306,12 @@ function greetPrefetch(lang){
 }
 let HIOFF = null;  // stops the greeting now
 function greet(lang){
-  greetPrefetch(lang);
+  const voice = chosenVoice(lang);
+  if(!TTS || (lang !== 'en' && !voice)) greetPrefetch(lang);  // the voice service only when no device voice can say it: it holds the server line
   return new Promise(done => {
     let over = false, cap = 0;
     const end = () => { if(over) return; over = true; clearTimeout(cap); HIOFF = null; done(); };
-    const h = HI[lang], voice = chosenVoice(lang);
+    const h = HI[lang] || {};
     const device = () => {
       if(over) return; if(!TTS || (lang !== 'en' && !voice)) return end();
       const u = new SpeechSynthesisUtterance(VOICE[lang].hi); let began = false;
@@ -2349,7 +2350,7 @@ function speechText(parts){
 // SILENCE_MS after speaking (HUSH_MS if they say nothing). Chrome ends a recognition by itself (after a silence; on Android
 // after every phrase), so a new one starts until then and the text adds up across them, after anything already typed in
 // the box. o: {btn, input, lang, hint: the placeholder to put back, done(text): speech was heard, fail(error)}.
-const SILENCE_MS = 5000, HUSH_MS = 10000, MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported'];
+const SILENCE_MS = 2500, HUSH_MS = 7000, MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported'];
 let MIC = null;  // the mic in use, on either page: MIC.stop(true) sends what was heard, MIC.stop(false) leaves it in the box
 function dictate(o){
   if(MIC) MIC.stop(false);
@@ -2511,7 +2512,7 @@ function faqFilter(faq, text){
      visit (RW.lang; English until then), listens through pauses, then asks what was said on the Ask page */
   const mic = $('#lMic'), inp = $('#lAskIn'), HINT = inp.placeholder, mine = () => MIC && MIC.btn === mic;
   if(!SR){ mic.setAttribute('aria-disabled', 'true'); mic.title = "Voice input isn't available in this browser"; }
-  else ['pointerenter', 'focus'].forEach(k => [mic, inp].forEach(x => x.addEventListener(k, () => greetPrefetch(RW.lang || 'en'))));
+  // (no greeting prefetch on hover: a voice-service request holds the single server line, and the next question waits behind it)
   mic.onclick = () => {
     if(!SR) return;
     if(mine()){ MIC.stop(true); return; }
@@ -2818,7 +2819,10 @@ document.addEventListener('input',e=>{
 const SCR=['scrLanding','scrOnb','scrMap','scrList','scrAsk','scrTrends','scrMore','scrSub'];
 // every screen change comes through here, so the nav and the address bar follow it (RW.shown takes an RW.PATHS value)
 const SHOWN={scrLanding:'home',scrOnb:'map',scrMap:'map',scrList:'list',scrAsk:'ask',scrTrends:'trends',scrMore:'more'};
-function show(id){SCR.forEach(s=>$('#'+s).hidden = s!==id); saveDetails(); RW.shown(id==='scrSub' ? 'more '+S.sub : SHOWN[id]);}
+function show(id){
+  // changing page stops any answer being read and any greeting; a voice never carries on over another page
+  if(SCR.some(s=>!$('#'+s).hidden && s!==id)){ if(typeof stopSpeak==='function') stopSpeak(); if(HIOFF) HIOFF(); }
+  SCR.forEach(s=>$('#'+s).hidden = s!==id); saveDetails(); RW.shown(id==='scrSub' ? 'more '+S.sub : SHOWN[id]);}
 function sideProf(){saveDetails();const b=$('#sideProf');if(!b)return;b.hidden=!(S.onbDone||S.ageSet);b.innerHTML=`<span class="label">Your details</span><b>Youngest buyer ${S.age}</b><span>Average age ${S.avg} · CPF ${S.oaSet?exact(S.oa):'not given'}</span>`;b.onclick=()=>{tab('more');sub('details');};}
 function tab(t){
   S.tab=t; S.sub=null; closeSheet(); sideProf();
@@ -3348,7 +3352,7 @@ function renderList(){
 const LANGS={en:{tag:'en',name:'English'}, zh:{tag:'zh-Hans',name:'Chinese'},
   ms:{tag:'ms',name:'Malay'}, ta:{tag:'ta',name:'Tamil'}};  // read-aloud voices: VPREF; voice input and the mic's greeting: VOICE
 S.lang='en';
-$('#askLang').onchange=e=>{ S.lang = LANGS[e.target.value] ? e.target.value : 'en'; RW.lang = S.lang; if(!RW.busy) greetPrefetch(S.lang); };  // RW.lang: the Home mic's language
+$('#askLang').onchange=e=>{ S.lang = LANGS[e.target.value] ? e.target.value : 'en'; RW.lang = S.lang; };  // RW.lang: the Home mic's language
 const SUGG=['Can I still use CPF for an old flat?','Is my HDB loan cut too?','How long can my loan be?','Why do short leases cost more in Clementi than Yishun?'];
 // Follow-up questions, picked by the words in the latest question and answer (no AI needed).
 const FOLLOW=[
@@ -3451,7 +3455,7 @@ function renderChat(){
 }
 $('#autoRead').onchange=e=>{ if(!e.target.checked){stopSpeak();return;} const btns=$$('[data-say]'); if(btns.length) btns[btns.length-1].click(); };
 function fbHtml(m,i){return `<div class="fb" role="group" aria-label="Was this answer helpful?">${[['up','Helpful','M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3'],['down','Not helpful','M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17']].map(([v,t,d])=>`<button type="button" class="chip" data-fb="${i}" data-v="${v}" aria-pressed="${m.fb.v===v}" aria-label="${t}" title="${t}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;margin:auto"><path d="${d}"/></svg></button>`).join('')}<p class="small">A vote keeps this question, unless it has personal details, to improve Runway.</p></div>`;}
-function pushBot(b){S.chat.push(b);renderChat();$('#chatLive').textContent=plain(b.html);if(!b.warn)prefetchPack(plain(b.html),b.lang);if($('#autoRead').checked&&!MIC){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1],b.lang);}}
+function pushBot(b){S.chat.push(b);renderChat();$('#chatLive').textContent=plain(b.html);if($('#autoRead').checked&&!MIC){const btns=$$('[data-say]');speak(plain(b.html),btns[btns.length-1],b.lang);}}
 function plain(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.small').forEach(x=>x.remove());return d.textContent.replace(/\s+/g,' ').trim();}
 // plain(), keeping one line per paragraph and "- " before each list item
 function plainLines(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('.small').forEach(x=>x.remove());
@@ -3637,9 +3641,8 @@ $('#micBtn').onclick=()=>{
     fail:e=>e==='language-not-supported'?pushBot({warn:true,skip:true,html:`<p>Voice input in ${LANGS[S.lang].name} is not available in this browser. You can type your question instead.</p>`})
       :pushBot({warn:true,html:'<p>The microphone is blocked, so I could not hear you. Allow the microphone and tap the mic again, or type your question.</p>'})});
 };
-['pointerenter','focus'].forEach(k=>$('#micBtn').addEventListener(k,()=>greetPrefetch(S.lang)));
-// leaving the Ask page stops the mic (what was heard stays in the box); opening it fetches the greeting while the line is free
-new MutationObserver(()=>{const h=$('#scrAsk').hidden; if(h&&MIC&&MIC.btn===$('#micBtn'))MIC.stop(false); if(!h&&!RW.busy&&!RW.queue.length)greetPrefetch(S.lang);}).observe($('#scrAsk'),{attributes:true,attributeFilter:['hidden']});
+// leaving the Ask page stops the mic (what was heard stays in the box)
+new MutationObserver(()=>{const h=$('#scrAsk').hidden; if(h&&MIC&&MIC.btn===$('#micBtn'))MIC.stop(false);}).observe($('#scrAsk'),{attributes:true,attributeFilter:['hidden']});
 $('#askForm').addEventListener('submit',e=>{e.preventDefault();const v=$('#askIn').value.trim();if(!v)return;$('#askIn').value='';ask(v);});
 
 /* ---------- more ---------- */
