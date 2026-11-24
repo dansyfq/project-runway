@@ -575,6 +575,11 @@ def test_voice_clips_are_played_at_one_level():
     assert "src.start(AC.currentTime+(i===0?warmUp():0));" in block  # the first clip only, 0.1 s after the noise starts
 
 
+def test_the_reply_label_says_key_not_runway():
+    # the assistant is called KEY: the small name above each reply on the Ask page says so (Runway stays the product name)
+    assert '<span class="who">KEY</span>' in GAME and '<span class="who">Runway</span>' not in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
