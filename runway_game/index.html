@@ -2072,8 +2072,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
     else if(e.key === 'Escape'){ e.stopPropagation(); clearSearch(); q.focus(); }
   });
 
-  /* Back to top on the long pages: shows once the open screen (each screen scrolls itself) is well down */
-  const toTop = document.getElementById('toTop'), LONG = new Set(['', 'methodology', 'how-it-works', 'faq', 'sources', 'privacy', 'terms', 'timeline']);
+  /* Back to top on the long pages (not Home: the KEY button sits where it shows): shows once the open screen (each screen scrolls itself) is well down */
+  const toTop = document.getElementById('toTop'), LONG = new Set(['methodology', 'how-it-works', 'faq', 'sources', 'privacy', 'terms', 'timeline']);
   document.addEventListener('scroll', e => {
     const s = e.target; if(!s.classList || !s.classList.contains('screen')) return;
     toTop.hidden = !(LONG.has(RW.want ?? '') && s.scrollTop > 600);
