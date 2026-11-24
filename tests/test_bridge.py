@@ -400,3 +400,9 @@ def test_only_a_follow_up_question_is_searched_together_with_the_one_before():
     for q in ("What is the minimum occupation period before I can sell my flat?",
               "How much CPF can I use for a resale flat with a short lease?", "What is the Valuation Limit used for in CPF?"):
         assert not is_follow_up(q), q
+
+
+def test_a_name_question_gets_a_fixed_reply_without_a_search_or_an_ai_call(bot, index):
+    reply = send("ask", {}, bot, index, q="what is your name", **{"as": "key"})
+    assert "I'm KEY" in reply["text"] and reply["clarify"] is True and reply["sources"] == [] and reply["blocked"] is None
+    assert "I'm Ask Runway" in send("ask", {}, bot, index, q="who are you")["text"]

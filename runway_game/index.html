@@ -2584,10 +2584,10 @@ function faqFilter(faq, text){
     K.chat.push(typing); K.busy = true; ks.disabled = true; kRender();
     let b;
     try{
-      const d = RW.prof.get(), r = await RW.send('ask', {q, facts: null, history: prior, age: (d.onbDone || d.ageSet) && Number.isFinite(d.age) ? d.age : null, lang: RW.lang || 'en'});
+      const d = RW.prof.get(), r = await RW.send('ask', {q, facts: null, history: prior, age: (d.onbDone || d.ageSet) && Number.isFinite(d.age) ? d.age : null, lang: RW.lang || 'en', as: 'key'});
       if(typeof r.text !== 'string') throw new Error(r.error || 'no answer');
       b = {html: md(r.text) + (r.note ? `<p><small>${esc(r.note)}</small></p>` : ''), src: r.sources, warn: r.blocked === 'personal', skip: !!r.blocked};
-      if(r.blocked) mine.skip = true; else b.fb = {v: null, q};  // a real answer can be voted on
+      if(r.blocked) mine.skip = true; else if(!r.clarify && !r.offline) b.fb = {v: null, q};  // only a real AI answer can be voted on (not a greeting, a question back or the document links)
     }catch(e){ b = {warn: true, skip: true, html: '<p>KEY could not reach the documents just now. Try again in a moment.</p>'}; }
     K.chat.splice(K.chat.indexOf(typing), 1); K.chat.push(b); K.busy = false; ks.disabled = false; kRender();
   }

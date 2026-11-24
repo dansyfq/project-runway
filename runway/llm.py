@@ -208,6 +208,35 @@ def decline_message(reason: str) -> str:
         reason, DECLINE_OFF_TOPIC)
 
 
+# Greetings and questions about the assistant itself have no housing words, so screen_question() would decline them as
+# off topic. They get a short fixed reply instead (no AI call, nothing to invent): who it is, what it can do, a welcome.
+_NAME_RE = re.compile(r"\b(?:what(?:'s| is|s)? (?:is )?your name|who are you|what are you|who made you|who built you|"
+                      r"introduce yourself|tell me about yourself|your name)\b")
+_HELLO_RE = re.compile(r"^(?:hi|hello|hey|hiya|howdy|good (?:morning|afternoon|evening)|greetings)(?: there| key| runway)?$")
+_THANKS_RE = re.compile(r"^(?:thanks|thank you|thank u|thx|ty|cheers|ok thanks|great thanks)(?: a lot| so much| very much)?$")
+_CAN_DO_RE = re.compile(r"\b(?:what (?:can|do) you (?:do|help)|how can you help|what do you do|what can i ask|how do you work|help me)\b")
+
+
+def small_talk(question: str, name: str = "Ask Runway") -> str | None:
+    """A fixed reply to a greeting, thanks, or a question about the assistant, or None for anything else."""
+    q = unicodedata.normalize("NFKC", question).lower().strip()
+    q = re.sub(r"[\s!.?,]+$", "", q)
+    if not q or len(q) > 60 or screen_question(question) != "off_topic":
+        return None  # only what would be declined for having no housing words: "How can you help with CPF?" is a real question
+    about = ("I answer questions about buying an HDB resale flat from official documents: how much CPF you can use, the "
+             "age-95 lease rule, HDB loans, grants and the resale steps.")
+    if _NAME_RE.search(q):
+        return f"I'm {name}, Runway's assistant. {about} What would you like to know?"
+    if _HELLO_RE.match(q):
+        return f"Hello! I'm {name}. {about} What would you like to know?"
+    if _THANKS_RE.match(q):
+        return "You're welcome! Ask me anything else about buying an HDB flat."
+    if _CAN_DO_RE.search(q):
+        return (f"{about} For example, try: \"How long can my HDB loan be?\" or \"Can I still use CPF for an older flat?\" "
+                "I don't give advice on whether to buy a particular flat.")
+    return None
+
+
 NUMBER_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
 
 

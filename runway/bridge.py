@@ -21,7 +21,7 @@ from runway.agent import lease_price_needs, price_ask_needs
 from runway.auth import check_login
 from runway.chain import retrieve
 from runway.game_data import load_towns, recent_months, town_photo
-from runway.llm import AI_BUSY, INVENTED_FIGURE, LLM, language, screen_question
+from runway.llm import AI_BUSY, INVENTED_FIGURE, LLM, language, screen_question, small_talk
 from runway.rag import Chunk, Retriever
 
 # Every screen's URL path and its name. app.py makes one page per entry; the interface (RW.PATHS) uses the same paths.
@@ -170,6 +170,10 @@ def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retri
             text, used_llm = bot.explain(facts, sources, lang=lang)
             return {"text": text, "sources": source_view(sources), "offline": False, "lang": lang if used_llm else "en",
                     "note": NUMBERS_NOTE if used_llm else NUMBERS_NOTE + " Written from a fixed template."}
+        talk = small_talk(question, "KEY" if payload.get("as") == "key" else "Ask Runway")
+        if talk:  # a greeting, thanks or "what is your name": a fixed reply, no search and no AI call
+            return {"text": talk, "sources": [], "blocked": None, "offline": False, "note": None, "lang": "en",
+                    "clarify": True}
         history = clean_history(payload.get("history"), 6)
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
         if lang == "en" and not screen_question(question):
