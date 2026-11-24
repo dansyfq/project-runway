@@ -558,6 +558,20 @@ def test_the_voice_is_not_slowed_down():
     assert 'rate="+10%"' in pack and 'rate="-' not in pack
 
 
+def test_voice_clips_are_played_at_one_level():
+    # a reply is several clips made separately; each is decoded and played at the gain that brings its speech to one level,
+    # so the quiet first sentence is not followed by a louder second clip
+    i = GAME.index("// Loudness matching: the voice makes each clip")
+    block = GAME[i:GAME.index("async function speak(text,btn,lang='en')", i)]
+    assert "const LEVEL=.15, GAIN_MIN=.5, GAIN_MAX=3, PEAK_MAX=.98;" in block
+    assert "Math.max(GAIN_MIN, Math.min(GAIN_MAX, LEVEL/Math.sqrt(s/n), PEAK_MAX/peak))" in block  # never clips, never extreme
+    assert "if(n<2000||!peak) return 1;" in block  # silence or a tiny clip is left alone
+    # only the speech counts, not the pauses; a clip that cannot be decoded (or an audio context that cannot run) plays as it was
+    assert "if(v>.02){s+=v*v; n++;}" in block and "if(AC.state!=='running') return null;" in block
+    assert "gn.gain.value=clipGain(buf.getChannelData(0));" in block and "new Audio('data:audio/mpeg;base64,'+b64)" in block
+    assert "AUD={pause(){try{src.stop();}catch(e){}}}" in block  # stopSpeak() still stops it
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
