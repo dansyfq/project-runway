@@ -838,7 +838,14 @@ def test_when_you_sell_says_from_what_buyer_age_cpf_is_in_full():
 
 def test_an_age_changed_elsewhere_reaches_when_you_sell_home_and_the_lease_explorer():
     game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
-    assert "const EXIT=S.ageSet?S.age:EXIT_AGE" in game and "resaleExit(f.lease,y,EXIT)" in game  # the example buyer is the age you set
+    assert "const start=S.ageSet?S.age:EXIT_AGE" in game and "let EXIT=start, years=5;" in game and "resaleExit(f.lease,y,EXIT)" in game  # the example buyer starts at the age you set
     assert "A buyer aged ${EXIT}${mine} needs at least" in game
     assert "if(st.fromAge!==S.age){ st.age=S.age; st.fromAge=S.age; }" in game  # the Lease explorer
     assert "observe($('#scrLanding'), {attributes: true, attributeFilter: ['hidden']})" in game  # Home takes the age back
+
+
+def test_when_you_sell_has_buyer_age_chips_that_keep_the_sell_date():
+    game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
+    assert "[...new Set([25,35,45,55,start])]" in game and "data-buyer=" in game  # 25, 35, 45, 55 and your own age
+    assert "How old is the youngest buyer?" in game
+    assert "EXIT=+b.dataset.buyer; upd(years);" in game  # a chip keeps the chosen sell date

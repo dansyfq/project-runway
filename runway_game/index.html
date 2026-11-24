@@ -3256,15 +3256,21 @@ function resaleExit(lease, yrs, age){const left=Math.max(0,lease-yrs), share=lef
 const EXIT_AGE=30;  // the example buyer's age until you give yours; not a rule
 function exitView(f){
   const box=$('#exitBox'); if(!box) return;
-  const EXIT=S.ageSet?S.age:EXIT_AGE, mine=S.ageSet?' (the age you set)':'';  // the example buyer follows the youngest-buyer age you set
+  const start=S.ageSet?S.age:EXIT_AGE;  // the example buyer starts at the youngest-buyer age you set; the chips below change it
+  let EXIT=start, years=5;
+  const ages=[...new Set([25,35,45,55,start])].sort((a,b)=>a-b);
   box.innerHTML=`<h3 id="exitH" style="font-size:1.05rem;color:var(--ink)">When you sell</h3>
     <p>A short lease also limits your buyer. When do you sell?</p>
     <div class="chips" role="group" aria-labelledby="exitH">${[5,10,15,20].map(n=>`<button type="button" class="chip" data-exit="${n}" aria-pressed="${n===5}">In ${n} years</button>`).join('')}</div>
+    <p id="buyerH" style="margin:12px 0 6px">How old is the youngest buyer?</p>
+    <div class="chips" role="group" aria-labelledby="buyerH">${ages.map(a=>`<button type="button" class="chip" data-buyer="${a}" aria-pressed="${a===start}">${a}${S.ageSet&&a===start?' (you)':''}</button>`).join('')}</div>
     <div id="exitOut" aria-live="polite"></div>
-    <details class="more"><summary>Why?</summary><p class="small" style="margin-top:8px">Rule: CPF Board, “How much CPF savings can I use … lease does not cover the youngest buyer to age 95?” and HDB, “Housing loan from HDB”. The buyer aged ${EXIT} is only an example${S.ageSet?', taken from the youngest-buyer age you set':''}. Most flats can be sold on the open market only after the 5-year minimum occupation period (HDB, “Conditions after buying a resale flat”).</p></details>`;
+    <details class="more"><summary>Why?</summary><p class="small" style="margin-top:8px">Rule: CPF Board, “How much CPF savings can I use … lease does not cover the youngest buyer to age 95?” and HDB, “Housing loan from HDB”. The buyer's age is only an example${S.ageSet?`: it starts at the youngest-buyer age you set (${start}) and you can try others`:'; try other ages with the chips'}. Most flats can be sold on the open market only after the 5-year minimum occupation period (HDB, “Conditions after buying a resale flat”).</p></details>`;
   const upd=y=>{
+    years=y; const mine=S.ageSet&&EXIT===S.age?' (the age you set)':'';
     const e=resaleExit(f.lease,y,EXIT), left=Math.floor(e.left), need=95-EXIT;
     box.querySelectorAll('[data-exit]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.exit===y));
+    box.querySelectorAll('[data-buyer]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.buyer===EXIT));
     if(e.left<=20){ $('#exitOut').innerHTML=`<p><b style="color:var(--ink)">Only ${left} year${left===1?'':'s'} would be left.</b> With 20 years or less, a buyer can't use CPF or take an HDB loan for this flat.</p>`; return; }
     const w=v=>Math.max(0,Math.min(100,v/99*100)).toFixed(1), full=e.share>=1, col=full?'var(--ok)':'var(--part)';
     const minAge=95-left;  // the youngest buyer's age from which lease left + age reaches 95, so CPF and the 75% loan are in full
@@ -3278,6 +3284,7 @@ function exitView(f){
       <p style="margin:10px 0 0"><b style="color:var(--ink)">Who gets full CPF:</b> ${minAge<=21?'any buyer, whatever their age.':`if the youngest buyer is ${minAge} or older (95 minus ${left} years of lease left). A younger buyer can still use part of their CPF, with a smaller HDB loan.`}</p>`;
   };
   box.querySelectorAll('[data-exit]').forEach(b=>b.onclick=()=>upd(+b.dataset.exit));
+  box.querySelectorAll('[data-buyer]').forEach(b=>b.onclick=()=>{EXIT=+b.dataset.buyer; upd(years);});
   upd(5);
 }
 function showResult(){
