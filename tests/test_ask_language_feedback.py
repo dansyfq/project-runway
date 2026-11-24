@@ -218,8 +218,9 @@ def test_key_has_action_chips_a_mic_and_votes():
     assert "KEY_ACTIONS" in GAME and 'id="keyMic"' in GAME and "src: 'key'" in GAME
 
 
-def test_opening_ask_says_hello_in_a_device_voice():
-    assert "function welcomeAsk()" in GAME and "if(!h)welcomeAsk();" in GAME
+def test_opening_ask_does_not_say_hello():
+    # opening the Ask page used to speak "Hi, I'm KEY. How are you?" every time; it is silent now (the mic does not greet either)
+    assert "welcomeAsk" not in GAME and "MIC.stop(false);}).observe($('#scrAsk')" in GAME
 
 
 def test_sources_show_when_each_document_was_retrieved():
