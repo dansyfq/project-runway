@@ -2365,7 +2365,7 @@ function speechText(parts){
 // SILENCE_MS after speaking (HUSH_MS if they say nothing). Chrome ends a recognition by itself (after a silence; on Android
 // after every phrase), so a new one starts until then and the text adds up across them, after anything already typed in
 // the box. o: {btn, input, lang, hint: the placeholder to put back, done(text): speech was heard, fail(error)}.
-const SILENCE_MS = 2500, HUSH_MS = 7000, MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported'];
+const SILENCE_MS = 1500, HUSH_MS = 7000, MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported'];
 let MIC = null;  // the mic in use, on either page: MIC.stop(true) sends what was heard, MIC.stop(false) leaves it in the box
 function dictate(o){
   if(MIC) MIC.stop(false);
