@@ -3566,7 +3566,7 @@ const SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wid
 const INTRO='<p>Hello. Ask me about using CPF, HDB loans, or lease. You can speak or type. I answer from official documents.</p>';
 function renderChat(){
   const all=[{bot:true,html:INTRO}].concat(S.chat);
-  $('#chat').innerHTML = all.map((m,i)=>m.me?`<div class="msg me" id="cm${i}" tabindex="-1">${m.html}</div>`:`<div class="msg bot ${m.warn?'warn':''}" id="cm${i}" tabindex="-1"><span class="who">Runway</span>${m.lang&&m.lang!=='en'?`<div class="mlang" lang="${LANGS[m.lang].tag}">${m.html}</div>`:m.html}${m.src?srcHtml(m.src):''}<button type="button" class="speakbtn" data-say="${i}" aria-pressed="false">${SPK}Listen</button>${m.fb?fbHtml(m,i):''}</div>`).join('');
+  $('#chat').innerHTML = all.map((m,i)=>m.me?`<div class="msg me" id="cm${i}" tabindex="-1">${m.html}</div>`:`<div class="msg bot ${m.warn?'warn':''}" id="cm${i}" tabindex="-1"><span class="who">KEY</span>${m.lang&&m.lang!=='en'?`<div class="mlang" lang="${LANGS[m.lang].tag}">${m.html}</div>`:m.html}${m.src?srcHtml(m.src):''}<button type="button" class="speakbtn" data-say="${i}" aria-pressed="false">${SPK}Listen</button>${m.fb?fbHtml(m,i):''}</div>`).join('');
   $$('[data-say]').forEach(b=>b.onclick=()=>{const m=all[+b.dataset.say];if(b.getAttribute('aria-pressed')==='true'){stopSpeak();return;}speak(plain(m.html),b,m.lang);});
   $$('[data-fb]').forEach(b=>b.onclick=()=>{const m=all[+b.dataset.fb]; if(m.fb.v===b.dataset.v) return; m.fb.v=b.dataset.v;
     b.parentElement.querySelectorAll('[data-fb]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
