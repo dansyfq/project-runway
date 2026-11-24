@@ -2361,16 +2361,16 @@ function speechText(parts){
   }
   return out;
 }
-// Dictation: a tap greets in the answer language, then listens until a second tap, or until the user has been quiet for
+// Dictation: a tap starts listening at once (no greeting), until a second tap, or until the user has been quiet for
 // SILENCE_MS after speaking (HUSH_MS if they say nothing). Chrome ends a recognition by itself (after a silence; on Android
 // after every phrase), so a new one starts until then and the text adds up across them, after anything already typed in
 // the box. o: {btn, input, lang, hint: the placeholder to put back, done(text): speech was heard, fail(error)}.
-const SILENCE_MS = 1500, HUSH_MS = 7000, MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported'];
+const SILENCE_MS = 1000, HUSH_MS = 7000, MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported'];
 let MIC = null;  // the mic in use, on either page: MIC.stop(true) sends what was heard, MIC.stop(false) leaves it in the box
 function dictate(o){
   if(MIC) MIC.stop(false);
   const base = o.input.value.trim(), lang = VOICE[o.lang] ? o.lang : 'en';
-  let phase = 'greet', send = true, kept = '', live = '', rec = null, quiet = 0, wait = 0, quick = 0, err = '';
+  let phase = 'listen', send = true, kept = '', live = '', rec = null, quiet = 0, wait = 0, quick = 0, err = '';
   const heard = () => joinSpeech(kept, live);
   const pressed = v => { o.btn.setAttribute('aria-pressed', String(v)); o.btn.classList.toggle('on', v); };
   const arm = () => { clearTimeout(quiet); quiet = setTimeout(() => me.stop(true), heard() ? SILENCE_MS : HUSH_MS); };
@@ -2407,11 +2407,8 @@ function dictate(o){
     if(MIC_FATAL.includes(err)) o.fail(err); else if(said && send) o.done(text);
   }
   pressed(true);
-  greet(lang).then(() => {  // listening starts after the greeting, so the greeting is never written down
-    if(phase !== 'greet') return;
-    phase = 'listen'; o.input.placeholder = 'Listening…'; arm();
-    try{ session(); }catch(e){ end(); }
-  });
+  o.input.placeholder = 'Listening…'; arm();  // no greeting: it only slowed the first words down
+  try{ session(); }catch(e){ end(); }
   return me;
 }
 addEventListener('pagehide', () => { if(MIC) MIC.stop(false); });
@@ -4145,7 +4142,7 @@ function privacyHtml(){
     <li>With the AI on, Anthropic (the maker of Claude) gets your question, up to six recent turns, the age if set and the matching official passages, to write the answer. A question that is not in English also goes there, with your previous one, to be put into English for the document search. With the AI off or busy, nothing goes to Anthropic and you see the official pages.</li>
     <li>"Why?" has the AI explain a flat's calculator figures (age, lease, percentages, the town's lease effect), with no chat history. "Sum up this chat" sends the chat so far; the AI reads the last 12 turns.</li>
     <li>"Download this chat" makes a text file of your questions, the answers, their sources and any summary, with the notice, in your browser, and saves it on your device. Questions with personal details, declined ones and uploaded files are left out. Nothing is sent to Runway's server for it, and Runway keeps no copy.</li>
-    <li>Voice input uses your browser's speech recognition (some browsers, such as Chrome, send the audio to their own speech service); Runway gets only the text. The mic says a short greeting, then listens until you tap it again or stop talking for a few seconds.</li>
+    <li>Voice input uses your browser's speech recognition (some browsers, such as Chrome, send the audio to their own speech service); Runway gets only the text. The mic starts listening at once and sends what it heard when you tap it again or stop talking for a moment.</li>
     <li>Read aloud is on until you turn it off. It and the mic's greeting use Runway's voice pack: the server sends the words being read (never your voice) to Microsoft's free online voices. If that fails, your device's voices read them.</li></ul>
   <h2>Answer feedback</h2><ul>
     <li>Pressing Helpful or Not helpful under an answer, on the Ask page or in KEY, sends Runway's server your vote, the answer language and the question you asked. A vote never uses the AI.</li>
