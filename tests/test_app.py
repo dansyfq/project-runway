@@ -710,6 +710,29 @@ def speech_text(tmp_path, cases):
 
 
 @needs_node
+def test_voice_activity_hears_the_user_stop_over_background_noise(tmp_path):
+    """vadStep, 50 ms frames in dBFS: speech is the speech band 12 dB over the room's learned level; it adapts to a noisy room."""
+    code = GAME[GAME.index("const VAD_DB = "):GAME.index("function voiceActivity(")]
+    script = code + """
+const run = frames => { const st = {}; return frames.map(db => vadStep(st, db).speaking ? 1 : 0); };
+const noise = (n, lvl) => Array.from({length: n}, (_, i) => lvl + (i % 3) - 1);  // a steady room with a little flutter
+const quiet = noise(20, -55), loud = noise(40, -32);
+console.log(JSON.stringify({
+  quiet: run([...quiet, ...noise(10, -25), ...noise(20, -55)]),
+  loud: run([...loud, ...noise(10, -12), ...noise(20, -32)]),
+  roomOnly: run(noise(60, -32)),
+  blip: run([...quiet, -25, -25, ...noise(10, -55)]),
+}));"""
+    got = node_json(tmp_path, script)
+    def onoff(v):  # frame where speech starts and where it stops being heard
+        on = v.index(1); return on, on + v[on:].index(0)
+    assert onoff(got["quiet"]) == (22, 35)   # 150 ms to notice the voice; 300 ms after it ends, it has stopped
+    assert onoff(got["loud"]) == (42, 55)    # same in a loud room (-32 dB of noise): the room's level is learned
+    assert 1 not in got["roomOnly"][25:]     # a steady loud room alone is never taken for a voice once learned
+    assert 1 not in got["blip"]              # a 100 ms knock is not speech
+
+
+@needs_node
 def test_speech_pieces_join_on_desktop_and_android(tmp_path):
     """Desktop Chrome gives one result per phrase; Android Chrome repeats everything said so far in each result."""
     got = speech_text(tmp_path, [
@@ -734,10 +757,23 @@ def test_both_mics_dictate_through_pauses_and_greet_first():
     assert "if(phase !== 'listen' || err) return end();" in shared and "if(quick >= 3) return end();" in shared
     assert "e.error !== 'no-speech'" in shared
     assert "MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported']" in shared
-    # a tap starts listening at once: the mic no longer says "Hi, I'm KEY" first
+    # a press starts listening at once, inside the press: the mic no longer says "Hi, I'm KEY" first
     dict = shared[shared.index("function dictate(o){"):shared.index("addEventListener('pagehide'")]
-    assert "greet(" not in dict and "let phase = 'listen'" in dict and "o.input.placeholder = 'Listening…'; arm();" in dict
-    assert "const base = o.input.value.trim()" in shared and "joinSpeech(base, heard())" in shared  # typed text is kept in front
+    assert "greet(" not in dict and "let phase = 'listen'" in dict
+    assert dict.index("try{ session(); }") < dict.index("tick = setInterval(")
+    assert "r.onaudiostart = () => hearing('audio')" in dict and "o.input.placeholder = 'Starting the mic…'" in dict
+    # the mouse press, not its release, starts it; the click that follows is swallowed
+    assert "const MIC_BTNS = '#lMic, #keyMic, #micBtn';" in dict and "e.pointerType !== 'mouse'" in dict and "b.dataset.early" in dict
+    # the user has stopped when their words and (on a computer) their voice over the room stopped; words heard while only
+    # the room is audible are background and don't keep the mic open
+    assert "const vad = voiceActivity();" in dict and "if(!background()){ said = Date.now(); mine = now; }" in dict
+    assert "vad.heardVoice && !vad.speaking && Date.now() - vad.last > 500" in dict  # never before it has heard this user's voice
+    assert "const got = (vad && vad.heardVoice ? mine : heard()).trim()" in dict
+    assert "Math.max(said, vad && vad.speaking ? Date.now() : vad ? vad.last : 0)" in dict
+    assert "if(vad) vad.stop();" in dict
+    # ending with nothing heard says so instead of quietly switching off
+    assert "I didn't hear anything. Tap the mic and speak, or type." in dict and "The voice service didn't answer." in dict
+    assert "const base = o.input.value.trim()" in shared and "o.input.value = joinSpeech(base, mine);" in shared  # typed text is kept in front
     assert "dictate({btn: mic, input: inp, lang: RW.lang," in hero and "KEY.open(q)" in hero
     assert "dictate({btn:mb, input:$('#askIn'), lang:S.lang," in ask and "ask(v)" in ask
     assert "The microphone is blocked, so I could not hear you." in ask and "is not available in this browser" in ask
