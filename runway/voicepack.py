@@ -23,7 +23,7 @@ def speak(text: str, lang: str) -> str | None:
     async def run() -> bytes:
         import edge_tts
 
-        return b"".join([c["data"] async for c in edge_tts.Communicate(text, voice, rate="-8%").stream() if c["type"] == "audio"])
+        return b"".join([c["data"] async for c in edge_tts.Communicate(text, voice, rate="+10%").stream() if c["type"] == "audio"])
 
     # The page sends one message at a time, so a hung voice service would hold up the next question: one 10 s wait at
     # most. A quick failure is tried once more (the service sometimes returns nothing once); a timeout is not.
