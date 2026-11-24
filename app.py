@@ -8,13 +8,25 @@ Run locally with:  streamlit run app.py
 """
 
 import hashlib
+import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
 import streamlit as st
 import streamlit.components.v1 as components
 
-from runway.auth import load_users
+HERE = Path(__file__).parent
+# Streamlit Community Cloud keeps the process running across a redeploy, so the runway.* modules imported by an earlier
+# run would stay in memory and keep answering with the old code (only a reboot cleared them). The newest file time
+# changes on a redeploy: forget the old modules, so the imports below load the new ones, and key the caches on it.
+CODE = max(p.stat().st_mtime for p in (HERE / "runway").glob("*.py"))
+_seen = getattr(st, "_runway_code", None)
+if _seen is not None and _seen != CODE:  # not on the first run: nothing is stale yet
+    for _name in [n for n in sys.modules if n == "runway" or n.startswith("runway.")]:
+        del sys.modules[_name]
+st._runway_code = CODE
+
+from runway.auth import load_users  # noqa: E402  (after the module purge above)
 from runway.bridge import PAGES, handle
 from runway.config import get_setting
 from runway.content import load_content
@@ -26,7 +38,6 @@ from runway.rag import Retriever, load_chunks
 pages = {path: st.Page(lambda: None, title=f"{name} · Runway" if path else name, url_path=path, default=not path)
          for path, name in PAGES.items()}
 pg = st.navigation(list(pages.values()), position="hidden")
-HERE = Path(__file__).parent
 st.set_page_config(page_title=pg.title, page_icon=str(HERE / "runway_game" / "assets" / "favicon.svg"), layout="wide",
                    initial_sidebar_state="collapsed")
 pg.run()
@@ -54,9 +65,7 @@ def game_data() -> dict:
     return load_game_data()
 
 
-# Streamlit Community Cloud keeps the process running across a redeploy, so a cached object would stay an instance of
-# the old code (and fail when the new code calls it differently). The newest file time makes a redeploy build new ones.
-CODE = max(p.stat().st_mtime for p in (HERE / "runway").glob("*.py"))
+# CODE (top of this file) is part of each cache key, so a redeploy builds new objects instead of reusing old-code ones.
 
 
 @st.cache_resource(show_spinner=False, max_entries=1)

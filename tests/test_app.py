@@ -646,6 +646,15 @@ def test_a_redeploy_rebuilds_the_cached_ai(monkeypatch):
     assert "llm(CODE, key_id())" in app and "retriever(CODE)" in app and 'glob("*.py")' in app
 
 
+def test_a_redeploy_reloads_the_runway_modules():
+    """Streamlit Cloud keeps the process across a redeploy: app.py forgets the old runway.* modules when the code's file
+    time changes (not on the first run), and does so before importing them."""
+    app = (ROOT / "app.py").read_text()
+    purge = app.index('del sys.modules[_name]')
+    assert app.index("CODE = max(") < purge < app.index("from runway.auth import")
+    assert "_seen is not None and _seen != CODE" in app and "st._runway_code = CODE" in app
+
+
 def test_ask_never_shows_an_empty_answer():
     """A failed server reply ({"ok": False, "error": ...}) has no text: the chat says so instead of an empty bubble."""
     ask = GAME[GAME.index("async function ask("):GAME.index("const SPK=")]
