@@ -822,3 +822,9 @@ def test_lease_explorer_and_insights_are_wired_in():
     assert "if(!REV())" in GAME[GAME.index("function insightsPage"):GAME.index("function caseStudy")]  # reviewers only
     assert GAME.count("${FLOW_EXPLORER}") == 2  # How it works, short and full versions: one flowchart per use case
     assert "id=\"chatDl\"" in GAME and "function downloadChat" in GAME
+
+
+def test_when_you_sell_says_how_many_years_of_lease_the_buyer_needs():
+    game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
+    assert "needs at least ${need} years of lease left to use CPF in full (95 minus ${EXIT_AGE})" in game
+    assert "${need} years of lease needed</span>" in game
