@@ -216,3 +216,7 @@ def test_a_key_vote_is_marked_and_an_ask_vote_is_not(feedback_file, no_ai):
 
 def test_key_has_action_chips_a_mic_and_votes():
     assert "KEY_ACTIONS" in GAME and 'id="keyMic"' in GAME and "src: 'key'" in GAME
+
+
+def test_opening_ask_says_hello_in_a_device_voice():
+    assert "function welcomeAsk()" in GAME and "if(!h)welcomeAsk();" in GAME

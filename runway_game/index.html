@@ -3673,8 +3673,19 @@ $('#micBtn').onclick=()=>{
     fail:e=>e==='language-not-supported'?pushBot({warn:true,skip:true,html:`<p>Voice input in ${LANGS[S.lang].name} is not available in this browser. You can type your question instead.</p>`})
       :pushBot({warn:true,html:'<p>The microphone is blocked, so I could not hear you. Allow the microphone and tap the mic again, or type your question.</p>'})});
 };
+// Opening the Ask page says hello in the answer language, in a device voice (no server call, so it never holds up a question).
+// Only after a click or tap on the page: a browser would block speech on a plain reload anyway. Changing page stops it (show()).
+function welcomeAsk(){
+  if(!TTS || MIC || !(navigator.userActivation&&navigator.userActivation.hasBeenActive)) return;
+  const lang=S.lang, voice=chosenVoice(lang); if(lang!=='en'&&!voice) return;
+  stopSpeak();
+  const u=new SpeechSynthesisUtterance(VOICE[lang].hi);
+  if(voice){u.voice=voice;u.lang=voice.lang;} else u.lang='en-SG';
+  u.rate=.92; window._utter=u;
+  setTimeout(()=>{ if(!$('#scrAsk').hidden && !MIC) TTS.speak(u); },60);  // Chrome skips a speak() right after cancel()
+}
 // leaving the Ask page stops the mic (what was heard stays in the box)
-new MutationObserver(()=>{const h=$('#scrAsk').hidden; if(h&&MIC&&MIC.btn===$('#micBtn'))MIC.stop(false);}).observe($('#scrAsk'),{attributes:true,attributeFilter:['hidden']});
+new MutationObserver(()=>{const h=$('#scrAsk').hidden; if(h&&MIC&&MIC.btn===$('#micBtn'))MIC.stop(false); if(!h)welcomeAsk();}).observe($('#scrAsk'),{attributes:true,attributeFilter:['hidden']});
 $('#askForm').addEventListener('submit',e=>{e.preventDefault();const v=$('#askIn').value.trim();if(!v)return;$('#askIn').value='';ask(v);});
 
 /* ---------- more ---------- */
