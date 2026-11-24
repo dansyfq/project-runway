@@ -604,6 +604,17 @@ def test_home_has_no_back_to_top_arrow():
         assert f"'{page}'" in long_pages
 
 
+def test_key_suggestions_look_unlike_messages_and_sources_are_tucked_away():
+    # suggested questions: a caption and green outlined pills, so they cannot be mistaken for one of KEY's white message bubbles
+    assert '<p class="keychips-h">Suggested questions</p><div class="keychips">' in GAME
+    assert ".keychips button{border:1.5px solid var(--green-mid);border-radius:999px;background:transparent;" in GAME
+    assert ".kmsg.bot{align-self:flex-start;background:var(--page);border:1px solid var(--line)}" in GAME  # the bubble they must differ from
+    # the document links sit under a closed "Sources (n)" line: the Home page already links the documents, and a long list buried the answer
+    assert "<details class=\"ksrc\"><summary>Sources (${li.length})</summary>" in GAME and "Where this comes from" not in GAME[GAME.index("const kSources = src =>"):GAME.index("function kRender(){")]
+    assert "rel=\"noopener\"" in GAME[GAME.index("const kSources = src =>"):GAME.index("function kRender(){")]  # the links are still there, one tap away
+    assert "Rules and amounts can change after these dates." in GAME  # and so is the reminder to confirm them
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
