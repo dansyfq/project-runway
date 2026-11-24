@@ -55,8 +55,12 @@ def feedback_summary(votes: list[dict]) -> dict:
             low.append({"q": q[:300], "date": str(v.get("date", ""))[:10]})
         if len(low) >= MAX_LOW_RATED:
             break
+    key = [v for v in votes if v.get("src") == "key"]  # votes under KEY's answers; the rest are from the Ask page
+    key_up = sum(v.get("rating") == "up" for v in key)
     return {"total": len(votes), "up": up, "down": len(votes) - up,
             "helpful_pct": round(100 * up / len(votes)) if votes else None,
+            "key": {"total": len(key), "up": key_up, "down": len(key) - key_up,
+                    "helpful_pct": round(100 * key_up / len(key)) if key else None},
             "by_lang": dict(langs.most_common()), "low_rated": low}
 
 

@@ -1539,6 +1539,15 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .keyform input{flex:1;min-width:0;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:var(--radius-btn);background:var(--field);color:var(--ink);font:1rem var(--font-ui)}
 .keyform button{min-width:48px;min-height:44px;border:0;border-radius:var(--radius-btn);background:var(--brand);color:var(--on-brand);font:700 .9rem var(--font-ui);cursor:pointer}
 .keyform button:disabled{opacity:.55;cursor:default}
+.keyform .keymic{display:grid;place-items:center;background:var(--tint);color:var(--green)}
+.keyform .keymic.on{background:var(--green);color:var(--snow)}
+.keyform .keymic[aria-disabled="true"]{opacity:.55;cursor:default}
+.keyacts{display:flex;gap:6px;overflow-x:auto;padding:8px 10px 0;background:var(--page)}
+.keyacts button{flex:none;min-height:44px;border:0;border-radius:var(--radius-chip);background:var(--tint);color:var(--green);font:600 .82rem var(--font-ui);padding:0 12px;cursor:pointer}
+.keyacts button:hover{background:var(--tint-2)}
+.kfb{margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.78rem;color:var(--ink-2)}
+.kfb button{min-height:36px;border:0;border-radius:var(--radius-chip);background:var(--tint);color:var(--green);font:600 .78rem var(--font-ui);padding:0 10px;cursor:pointer}
+.kfb button[aria-pressed="true"]{background:var(--green);color:var(--snow)}
 </style>
 
 <div class="stage">
@@ -1892,7 +1901,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 <section class="keypanel" id="keyPanel" role="dialog" aria-label="KEY, Runway's assistant" hidden>
   <div class="keyhead"><div><b>KEY</b><small>Reads CPF · HDB · MND documents</small></div><button type="button" class="keyfull" id="keyFull">Full Ask page</button><button type="button" class="keyx" id="keyClose" aria-label="Close KEY">×</button></div>
   <div class="keylog" id="keyLog" aria-live="polite"></div>
-  <form class="keyform" id="keyForm"><label for="keyIn" class="lsr">Ask KEY a question</label><input id="keyIn" type="text" autocomplete="off" maxlength="1000" placeholder="Ask about CPF, lease or loans"><button type="submit" id="keySend">Ask</button></form>
+  <div class="keyacts" id="keyActs" role="group" aria-label="Quick actions"></div>
+  <form class="keyform" id="keyForm"><label for="keyIn" class="lsr">Ask KEY a question</label><input id="keyIn" type="text" autocomplete="off" maxlength="1000" placeholder="Ask about CPF, lease or loans"><button type="button" class="keymic" id="keyMic" aria-label="Ask by voice" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><button type="submit" id="keySend">Ask</button></form>
 </section>
 
 <script>
@@ -2536,9 +2546,16 @@ function faqFilter(faq, text){
   };
   function kRender(){
     const all = [{bot: true, html: `<p>${esc(KEY_INTRO)}</p>`}].concat(K.chat);
-    kl.innerHTML = all.map(m => `<div class="kmsg ${m.me ? 'me' : 'bot'}${m.warn ? ' warn' : ''}">${m.html}${m.src ? kSources(m.src) : ''}</div>`).join('')
+    const kFb = (m, i) => !m.fb ? '' : `<div class="kfb" role="group" aria-label="Was this answer helpful?"><span>Helpful?</span>`
+      + [['up', 'Helpful'], ['down', 'Not helpful']].map(([v, t]) => `<button type="button" data-kv="${v}" data-ki="${i}" aria-pressed="${m.fb.v === v}">${t}</button>`).join('') + '</div>';
+    kl.innerHTML = all.map((m, i) => `<div class="kmsg ${m.me ? 'me' : 'bot'}${m.warn ? ' warn' : ''}">${m.html}${m.src ? kSources(m.src) : ''}${kFb(m, i)}</div>`).join('')
       + (K.chat.some(m => m.me) ? '' : `<div class="keychips">${KEY_CHIPS.map(q => `<button type="button" data-kq="${esc(q)}">${esc(q)}</button>`).join('')}</div>`);
     kl.querySelectorAll('[data-kq]').forEach(b => b.onclick = () => kAsk(b.dataset.kq));
+    kl.querySelectorAll('[data-kv]').forEach(b => b.onclick = () => {  // a vote never calls the AI; the server checks the question again before keeping it
+      const m = all[+b.dataset.ki]; if(!m || !m.fb || m.fb.v === b.dataset.kv) return; m.fb.v = b.dataset.kv;
+      b.parentElement.querySelectorAll('[data-kv]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      RW.send('feedback', {rating: m.fb.v, lang: RW.lang || 'en', q: m.fb.q.length <= 300 ? m.fb.q : '', src: 'key'}).catch(() => {});
+    });
     kl.scrollTop = kl.scrollHeight;
   }
   const kHistory = (n = 7) => K.chat.filter(m => !m.typing && !m.skip).slice(-n).map(m => ({role: m.me ? 'user' : 'assistant', content: kPlain(m.html)}));
@@ -2558,7 +2575,7 @@ function faqFilter(faq, text){
       const d = RW.prof.get(), r = await RW.send('ask', {q, facts: null, history: prior, age: (d.onbDone || d.ageSet) && Number.isFinite(d.age) ? d.age : null, lang: RW.lang || 'en'});
       if(typeof r.text !== 'string') throw new Error(r.error || 'no answer');
       b = {html: md(r.text) + (r.note ? `<p><small>${esc(r.note)}</small></p>` : ''), src: r.sources, warn: r.blocked === 'personal', skip: !!r.blocked};
-      if(r.blocked) mine.skip = true;
+      if(r.blocked) mine.skip = true; else b.fb = {v: null, q};  // a real answer can be voted on
     }catch(e){ b = {warn: true, skip: true, html: '<p>KEY could not reach the documents just now. Try again in a moment.</p>'}; }
     K.chat.splice(K.chat.indexOf(typing), 1); K.chat.push(b); K.busy = false; ks.disabled = false; kRender();
   }
@@ -2566,11 +2583,26 @@ function faqFilter(faq, text){
     kp.hidden = false; kb.hidden = true; kb.setAttribute('aria-expanded', 'true'); kRender();
     if(q) kAsk(q); else ki.focus({preventScroll: true});
   }
-  function keyClose(){ kp.hidden = true; kb.hidden = false; kb.setAttribute('aria-expanded', 'false'); kb.focus({preventScroll: true}); }
+  /* Quick actions: unlike the question chips, these take you somewhere (the way Ask PAM goes from asking to doing). KEY closes first. */
+  const KEY_ACTIONS = [['Find flats on the map', () => RW.enter('map', {town: null, ft: $('#lType').value, age: L.age})], ['Open my shortlist', () => RW.enter('shortlist')],
+    ['See price trends', () => RW.enter('trends', {town: trendTownId(), type: $('#lType').value, lease: L.lease})], ['Try the lease explorer', () => RW.enter('more', 'explorer')]];
+  const kActs = document.getElementById('keyActs');
+  KEY_ACTIONS.forEach(([t, fn]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t;
+    b.onclick = () => { keyClose(true); fn(); }; kActs.appendChild(b); });
+  /* Voice: the same dictation as the Home and Ask boxes (greets, listens through pauses, sends after a short quiet). */
+  const km = document.getElementById('keyMic'), KEY_HINT = ki.placeholder, kMine = () => MIC && MIC.btn === km;
+  if(!SR){ km.setAttribute('aria-disabled', 'true'); km.title = "Voice input isn't available in this browser"; }
+  km.onclick = () => {
+    if(!SR) return;
+    if(kMine()){ MIC.stop(true); return; }
+    dictate({btn: km, input: ki, lang: RW.lang, hint: KEY_HINT, done: q => { ki.value = ''; kAsk(q); },
+      fail: e => { ki.placeholder = e === 'language-not-supported' ? "Voice input in this language isn't available here. Type your question." : 'The microphone is blocked. Allow it, or type your question.'; }});
+  };
+  function keyClose(quiet){ if(kMine()) MIC.stop(false); kp.hidden = true; kb.hidden = false; kb.setAttribute('aria-expanded', 'false'); if(quiet !== true) kb.focus({preventScroll: true}); }
   window.KEY = {open: keyOpen, close: keyClose};
   kb.onclick = () => keyOpen();
   document.getElementById('keyClose').onclick = keyClose;
-  document.getElementById('keyFull').onclick = () => { kp.hidden = true; kb.hidden = false; RW.enter('ask'); };
+  document.getElementById('keyFull').onclick = () => { keyClose(true); RW.enter('ask'); };
   document.getElementById('keyForm').addEventListener('submit', e => { e.preventDefault(); const q = ki.value; ki.value = ''; kAsk(q); });
   kp.addEventListener('keydown', e => { if(e.key === 'Escape'){ e.stopPropagation(); keyClose(); } });
   // the Ask page has the full chat, so KEY steps aside there
@@ -4074,7 +4106,7 @@ function privacyHtml(){
     <li>Voice input uses your browser's speech recognition (some browsers, such as Chrome, send the audio to their own speech service); Runway gets only the text. The mic says a short greeting, then listens until you tap it again or stop talking for a few seconds.</li>
     <li>Read aloud is on until you turn it off. It and the mic's greeting use Runway's voice pack: the server sends the words being read (never your voice) to Microsoft's free online voices. If that fails, your device's voices read them.</li></ul>
   <h2>Answer feedback</h2><ul>
-    <li>Pressing Helpful or Not helpful under an answer sends Runway's server your vote, the answer language and the question you asked. A vote never uses the AI.</li>
+    <li>Pressing Helpful or Not helpful under an answer, on the Ask page or in KEY, sends Runway's server your vote, the answer language and the question you asked. A vote never uses the AI.</li>
     <li>The server checks the question again. If it has an NRIC number, a Singapore phone number or an email address, or is a question Runway declines, the question is dropped and only the vote and the language are kept.</li>
     <li>Each vote is kept as one line: the vote, the answer language, the question (if kept) and the date, plus empty fields the team fills in to turn it into a test question. No name, login, address or time of day. The line goes to the server log, to a file on the server when one can be written, and to Runway's database (Neon, a Postgres service) when one is set up. The team reads these lines to find questions Runway answers badly.</li>
     <li>Changing your vote records a new line. One visit can record up to 30 votes.</li></ul>
@@ -4169,14 +4201,15 @@ function insightsPage(b,top){
   RW.send('insights').then(r=>{
     if(S.sub!=='insights') return;
     if(!r||!r.ok){ b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1><p>${esc((r&&r.error)||'Insights could not load.')}</p></div>`; return; }
-    const d=r.data, f=d.feedback, c=d.corpus, e=d.eval, ai=d.ai;
+    const d=r.data, f=d.feedback, c=d.corpus, e=d.eval, ai=d.ai, fk=f.key||{total:0,up:0,down:0,helpful_pct:null};
     const stat=(v,l)=>`<div class="stat"><b>${esc(v)}</b><span class="small">${esc(l)}</span></div>`;
     const modes=e&&e.by_mode?Object.entries(e.by_mode):[];
     b.innerHTML=`${top}<div class="doctext"><h1>Insights</h1>
       <p>How Ask Runway is doing, from what Runway already keeps. Updated ${esc(d.generated)}.</p>
-      <div class="stats">${stat(c.docs,'official documents')}${stat(c.passages,'passages searched')}${stat(f.helpful_pct==null?'–':f.helpful_pct+'%',`helpful (${f.total} vote${f.total===1?'':'s'})`)}${stat(ai.calls_last_hour+' / '+ai.cap,'AI calls in the last hour')}</div>
+      <div class="stats">${stat(c.docs,'official documents')}${stat(c.passages,'passages searched')}${stat(f.helpful_pct==null?'–':f.helpful_pct+'%',`helpful, all answers (${f.total} vote${f.total===1?'':'s'})`)}${stat(fk.helpful_pct==null?'–':fk.helpful_pct+'%',`helpful, KEY (${fk.total} vote${fk.total===1?'':'s'})`)}${stat(ai.calls_last_hour+' / '+ai.cap,'AI calls in the last hour')}</div>
       <h2>Answers people marked Not helpful</h2>
       ${f.low_rated.length?`<ul>${f.low_rated.map(x=>`<li>${esc(x.q)} <span class="small">${esc(x.date)}</span></li>`).join('')}</ul><p class="small">A question here may need a document Ask doesn't have yet: add it with Upload Ask documents. Only questions with no NRIC, phone number or email are ever kept.</p>`:'<p>None yet.</p>'}
+      <p class="small">KEY votes: ${fk.up} helpful, ${fk.down} not helpful (included in the totals).</p>
       <p class="small">Votes: ${f.up} helpful, ${f.down} not helpful${Object.keys(f.by_lang).length?' · by answer language: '+Object.entries(f.by_lang).map(([k,n])=>`${esc((LANGS[k]||{name:k}).name)} ${n}`).join(', '):''}. Read from ${esc(f.from)}.</p>
       <h2>Quality checks</h2>
       ${e?`<div class="scroll"><table class="tbl"><thead><tr><th>Check</th><th>Passed</th></tr></thead><tbody>${e.checks.filter(x=>x[2]).map(x=>`<tr><td>${esc(x[0])}</td><td>${x[1]} of ${x[2]}</td></tr>`).join('')}</tbody></table></div>

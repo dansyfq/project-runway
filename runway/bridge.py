@@ -221,7 +221,9 @@ def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retri
         # Shaped like an eval/questions.json case; the question is kept only if screening passes it (no NRIC, phone, email).
         line = json.dumps({"type": "retrieval", "question": "" if screen_question(question) else question,
                            "expect_docs": [], "expect_words": [], "rating": rating,
-                           "lang": language(payload.get("lang")), "date": time.strftime("%Y-%m-%d")}, ensure_ascii=False)
+                           "lang": language(payload.get("lang")), "date": time.strftime("%Y-%m-%d"),
+                           # only a vote from the KEY assistant is marked; an Ask page vote keeps its original shape
+                           **({"src": "key"} if payload.get("src") == "key" else {})}, ensure_ascii=False)
         print(f"[runway] feedback {line}", flush=True)  # Streamlit Community Cloud has no lasting disk: the log is the record
         try:
             with FEEDBACK_FILE.open("a", encoding="utf-8") as f:

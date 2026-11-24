@@ -64,3 +64,10 @@ def test_feedback_summary_with_no_votes(tmp_path):
 def test_odd_vote_rows_are_not_counted():
     s = insights.feedback_summary([{"rating": "up"}, {"rating": "meh"}, "junk", {"rating": "down", "question": "x"}])
     assert (s["total"], s["up"], s["down"]) == (2, 1, 1)
+
+
+def test_key_votes_are_counted_apart_and_included_in_the_totals():
+    s = insights.feedback_summary([{"rating": "up", "src": "key"}, {"rating": "down", "src": "key"}, {"rating": "up", "src": "key"}, {"rating": "down"}])
+    assert (s["total"], s["up"]) == (4, 2)
+    assert s["key"] == {"total": 3, "up": 2, "down": 1, "helpful_pct": 67}
+    assert insights.feedback_summary([{"rating": "up"}])["key"]["helpful_pct"] is None

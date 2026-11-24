@@ -203,3 +203,16 @@ def test_off_topic_stays_off_topic_in_other_languages(question):
     from runway.llm import screen_question
 
     assert screen_question(question) == "off_topic"
+
+
+def test_a_key_vote_is_marked_and_an_ask_vote_is_not(feedback_file, no_ai):
+    bot, index, calls = no_ai
+    assert vote({}, bot, index, rating="up", lang="en", q="How long can my loan be?", src="key") == {"ok": True}
+    assert vote({}, bot, index, rating="up", lang="en", q="How long can my loan be?", src="other") == {"ok": True}
+    first, second = (json.loads(x) for x in feedback_file.read_text(encoding="utf-8").splitlines())
+    assert first["src"] == "key" and "src" not in second
+    assert calls == []
+
+
+def test_key_has_action_chips_a_mic_and_votes():
+    assert "KEY_ACTIONS" in GAME and 'id="keyMic"' in GAME and "src: 'key'" in GAME
