@@ -225,6 +225,6 @@ def test_opening_ask_does_not_say_hello():
 
 def test_sources_show_when_each_document_was_retrieved():
     from runway.llm import ANSWER_SYSTEM
-    assert "function retrievedOn(" in GAME and "retrieved ' + retrievedOn(s.retrieved)" in GAME  # KEY's sources
+    assert "function retrievedOn(" in GAME and "' · checked ' + esc(on)" in GAME  # KEY's one-line note says when the documents were checked
     assert "retrieved ${esc(retrievedOn(s.retrieved))}" in GAME  # the Ask page's sources
     assert "Never say you cannot tell when the documents are from" in ANSWER_SYSTEM
