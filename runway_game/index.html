@@ -1532,10 +1532,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .kmsg.bot{align-self:flex-start;background:var(--page);border:1px solid var(--line)}
 .kmsg.warn{border-color:var(--part);background:var(--part-soft);color:var(--ink)}
 .ksrc{margin-top:10px;font-size:.8rem;line-height:1.4;color:var(--ink-2)}
-.ksrc ul{margin:6px 0;padding:0;list-style:none}
-.ksrc li{padding:6px 0;border-top:1px solid var(--line)}
-.ksrc a{color:var(--green-mid)}
-.ksrc summary{cursor:pointer;min-height:36px;display:flex;align-items:center;font-weight:600;color:var(--green-mid)}
 .keysugg{margin-top:4px}
 .keychips-h{margin:0 0 6px;font:700 .72rem var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
 .keychips{display:flex;flex-wrap:wrap;gap:8px}
@@ -2627,10 +2623,10 @@ function faqFilter(faq, text){
   const K = {chat: [], busy: false};
   const kb = document.getElementById('keyBtn'), kp = document.getElementById('keyPanel'), kl = document.getElementById('keyLog'), ki = document.getElementById('keyIn'), ks = document.getElementById('keySend');
   const kPlain = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent.replace(/\s+/g, ' ').trim(); };
-  const kSources = src => {
-    const seen = new Set(), li = [];
-    (src || []).forEach(s => { if(!/^https:\/\//i.test(s.url || '') || seen.has(s.url)) return; seen.add(s.url); li.push(`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc([s.publisher, s.title, retrievedOn(s.retrieved) && 'retrieved ' + retrievedOn(s.retrieved)].filter(Boolean).join(' · '))}<span class="lsr"> (opens in a new tab)</span></a></li>`); });
-    return li.length ? `<details class="ksrc"><summary>Sources (${li.length})</summary><ul>${li.join('')}</ul><span>Rules and amounts can change after these dates. Confirm on the official HDB or CPF Board site.</span></details>` : '';
+  const kSources = src => {  // a plain line, no links (the Ask page keeps the full list): who the answer is based on, and when it was checked
+    const who = [...new Set((src || []).map(s => s.publisher).filter(Boolean))].slice(0, 3);
+    const dates = (src || []).map(s => s.retrieved).filter(Boolean).sort(), on = retrievedOn(dates[dates.length - 1]);
+    return who.length ? `<p class="ksrc">Based on ${esc(who.join(', '))}${on ? ' · checked ' + esc(on) : ''}. Rules can change: confirm on the official site.</p>` : '';
   };
   function kRender(){
     const all = [{bot: true, html: `<p>${esc(KEY_INTRO)}</p>`}].concat(K.chat);
