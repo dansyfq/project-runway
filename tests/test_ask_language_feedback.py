@@ -220,3 +220,10 @@ def test_key_has_action_chips_a_mic_and_votes():
 
 def test_opening_ask_says_hello_in_a_device_voice():
     assert "function welcomeAsk()" in GAME and "if(!h)welcomeAsk();" in GAME
+
+
+def test_sources_show_when_each_document_was_retrieved():
+    from runway.llm import ANSWER_SYSTEM
+    assert "function retrievedOn(" in GAME and "retrieved ' + retrievedOn(s.retrieved)" in GAME  # KEY's sources
+    assert "retrieved ${esc(retrievedOn(s.retrieved))}" in GAME  # the Ask page's sources
+    assert "Never say you cannot tell when the documents are from" in ANSWER_SYSTEM

@@ -2289,6 +2289,11 @@ function uploadProblem(name, size){
   return '';
 }
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+// "2026-10-16" → "16 Oct 2026" for the date a source document was retrieved ('' when it isn't a date)
+function retrievedOn(iso){
+  const m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(String(iso || '')); if(!m) return '';
+  return `${+m[3]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2] - 1] || ''} ${m[1]}`.replace('  ', ' ');
+}
 /* ---------- voice, shared by the Home ask box and the Ask page: device voices, the mic's greeting, dictation ---------- */
 // Each answer language: its speech-recognition tag (en-SG for English) and the greeting the mic says before it listens.
 const VOICE = {en: {rec: 'en-SG', hi: "Hi, I'm Runway. How are you?"}, zh: {rec: 'zh-CN', hi: '你好，我是 Runway。你好吗？'},
@@ -2541,8 +2546,8 @@ function faqFilter(faq, text){
   const kPlain = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent.replace(/\s+/g, ' ').trim(); };
   const kSources = src => {
     const seen = new Set(), li = [];
-    (src || []).forEach(s => { if(!/^https:\/\//i.test(s.url || '') || seen.has(s.url)) return; seen.add(s.url); li.push(`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc([s.publisher, s.title].filter(Boolean).join(' · '))}<span class="lsr"> (opens in a new tab)</span></a></li>`); });
-    return li.length ? `<div class="ksrc"><b>Where this comes from</b><ul>${li.join('')}</ul></div>` : '';
+    (src || []).forEach(s => { if(!/^https:\/\//i.test(s.url || '') || seen.has(s.url)) return; seen.add(s.url); li.push(`<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc([s.publisher, s.title, retrievedOn(s.retrieved) && 'retrieved ' + retrievedOn(s.retrieved)].filter(Boolean).join(' · '))}<span class="lsr"> (opens in a new tab)</span></a></li>`); });
+    return li.length ? `<div class="ksrc"><b>Where this comes from</b><ul>${li.join('')}</ul><span>Rules and amounts can change after these dates. Confirm on the official HDB or CPF Board site.</span></div>` : '';
   };
   function kRender(){
     const all = [{bot: true, html: `<p>${esc(KEY_INTRO)}</p>`}].concat(K.chat);
@@ -3429,7 +3434,7 @@ function srcHtml(src){
     const k = /^[a-z]/.test(w) ? w.slice(0, 120).search(/[.;:]\s+[A-Z]/) : -1;  // a passage cut mid-sentence starts at its next sentence
     if(k >= 0) w = w.slice(k).replace(/^[.;:]\s+/, ''); else if(/^[a-z]/.test(w)) w = '…' + w;
     const c = w.lastIndexOf(' ', 140); return w.length > 140 ? w.slice(0, c > 60 ? c : 140) + '…' : w; };
-  return `<div class="src"><span class="src-h"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Where this comes from</span>${[...docs.values()].map(({s,n})=>{ const t = `${n.map(x=>`[${x}]`).join('')} ${esc(s.publisher)} · ${esc(s.title)}`, q = quote(s.text);
+  return `<div class="src"><span class="src-h"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Where this comes from</span>${[...docs.values()].map(({s,n})=>{ const t = `${n.map(x=>`[${x}]`).join('')} ${esc(s.publisher)} · ${esc(s.title)}${retrievedOn(s.retrieved) ? ` · retrieved ${esc(retrievedOn(s.retrieved))}` : ''}`, q = quote(s.text);
     return (q ? `<span class="src-q">“${esc(q)}”</span>` : '') + (/^https:\/\//i.test(s.url||'') ? `<a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.title)}">${t}${NEWTAB}</a>` : `<span class="src-t">${t}</span>`); }).join('')}</div>`;
 }
 function flatFacts({f, r}){

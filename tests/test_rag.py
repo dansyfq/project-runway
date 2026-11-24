@@ -98,3 +98,10 @@ def test_search_mode_is_never_silently_swapped(retriever):
     assert [c.id for c in retriever.search(q, mode="vector")] == retriever.rankings(q)[1][:5]
     with pytest.raises(ValueError):
         retriever.search(q, mode="semantic")
+
+
+def test_format_context_gives_the_model_each_documents_retrieved_date(retriever):
+    chunks = retriever.search("Valuation Limit", k=2)
+    text = format_context(chunks)
+    assert all(f"retrieved {c.retrieved}" in text for c in chunks if c.retrieved)
+    assert "retrieved 20" in text  # the corpus files all carry a retrieved date

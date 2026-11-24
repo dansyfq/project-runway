@@ -61,7 +61,7 @@ def load_trends() -> dict:
 
 def source_view(chunks: list[Chunk]) -> list[dict]:
     return [{"title": c.title, "publisher": c.publisher, "url": c.url, "heading": c.heading,
-             "text": c.text[:600]} for c in chunks]
+             "retrieved": c.retrieved, "text": c.text[:600]} for c in chunks]
 
 
 def clean_history(raw, n: int) -> list[dict]:

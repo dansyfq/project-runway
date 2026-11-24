@@ -253,6 +253,7 @@ class Retriever:
 def format_context(chunks: list[Chunk]) -> str:
     """Numbered passages for the prompt; the model cites them as [1], [2], ..."""
     return "\n\n".join(
-        f"[{i}] {c.title} ({c.publisher})" + (f" - {c.heading}" if c.heading else "") + f"\n{c.text}"
+        f"[{i}] {c.title} ({c.publisher}" + (f", retrieved {c.retrieved}" if c.retrieved else "") + ")"
+        + (f" - {c.heading}" if c.heading else "") + f"\n{c.text}"
         for i, c in enumerate(chunks, start=1)
     )
