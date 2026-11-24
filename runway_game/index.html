@@ -2613,6 +2613,12 @@ function faqFilter(faq, text){
   function keyClose(quiet){ if(kMine()) MIC.stop(false); kp.hidden = true; kb.hidden = false; kb.setAttribute('aria-expanded', 'false'); if(quiet !== true) kb.focus({preventScroll: true}); }
   window.KEY = {open: keyOpen, close: keyClose};
   kb.onclick = () => keyOpen();
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && !kp.hidden && !document.querySelector('#sheetHost .sheet')) keyClose(); });  // a dialog closes on Escape
+  // The KEY button floats over the page's bottom-right corner, where a flat's sheet has "Next flat", "See the trend" and
+  // "More numbers": while a sheet is open the button steps aside (the panel, if already open, stays).
+  const sheetHost = document.getElementById('sheetHost');
+  if(sheetHost) new MutationObserver(() => { kb.style.display = sheetHost.querySelector('.sheet') && kp.hidden ? 'none' : ''; })
+    .observe(sheetHost, {childList: true, subtree: true});
   document.getElementById('keyClose').onclick = keyClose;
   document.getElementById('keyFull').onclick = () => { keyClose(true); RW.enter('ask'); };
   document.getElementById('keyForm').addEventListener('submit', e => { e.preventDefault(); const q = ki.value; ki.value = ''; kAsk(q); });
@@ -3079,6 +3085,7 @@ function openBudget(){
 function budgetResults(){
   const out=$('#bOut'), cash=numIn('#bCash'), oa=numIn('#bOa'), ft=$('#bFt').value||null;
   if(cash==null){out.innerHTML='<p class="fcount">Enter the cash you have, in dollars. Type 0 if none.</p>'; $('#bCash').focus(); return;}
+  if(cash>10000000 || (oa!=null&&oa>2000000)){out.innerHTML='<p class="fcount">That amount is too large to be real. Enter cash up to $10,000,000 and CPF savings up to $2,000,000.</p>'; $('#bCash').focus(); return;}  // the saved details accept CPF up to $2,000,000 as well
   S.age=Math.max(21,Math.min(85,Math.round(numIn('#bAge'))||S.age)); S.ageSet=true; syncAvg(); $('#bAge').value=S.age;
   S.oaSet=oa!=null; if(S.oaSet) S.oa=oa; S.cash=cash; S.dirty=true; sideProf();
   const r=recommend({age:S.age,cash,ft,towns:[]}).filter(x=>x.afford).slice(0,5);
@@ -3469,6 +3476,7 @@ function flatFacts({f, r}){
 const history = (n=7) => S.chat.filter(m=>!m.typing&&!m.skip).slice(-n).map(m=>({role:m.me?'user':'assistant', content:plain(m.html)}));
 async function ask(q, ctx){
   q = String(q).slice(0, 1000);  // the server reads no more than this
+  if(RW.queue.some(m => m.type === 'ask' && m.payload.q === q)) return;  // the same question is already on its way: a second tap or Enter doesn't ask it twice
   const prior = history();
   const mine = {me:true, html:esc(q)}; S.chat.push(mine);
   if(personal(q)){ mine.html=esc(redact(q).txt); mine.skip=true; /* never keep it: chat history goes to the server */ pushBot({warn:true, skip:true, html:'<p>Please remove your NRIC, phone number or email. Runway never needs them.</p>'}); return; }

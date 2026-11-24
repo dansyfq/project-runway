@@ -849,3 +849,11 @@ def test_when_you_sell_has_buyer_age_chips_that_keep_the_sell_date():
     assert "[...new Set([25,35,45,55,start])]" in game and "data-buyer=" in game  # 25, 35, 45, 55 and your own age
     assert "How old is the youngest buyer?" in game
     assert "EXIT=+b.dataset.buyer; upd(years);" in game  # a chip keeps the chosen sell date
+
+
+def test_ui_fixes_from_the_live_app_review():
+    game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
+    assert "if(RW.queue.some(m => m.type === 'ask' && m.payload.q === q)) return;" in game  # Ask: a repeated question is not asked twice
+    assert "e.key === 'Escape' && !kp.hidden" in game  # KEY closes on Escape
+    assert "kb.style.display = sheetHost.querySelector('.sheet') && kp.hidden ? 'none' : ''" in game  # KEY steps aside for a sheet
+    assert "That amount is too large to be real." in game  # Find by budget: absurd amounts

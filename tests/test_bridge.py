@@ -389,3 +389,14 @@ def test_voicepack_gives_up_at_once_on_a_hung_service(monkeypatch):
     monkeypatch.setattr(voicepack, "TIMEOUT_S", 0.05)
     monkeypatch.setitem(sys.modules, "edge_tts", types.SimpleNamespace(Communicate=Hang))
     assert voicepack.speak("Hello there.", "en") is None and len(tries) == 1
+
+
+def test_only_a_follow_up_question_is_searched_together_with_the_one_before():
+    from runway.bridge import is_follow_up
+
+    for q in ("And how long can my HDB loan run in that case?", "What if the lease was only 50 years instead?",
+              "Why is my CPF cut?", "What about 60 years?", "How about a bank loan?"):
+        assert is_follow_up(q), q
+    for q in ("What is the minimum occupation period before I can sell my flat?",
+              "How much CPF can I use for a resale flat with a short lease?", "What is the Valuation Limit used for in CPF?"):
+        assert not is_follow_up(q), q

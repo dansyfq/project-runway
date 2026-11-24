@@ -10,6 +10,7 @@ Passwords, the AI and the documents stay server-side.
 from __future__ import annotations
 
 import json
+import re
 import threading
 import time
 import traceback
@@ -57,6 +58,21 @@ def load_trends() -> dict:
     from runway.trends import load_trends as load
 
     return load()
+
+
+_FOLLOW_UP_RE = re.compile(r"^\s*(and|but|so|also|then|what about|how about|what if|why|how come)\b"
+                           r"|\b(it|that|this|they|them|those|these|there|same|instead)\b", re.I)
+
+
+def is_follow_up(question: str) -> bool:
+    """True when the question leans on the one before it ("What about 50 years?", "And the loan?"). Only then is the earlier
+    question added to the document search: a new topic searched together with an unrelated earlier question finds the
+    wrong passages and gets "I don't know"."""
+    q = question.strip()
+    words = q.split()
+    if len(words) <= 2 and len(q) > 15:  # Chinese has no spaces: judge by length
+        return len(q) <= 20
+    return len(words) <= 5 or (len(words) <= 12 and bool(_FOLLOW_UP_RE.search(q)))
 
 
 def source_view(chunks: list[Chunk]) -> list[dict]:
@@ -164,7 +180,8 @@ def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retri
                         "clarify": True}
         # A question that will be declined must not spend an AI call on the search (the hourly budget is shared).
         sources = ([] if screen_question(question)
-                   else retrieve(index, bot.search_query(f"{previous} {question}", lang), k=5))
+                   else retrieve(index, bot.search_query(
+                       f"{previous[:300]} {question}" if is_follow_up(question) else question, lang), k=5))
         answer = bot.answer(question, sources, history=history, situation=situation_from(payload.get("age")), lang=lang)
         offline = bool(answer.error) or (not bot.available and not answer.blocked)
         why = {INVENTED_FIGURE: "used a figure not in the documents", AI_BUSY: "has reached its limit for this hour",
