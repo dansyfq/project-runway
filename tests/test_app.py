@@ -728,14 +728,15 @@ def test_both_mics_dictate_through_pauses_and_greet_first():
     hero = GAME[GAME.index("  /* voice: as on the Ask page"):GAME.index("/* ---------- your town")]
     ask = GAME[GAME.index("/* ---------- voice: speech to text (in the answer language"):GAME.index("/* ---------- more ----------")]
     assert "r.continuous = true" in shared and "r.interimResults = true" in shared
-    assert "const SILENCE_MS = 1500, HUSH_MS = 7000" in shared  # 1.5 s of quiet sends (it was 2.5 s, which felt slow); a person who says nothing still gets 7 s
+    assert "const SILENCE_MS = 1000, HUSH_MS = 7000" in shared  # 1 s of quiet sends (it was 2.5 s, which felt slow); a person who says nothing still gets 7 s
     assert "10000);" not in hero + ask and "new SR(" not in hero + ask  # no fixed 10-second cut-off; one dictation for both
     # a session the browser ends restarts unless the user stopped, an error ended it, or it keeps ending at once
     assert "if(phase !== 'listen' || err) return end();" in shared and "if(quick >= 3) return end();" in shared
     assert "e.error !== 'no-speech'" in shared
     assert "MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported']" in shared
-    # listening starts only once the greeting is over, so the greeting is never written into the box
-    assert "greet(lang).then(() => {" in shared and "phase = 'listen'" in shared[shared.index("greet(lang).then"):]
+    # a tap starts listening at once: the mic no longer says "Hi, I'm KEY" first
+    dict = shared[shared.index("function dictate(o){"):shared.index("addEventListener('pagehide'")]
+    assert "greet(" not in dict and "let phase = 'listen'" in dict and "o.input.placeholder = 'Listening…'; arm();" in dict
     assert "const base = o.input.value.trim()" in shared and "joinSpeech(base, heard())" in shared  # typed text is kept in front
     assert "dictate({btn: mic, input: inp, lang: RW.lang," in hero and "KEY.open(q)" in hero
     assert "dictate({btn:mb, input:$('#askIn'), lang:S.lang," in ask and "ask(v)" in ask
