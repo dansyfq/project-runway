@@ -595,6 +595,15 @@ def test_key_popup_layout_placeholder_and_thumb_votes():
     assert "data-kv=" in block and "aria-pressed=" in block  # the vote handler is unchanged
 
 
+def test_home_has_no_back_to_top_arrow():
+    # the arrow sat under the KEY button on Home; the other long pages keep it
+    i = GAME.index("const toTop = document.getElementById('toTop'), LONG = new Set([")
+    long_pages = GAME[i:GAME.index("]);", i)]
+    assert "LONG = new Set(['methodology'," in long_pages and "[''" not in long_pages and "'', " not in long_pages
+    for page in ("methodology", "faq", "sources", "privacy", "terms", "timeline"):
+        assert f"'{page}'" in long_pages
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
