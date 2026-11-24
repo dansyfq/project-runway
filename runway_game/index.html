@@ -2296,8 +2296,8 @@ function retrievedOn(iso){
 }
 /* ---------- voice, shared by the Home ask box and the Ask page: device voices, the mic's greeting, dictation ---------- */
 // Each answer language: its speech-recognition tag (en-SG for English) and the greeting the mic says before it listens.
-const VOICE = {en: {rec: 'en-SG', hi: "Hi, I'm Runway. How are you?"}, zh: {rec: 'zh-CN', hi: '你好，我是 Runway。你好吗？'},
-  ms: {rec: 'ms-MY', hi: 'Hai, saya Runway. Apa khabar?'}, ta: {rec: 'ta-SG', hi: 'வணக்கம், நான் Runway. நீங்கள் எப்படி இருக்கிறீர்கள்?'}};
+const VOICE = {en: {rec: 'en-SG', hi: "Hi, I'm KEY. How are you?"}, zh: {rec: 'zh-CN', hi: '你好，我是 KEY。你好吗？'},
+  ms: {rec: 'ms-MY', hi: 'Hai, saya KEY. Apa khabar?'}, ta: {rec: 'ta-SG', hi: 'வணக்கம், நான் KEY. நீங்கள் எப்படி இருக்கிறீர்கள்?'}};
 const TTS = 'speechSynthesis' in window ? window.speechSynthesis : null;
 // The voices that can read each answer language, best first: Singapore, then the nearest region. Mandarin skips
 // zh-HK, which is Cantonese. A voice named "Singapore" counts as Singapore English even with a bare "en" tag.
