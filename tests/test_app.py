@@ -544,9 +544,9 @@ def test_when_you_sell_shows_a_lease_bar_with_the_rule_behind_why():
     i = GAME.index("function exitView(f){")
     view = GAME[i:GAME.index("function showResult(){", i)]
     assert "<summary>Why?</summary>" in view and "Rule: CPF Board" in view  # the sources stay, behind Why?
-    assert 'role="img" aria-label="Bar:' in view and "need=95-EXIT_AGE" in view  # the bar and the years a buyer aged 30 needs
+    assert 'role="img" aria-label="Bar:' in view and "need=95-EXIT" in view  # the bar and the years the example buyer needs
     assert "${full?'✓':'!'}" in view  # not colour alone
-    assert "or older" not in view and "A short lease also limits your buyer. When do you sell?" in view
+    assert "Full CPF for a buyer aged" not in view and "A short lease also limits your buyer. When do you sell?" in view
     assert "e.left<=20" in view  # 20 years or less keeps the plain message
 
 
@@ -835,14 +835,26 @@ def test_lease_explorer_and_insights_are_wired_in():
 
 def test_when_you_sell_says_how_many_years_of_lease_the_buyer_needs():
     game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
-    assert "needs at least ${need} years of lease left to use CPF in full (95 minus ${EXIT_AGE})" in game
+    assert "needs at least ${need} years of lease left to use CPF in full (95 minus ${EXIT})" in game
     assert "${need} years of lease needed</span>" in game
+
+
+def test_when_you_sell_says_just_under_when_the_lease_is_a_fraction_short():
+    i = GAME.index("function exitView(f){")
+    view = GAME[i:GAME.index("function showResult(){", i)]
+    # between need-1 and need years the card says "Just under N years", not the whole year below, so two flats a fraction
+    # short read the same instead of "39 years" next to "need 40" at 97% and 98%
+    assert "const near=!full&&e.left<need&&e.left>need-1, got=near?`Just under ${need} years`:`${left} years`;" in view
+    assert "<b style=\"color:var(--ink)\">${got} of lease left</b> when you sell." in view
+    assert "aria-label=\"Bar: ${got.toLowerCase()} of lease left when you sell;" in view
+    assert "(95 minus ${left} full years of lease left)" in view  # the age rule counts whole years of lease
+    assert "background:transparent;border:1.5px solid ${col}" in view  # the result chips are outlined tags, not pressable-looking chips
 
 
 def test_when_you_sell_says_from_what_buyer_age_cpf_is_in_full():
     game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
     assert "const minAge=95-left;" in game
-    assert "Who gets full CPF:" in game and "if the youngest buyer is ${minAge} or older (95 minus ${left} years of lease left)" in game
+    assert "Who gets full CPF:" in game and "if the youngest buyer is ${minAge} or older (95 minus ${left} full years of lease left)" in game
 
 
 def test_an_age_changed_elsewhere_reaches_when_you_sell_home_and_the_lease_explorer():
