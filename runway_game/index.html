@@ -3259,13 +3259,15 @@ function exitView(f){
     box.querySelectorAll('[data-exit]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.exit===y));
     if(e.left<=20){ $('#exitOut').innerHTML=`<p><b style="color:var(--ink)">Only ${left} year${left===1?'':'s'} would be left.</b> With 20 years or less, a buyer can't use CPF or take an HDB loan for this flat.</p>`; return; }
     const w=v=>Math.max(0,Math.min(100,v/99*100)).toFixed(1), full=e.share>=1, col=full?'var(--ok)':'var(--part)';
+    const minAge=95-left;  // the youngest buyer's age from which lease left + age reaches 95, so CPF and the 75% loan are in full
     const cpf=full?'CPF in full':`CPF ${Math.floor(e.share*100)}% of the limit`, loan=`HDB loan up to ${Math.floor(e.ltv*100)}%`;
     $('#exitOut').innerHTML=`<p style="margin:10px 0 6px"><b style="color:var(--ink)">${left} years of lease left</b> when you sell. A buyer aged ${EXIT_AGE} needs at least ${need} years of lease left to use CPF in full (95 minus ${EXIT_AGE}).</p>
       <div role="img" aria-label="Bar: ${left} years of lease left when you sell; a buyer aged ${EXIT_AGE} needs ${need} years to use CPF in full" style="position:relative;height:14px;border-radius:7px;background:var(--tint)">
         <div style="height:100%;width:${w(left)}%;border-radius:7px;background:${col}"></div>
         <div style="position:absolute;top:-4px;bottom:-4px;left:${w(need)}%;width:2px;background:var(--ink)"></div></div>
       <div class="small" style="position:relative;height:1.3em;margin-top:4px"><span style="position:absolute;left:${w(need)}%;transform:translateX(-50%);white-space:nowrap">${need} years of lease needed</span></div>
-      <div class="chips" style="margin-top:6px"><span class="chip" style="cursor:default;color:${col}">${full?'✓':'!'} ${cpf}</span><span class="chip" style="cursor:default">${loan}</span></div>`;
+      <div class="chips" style="margin-top:6px"><span class="chip" style="cursor:default;color:${col}">${full?'✓':'!'} ${cpf}</span><span class="chip" style="cursor:default">${loan}</span></div>
+      <p style="margin:10px 0 0"><b style="color:var(--ink)">Who gets full CPF:</b> ${minAge<=21?'any buyer, whatever their age.':`if the youngest buyer is ${minAge} or older (95 minus ${left} years of lease left). A younger buyer can still use part of their CPF, with a smaller HDB loan.`}</p>`;
   };
   box.querySelectorAll('[data-exit]').forEach(b=>b.onclick=()=>upd(+b.dataset.exit));
   upd(5);

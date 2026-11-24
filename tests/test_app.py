@@ -828,3 +828,9 @@ def test_when_you_sell_says_how_many_years_of_lease_the_buyer_needs():
     game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
     assert "needs at least ${need} years of lease left to use CPF in full (95 minus ${EXIT_AGE})" in game
     assert "${need} years of lease needed</span>" in game
+
+
+def test_when_you_sell_says_from_what_buyer_age_cpf_is_in_full():
+    game = (Path(__file__).resolve().parent.parent / "runway_game" / "index.html").read_text(encoding="utf-8")
+    assert "const minAge=95-left;" in game
+    assert "Who gets full CPF:" in game and "if the youngest buyer is ${minAge} or older (95 minus ${left} years of lease left)" in game
