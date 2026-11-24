@@ -3740,6 +3740,14 @@ function clipGain(ch){  // ch: the clip's samples (-1..1); speech only, so the p
   if(n<2000||!peak) return 1;  // too little sound to measure
   return Math.max(GAIN_MIN, Math.min(GAIN_MAX, LEVEL/Math.sqrt(s/n), PEAK_MAX/peak));
 }
+// Warm-up: a phone or Bluetooth speaker can take a moment to wake, so the first words of a reply can sound soft. Before the
+// first clip a third of a second of inaudible noise (about -54 dBFS) is played to wake the output; the clip follows 0.1 s later.
+const WARM_S=.3, WARM_AMP=.002, WARM_LEAD=.1;
+function warmUp(){
+  const n=Math.floor(AC.sampleRate*WARM_S), b=AC.createBuffer(1,n,AC.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*WARM_AMP;
+  const s=AC.createBufferSource(); s.buffer=b; s.connect(AC.destination); s.start(); return WARM_LEAD;
+}
 async function decodeClip(b64){  // the clip as an AudioBuffer, or null when it cannot be decoded or the page cannot play audio yet
   try{
     const C=window.AudioContext||window.webkitAudioContext; if(!C) return null;
@@ -3766,7 +3774,7 @@ async function speakPack(text,btn,lang){
       try{
         const src=AC.createBufferSource(), gn=AC.createGain(); src.buffer=buf; gn.gain.value=clipGain(buf.getChannelData(0));
         src.connect(gn); gn.connect(AC.destination); done=new Promise(r=>{src.onended=r;});
-        AUD={pause(){try{src.stop();}catch(e){}}}; src.start();
+        AUD={pause(){try{src.stop();}catch(e){}}}; src.start(AC.currentTime+(i===0?warmUp():0));
       }catch(e){AUD=null;stopSpeak();return i>0;}
     }else{  // it cannot be decoded here: play it as it is
       const a=AUD=new Audio('data:audio/mpeg;base64,'+b64); done=new Promise(r=>{a.onended=a.onerror=a.onpause=r;});
