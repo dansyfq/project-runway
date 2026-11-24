@@ -2361,56 +2361,128 @@ function speechText(parts){
   }
   return out;
 }
-// Dictation: a tap starts listening at once (no greeting), until a second tap, or until the user has been quiet for
-// SILENCE_MS after speaking (HUSH_MS if they say nothing). Chrome ends a recognition by itself (after a silence; on Android
-// after every phrase), so a new one starts until then and the text adds up across them, after anything already typed in
-// the box. o: {btn, input, lang, hint: the placeholder to put back, done(text): speech was heard, fail(error)}.
+// Voice activity (computers only). A second, noise-suppressed copy of the mic measures the loudness of the speech band
+// (250-3800 Hz) against the room's own level, which it keeps learning, so "the user stopped talking" is heard even with a
+// fan, traffic or a TV in the background. Phones skip it: there a second mic stream can take the mic away from the
+// recogniser, and Safari is left alone (CHROMIUM). vadStep is one 50 ms frame: st {floor, above, below, speaking, frames}, db the frame's level in dBFS.
+const VAD_DB = 12, VAD_ON = 3, VAD_OFF = 6;  // speech is 12 dB over the room for 150 ms; it has stopped after 300 ms below
+const MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/i.test(navigator.platform || ''));
+// Chrome and Edge only: Safari's recogniser and a second mic stream at once is untested, so Safari keeps the word-based timing.
+const CHROMIUM = !!(navigator.userAgentData && navigator.userAgentData.brands && navigator.userAgentData.brands.some(b => /Chromium/.test(b.brand)));
+function vadStep(st, db){
+  st.frames = (st.frames || 0) + 1;
+  if(st.floor === undefined) st.floor = Math.min(db, -45);
+  // the room's level follows quiet quickly and noise slowly, and never learns from the user's own voice
+  if(db < st.floor) st.floor = st.floor * .7 + db * .3; else if(!st.speaking) st.floor = st.floor * .98 + db * .02;
+  if(db > st.floor + VAD_DB && db > -65){ st.above = (st.above || 0) + 1; st.below = 0; } else { st.below = (st.below || 0) + 1; st.above = 0; }
+  if(!st.speaking && st.above >= VAD_ON) st.speaking = true;
+  else if(st.speaking && st.below >= VAD_OFF) st.speaking = false;
+  return st;
+}
+function voiceActivity(){
+  const AC = window.AudioContext || window.webkitAudioContext, md = navigator.mediaDevices;
+  if(MOBILE || !CHROMIUM || !AC || !md || !md.getUserMedia) return null;
+  const v = {on: true, ready: false, speaking: false, last: 0, st: {}, stop(){}};
+  let ctx; try{ ctx = new AC(); }catch(e){ return null; }  // made inside the tap, so it is allowed to run
+  let timer = 0, stream = null;
+  v.stop = () => { if(!v.on) return; v.on = false; clearInterval(timer); if(stream) stream.getTracks().forEach(t => t.stop()); if(ctx.state !== 'closed') ctx.close().catch(() => {}); };
+  md.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true}}).then(s => {
+    if(!v.on){ s.getTracks().forEach(t => t.stop()); return; }
+    stream = s; if(ctx.state === 'suspended') ctx.resume().catch(() => {});
+    const src = ctx.createMediaStreamSource(s), hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), an = ctx.createAnalyser();
+    hp.type = 'highpass'; hp.frequency.value = 250; lp.type = 'lowpass'; lp.frequency.value = 3800; an.fftSize = 1024;
+    src.connect(hp); hp.connect(lp); lp.connect(an);
+    const buf = new Float32Array(an.fftSize);
+    timer = setInterval(() => {
+      an.getFloatTimeDomainData(buf); let sum = 0; for(let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+      vadStep(v.st, 20 * Math.log10(Math.sqrt(sum / buf.length) + 1e-9));
+      v.speaking = v.st.speaking; if(v.speaking){ v.last = Date.now(); v.heardVoice = true; }
+      v.ready = v.st.frames >= 20;  // a second to learn the room
+    }, 50);
+  }).catch(e => { micLog('voice activity off:', e && e.name); v.stop(); });
+  return v;
+}
+const micLog = (...a) => { try{ console.info('[KEY mic]', ...a); }catch(e){} };  // what the browser's recogniser did, for support
+// Dictation: a press starts listening at once, inside the press (Safari and iOS only trust a mic started there), until a
+// second press, or until the user has stopped talking for SILENCE_MS (HUSH_MS if they say nothing). The user is talking
+// while the recogniser's words change or, on a computer, while voiceActivity hears a voice over the room; words that
+// arrive while the voice detector hears only the room are background: they don't keep it open and aren't sent. Chrome ends a recognition
+// by itself (after a silence; on Android after every phrase), so a new one starts until then and the text adds up across
+// them, after anything already typed in the box.
+// o: {btn, input, lang, hint: the placeholder to put back, done(text): speech was heard, fail(error)}.
 const SILENCE_MS = 1000, HUSH_MS = 7000, MIC_FATAL = ['not-allowed', 'service-not-allowed', 'audio-capture', 'language-not-supported'];
-let MIC = null;  // the mic in use, on either page: MIC.stop(true) sends what was heard, MIC.stop(false) leaves it in the box
+let MIC = null;  // the mic in use, on any box: MIC.stop(true) sends what was heard, MIC.stop(false) leaves it in the box
 function dictate(o){
   if(MIC) MIC.stop(false);
-  const base = o.input.value.trim(), lang = VOICE[o.lang] ? o.lang : 'en';
-  let phase = 'listen', send = true, kept = '', live = '', rec = null, quiet = 0, wait = 0, quick = 0, err = '';
+  const base = o.input.value.trim(), lang = VOICE[o.lang] ? o.lang : 'en', t0 = Date.now();
+  let phase = 'listen', send = true, kept = '', live = '', rec = null, tick = 0, wait = 0, quick = 0, err = '', said = t0, shown = '', mine = '';
   const heard = () => joinSpeech(kept, live);
   const pressed = v => { o.btn.setAttribute('aria-pressed', String(v)); o.btn.classList.toggle('on', v); };
-  const arm = () => { clearTimeout(quiet); quiet = setTimeout(() => me.stop(true), heard() ? SILENCE_MS : HUSH_MS); };
-  const me = MIC = {btn: o.btn, stop(submit){
-    if(phase === 'greet'){ send = submit; if(HIOFF) HIOFF(); return end(); }
+  const vad = voiceActivity();
+  // only the room is audible: the detector has learned the room, has heard this user's voice over it, and not for 0.5 s
+  // (vad.last already trails the voice by 0.3 s; the recogniser's last words land within that)
+  const background = () => !!(vad && vad.ready && vad.heardVoice && !vad.speaking && Date.now() - vad.last > 500);
+  const me = MIC = {btn: o.btn, vad, stop(submit){
     if(phase !== 'listen') return;
-    send = submit; phase = 'stopping'; clearTimeout(quiet);
+    send = submit; phase = 'stopping'; clearInterval(tick);
     if(!submit) return end();
     try{ rec.stop(); }catch(e){ return end(); }
-    wait = setTimeout(end, 2000);  // the last words arrive before onend; never wait longer than this
+    wait = setTimeout(end, 1500);  // the last words arrive before onend; never wait longer than this
   }};
   function session(){
-    const r = rec = new SR(), t0 = Date.now(); let got = false;
+    const r = rec = new SR(), t1 = Date.now(); let got = false;
     r.lang = VOICE[lang].rec; r.continuous = true; r.interimResults = true; r.maxAlternatives = 1;
-    r.onresult = e => { if(rec !== r) return; live = speechText(Array.from(e.results, x => x[0].transcript)); got = got || !!live;
-      o.input.value = joinSpeech(base, heard()); if(phase === 'listen') arm(); };
-    r.onerror = e => { if(rec === r && e.error !== 'no-speech') err = e.error; };
+    const hearing = why => { if(phase === 'listen' && o.input.placeholder !== 'Listening…'){ micLog('listening (' + why + ')', r.lang, Date.now() - t0 + ' ms after the press'); o.input.placeholder = 'Listening…'; } };
+    r.onstart = () => hearing('start'); r.onaudiostart = () => hearing('audio');
+    r.onresult = e => {
+      if(rec !== r) return;
+      live = speechText(Array.from(e.results, x => x[0].transcript)); got = got || !!live; hearing('words');
+      const now = heard(); if(now !== shown){ shown = now; if(!background()){ said = Date.now(); mine = now; } }
+      o.input.value = joinSpeech(base, mine);  // words that came while only the room was audible are not the user's
+    };
+    r.onerror = e => { micLog('error', e.error); if(rec === r && e.error !== 'no-speech') err = e.error; };
     r.onend = () => {
-      if(rec !== r) return; kept = heard(); live = '';
+      micLog('ended'); if(rec !== r) return; kept = heard(); live = '';
       if(phase !== 'listen' || err) return end();
-      quick = got || Date.now() - t0 > 1000 ? 0 : quick + 1; if(quick >= 3) return end();  // it keeps ending at once: give up
+      quick = got || Date.now() - t1 > 1000 ? 0 : quick + 1; if(quick >= 3) return end();  // it keeps ending at once: give up
       try{ session(); }catch(e){ end(); }
     };
     r.start();
   }
   function end(){
     if(phase === 'done') return;
-    phase = 'done'; clearTimeout(quiet); clearTimeout(wait);
+    phase = 'done'; clearInterval(tick); clearTimeout(wait); if(vad) vad.stop();
     if(rec){ const r = rec; rec = null; try{ r.abort(); }catch(e){} }
     if(MIC === me) MIC = null;
-    pressed(false); o.input.placeholder = o.hint;
-    const said = heard().trim(), text = joinSpeech(base, said);
-    if(said) o.input.value = text;
-    if(MIC_FATAL.includes(err)) o.fail(err); else if(said && send) o.done(text);
+    pressed(false);
+    const got = (vad && vad.heardVoice ? mine : heard()).trim(), text = joinSpeech(base, got);
+    if(got) o.input.value = text;
+    o.input.placeholder = got || !send || MIC_FATAL.includes(err) ? o.hint : err === 'network' ? "The voice service didn't answer. Tap the mic to try again, or type."
+      : err === 'start' ? "The mic couldn't start. Tap it again, or type." : "I didn't hear anything. Tap the mic and speak, or type.";
+    if(o.input.placeholder !== o.hint) setTimeout(() => { if(!MIC) o.input.placeholder = o.hint; }, 6000);
+    if(MIC_FATAL.includes(err)) o.fail(err); else if(got && send) o.done(text);
   }
-  pressed(true);
-  o.input.placeholder = 'Listening…'; arm();  // no greeting: it only slowed the first words down
-  try{ session(); }catch(e){ end(); }
+  pressed(true); o.input.placeholder = 'Starting the mic…';
+  try{ session(); }catch(e){ micLog('could not start', e && e.name); err = 'start'; end(); return me; }  // inside the press
+  // every 100 ms: has the user stopped talking? (their words, or their voice over the room, last changed that long ago)
+  tick = setInterval(() => {
+    if(phase !== 'listen') return;
+    const last = Math.max(said, vad && vad.speaking ? Date.now() : vad ? vad.last : 0);
+    if(Date.now() - last > (heard() ? SILENCE_MS : HUSH_MS)) me.stop(true);
+  }, 100);
   return me;
 }
+// The mics act on the mouse press, not its release, so listening starts a moment sooner; touch and keys still use click.
+const MIC_BTNS = '#lMic, #keyMic, #micBtn';
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest && e.target.closest(MIC_BTNS);
+  if(!b || e.pointerType !== 'mouse' || e.button !== 0 || typeof b.onclick !== 'function' || b.getAttribute('aria-disabled') === 'true') return;
+  e.preventDefault(); b.dataset.early = '1'; b.onclick(e);
+}, true);
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest(MIC_BTNS);
+  if(b && b.dataset.early){ delete b.dataset.early; e.stopPropagation(); e.preventDefault(); }  // already handled on the press
+}, true);
 addEventListener('pagehide', () => { if(MIC) MIC.stop(false); });
 document.addEventListener('visibilitychange', () => { if(document.hidden && MIC) MIC.stop(false); });
 // Slider for every number the user picks: the value shown large above a native range input (arrows, Page Up/Down, Home/End).
@@ -4173,7 +4245,7 @@ function privacyHtml(){
     <li>With the AI on, Anthropic (the maker of Claude) gets your question, up to six recent turns, the age if set and the matching official passages, to write the answer. A question that is not in English also goes there, with your previous one, to be put into English for the document search. With the AI off or busy, nothing goes to Anthropic and you see the official pages.</li>
     <li>"Why?" has the AI explain a flat's calculator figures (age, lease, percentages, the town's lease effect), with no chat history. "Sum up this chat" sends the chat so far; the AI reads the last 12 turns.</li>
     <li>"Download this chat" makes a text file of your questions, the answers, their sources and any summary, with the notice, in your browser, and saves it on your device. Questions with personal details, declined ones and uploaded files are left out. Nothing is sent to Runway's server for it, and Runway keeps no copy.</li>
-    <li>Voice input uses your browser's speech recognition (some browsers, such as Chrome, send the audio to their own speech service); Runway gets only the text. The mic starts listening at once and sends what it heard when you tap it again or stop talking for a moment.</li>
+    <li>Voice input uses your browser's speech recognition (some browsers, such as Chrome, send the audio to their own speech service); Runway gets only the text. The mic starts listening at once and sends what it heard when you tap it again or stop talking for a moment. On a computer in Chrome or Edge, your browser also measures how loud the room is, to tell your voice from background noise; that sound stays on your device and is never recorded or sent.</li>
     <li>Read aloud is on until you turn it off. It and the mic's greeting use Runway's voice pack: the server sends the words being read (never your voice) to Microsoft's free online voices. If that fails, your device's voices read them.</li></ul>
   <h2>Answer feedback</h2><ul>
     <li>Pressing Helpful or Not helpful under an answer, on the Ask page or in KEY, sends Runway's server your vote, the answer language and the question you asked. A vote never uses the AI.</li>
