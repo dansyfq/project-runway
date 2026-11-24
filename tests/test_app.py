@@ -570,9 +570,7 @@ def test_voice_clips_are_played_at_one_level():
     assert "if(v>.02){s+=v*v; n++;}" in block and "if(AC.state!=='running') return null;" in block
     assert "gn.gain.value=clipGain(buf.getChannelData(0));" in block and "new Audio('data:audio/mpeg;base64,'+b64)" in block
     assert "AUD={pause(){try{src.stop();}catch(e){}}}" in block  # stopSpeak() still stops it
-    # the first clip is preceded by a third of a second of inaudible noise, so a speaker that is waking up is awake for the words
-    assert "const WARM_S=.3, WARM_AMP=.002, WARM_LEAD=.1;" in block and "(Math.random()*2-1)*WARM_AMP" in block
-    assert "src.start(AC.currentTime+(i===0?warmUp():0));" in block  # the first clip only, 0.1 s after the noise starts
+    assert "warmUp" not in block and "src.start();" in block  # no lead-in noise before the first clip: it made the voice worse
 
 
 def test_the_reply_label_says_key_not_runway():
