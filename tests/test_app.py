@@ -582,7 +582,8 @@ def test_key_popup_layout_placeholder_and_thumb_votes():
     # the header button and the quick actions stay on one line each (no clipped chips), text is one font, left aligned
     assert ".keypanel{font-family:var(--font-ui);text-align:left;position:fixed;" in GAME
     assert ".keyhead small{display:block;font-size:.75rem;" in GAME and "white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" in GAME  # the subtitle stays on one line
-    assert ".keyhead .keyfull{flex:none;white-space:nowrap;" in GAME and ".keyacts{display:flex;flex-wrap:wrap;" in GAME
+    assert ".keyhead .keyfull{flex:none;white-space:nowrap;" in GAME
+    assert "keyActs" not in GAME and ".keyacts" not in GAME and "KEY_ACTIONS" not in GAME  # no shortcut buttons to other pages above the text box
     assert "height:min(600px,calc(100vh - 160px));" in GAME and "<small>CPF · HDB · MND documents</small>" in GAME  # room for the chat; the subtitle fits on one line
     assert 'id="keyFull" aria-label="Open the full Ask page">Ask page</button>' in GAME  # a short label, so the subtitle is not cut off
     # the box says "Type your question": the header already says what KEY reads, and a long hint was cut off

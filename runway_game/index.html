@@ -1544,9 +1544,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .keyform .keymic{display:grid;place-items:center;background:var(--tint);color:var(--green)}
 .keyform .keymic.on{background:var(--green);color:var(--snow)}
 .keyform .keymic[aria-disabled="true"]{opacity:.55;cursor:default}
-.keyacts{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px 0;background:var(--page)}
-.keyacts button{flex:1 1 auto;min-height:40px;border:0;border-radius:var(--radius-chip);background:var(--tint);color:var(--green);font:600 .8rem var(--font-ui);padding:0 10px;cursor:pointer}
-.keyacts button:hover{background:var(--tint-2)}
 .kfb{margin-top:10px;display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--ink-2)}
 .kfb button{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:var(--radius-chip);background:var(--tint);color:var(--green);cursor:pointer}
 .kfb button svg{display:block}
@@ -1904,7 +1901,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 <section class="keypanel" id="keyPanel" role="dialog" aria-label="KEY, Runway's assistant" hidden>
   <div class="keyhead"><div><b>KEY</b><small>CPF · HDB · MND documents</small></div><button type="button" class="keyfull" id="keyFull" aria-label="Open the full Ask page">Ask page</button><button type="button" class="keyx" id="keyClose" aria-label="Close KEY">×</button></div>
   <div class="keylog" id="keyLog" aria-live="polite"></div>
-  <div class="keyacts" id="keyActs" role="group" aria-label="Quick actions"></div>
   <form class="keyform" id="keyForm"><label for="keyIn" class="lsr">Ask KEY a question</label><input id="keyIn" type="text" autocomplete="off" maxlength="1000" placeholder="Type your question"><button type="button" class="keymic" id="keyMic" aria-label="Ask by voice" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><button type="submit" id="keySend">Ask</button></form>
 </section>
 
@@ -2669,11 +2665,6 @@ function faqFilter(faq, text){
     if(q) kAsk(q); else ki.focus({preventScroll: true});
   }
   /* Quick actions: unlike the question chips, these take you somewhere (the way Ask PAM goes from asking to doing). KEY closes first. */
-  const KEY_ACTIONS = [['Find flats on the map', () => RW.enter('map', {town: null, ft: $('#lType').value, age: L.age})], ['Open my shortlist', () => RW.enter('shortlist')],
-    ['See price trends', () => RW.enter('trends', {town: trendTownId(), type: $('#lType').value, lease: L.lease})], ['Try the lease explorer', () => RW.enter('more', 'explorer')]];
-  const kActs = document.getElementById('keyActs');
-  KEY_ACTIONS.forEach(([t, fn]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t;
-    b.onclick = () => { keyClose(true); fn(); }; kActs.appendChild(b); });
   /* Voice: the same dictation as the Home and Ask boxes (greets, listens through pauses, sends after a short quiet). */
   const km = document.getElementById('keyMic'), KEY_HINT = ki.placeholder, kMine = () => MIC && MIC.btn === km;
   if(!SR){ km.setAttribute('aria-disabled', 'true'); km.title = "Voice input isn't available in this browser"; }
