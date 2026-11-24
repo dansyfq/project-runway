@@ -170,7 +170,7 @@ def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retri
             text, used_llm = bot.explain(facts, sources, lang=lang)
             return {"text": text, "sources": source_view(sources), "offline": False, "lang": lang if used_llm else "en",
                     "note": NUMBERS_NOTE if used_llm else NUMBERS_NOTE + " Written from a fixed template."}
-        talk = small_talk(question, "KEY" if payload.get("as") == "key" else "Ask Runway")
+        talk = small_talk(question, "KEY")
         if talk:  # a greeting, thanks or "what is your name": a fixed reply, no search and no AI call
             return {"text": talk, "sources": [], "blocked": None, "offline": False, "note": None, "lang": "en",
                     "clarify": True}
