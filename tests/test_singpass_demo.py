@@ -91,3 +91,10 @@ def test_the_demo_is_open_to_everyone():
     # the two screens that show the card still cope with it being absent
     assert "if(spd) spd.onclick=openSingpassDemo" in GAME
     assert "else if(!$('#scrOnb').hidden) renderOnb();" in GAME  # logging in on the age step refreshes the card
+
+
+def test_the_cpf_page_offers_the_demo_login_until_it_has_been_used():
+    """The Map set-up's CPF page shows the Singpass demo card like the age page does, and hides it once the demo filled details in."""
+    cpf_page = GAME[GAME.index("<h1>About how much CPF do you have?</h1>"):GAME.index("Which town first?")]
+    assert "${S.spd?'':spdCard()}" in cpf_page
+    assert "if(spd2) spd2.onclick=openSingpassDemo" in cpf_page

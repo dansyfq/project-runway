@@ -2991,11 +2991,11 @@ function renderOnb(){
     bindSlider('aAge',set); set(S.age); const spd=$('#onbBody #spdOpen'); if(spd) spd.onclick=openSingpassDemo;
   } else if(i===2){
     const opts=[50000,100000,150000,200000,300000];
-    b.innerHTML = `${crumbs('Map')}${back}${dots(2)}<h1>About how much CPF do you have?</h1><p class="lead">Ordinary Account, all buyers together. A rough number is fine.</p>
+    b.innerHTML = `${crumbs('Map')}${back}${dots(2)}<h1>About how much CPF do you have?</h1><p class="lead">Ordinary Account, all buyers together. A rough number is fine.</p>${S.spd?'':spdCard()}
       <div class="chips" data-st="st.pills">${opts.map(o=>`<button type="button" class="chip" data-o="${o}" aria-pressed="${S.oaSet&&S.oa===o}">${exact(o)}</button>`).join('')}<button type="button" class="chip" data-o="skip" aria-pressed="${!S.oaSet}">Not sure</button></div>
       ${oaFieldHtml('oOa')}
       <button class="btn primary" id="nx">Next</button>`;
-    bindOa('oOa',()=>{});
+    bindOa('oOa',()=>{}); const spd2=$('#onbBody #spdOpen'); if(spd2) spd2.onclick=openSingpassDemo;  // the demo "login", until it has been used
   } else {
     b.innerHTML = `${crumbs('Map')}${back}${dots(3)}<h1>Which town first?</h1><p class="lead">You can change it any time.</p><button type="button" class="btn" id="onbBudget">Not sure? Find towns by budget</button>${townListHtml()}`;
     bindTownList(t=>{S.town=t; RW.prof.set({pickTown:t}); finishOnb();}); $('#onbBudget').onclick=openBudget;
