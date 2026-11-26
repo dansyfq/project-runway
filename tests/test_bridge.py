@@ -266,7 +266,7 @@ def test_public_data_failure_is_reported_not_raised(bot, index, monkeypatch):
     assert send("town_photo", {}, bot, index, id="BEDOK") == {"ok": False, "error": "OSError: disk gone"}
 
 
-SCREEN_PATHS = ["", "map", "shortlist", "trends", "ask", "more", "details", "text-size", "about", "methodology", "how-it-works",
+SCREEN_PATHS = ["", "map", "shortlist", "trends", "ask-key", "ask", "more", "details", "text-size", "about", "methodology", "how-it-works",
                 "sources", "privacy", "terms", "faq", "case-study", "timeline", "lease-explorer", "insights"]
 
 

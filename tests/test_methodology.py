@@ -54,6 +54,15 @@ def method_pages(tmp_path):
 
 # ---------- /methodology and /how-it-works ----------
 
+def test_ask_key_has_its_own_address_and_keeps_the_old_one():
+    assert PAGES["ask-key"] == PAGES["ask"] == "Ask KEY"
+    table = GAME[GAME.index("RW.PATHS = {"):GAME.index("};", GAME.index("RW.PATHS = {"))]
+    paths = dict(re.findall(r"'([^']*)': '([^']*)'", table))
+    assert paths["ask-key"] == paths["ask"] == "ask" and table.index("'ask-key'") < table.index("'ask':")  # links use the first
+    assert 'data-go="ask-key"' in GAME and 'data-go="ask"' not in GAME
+    assert handle({"id": "x", "type": "nav", "payload": {"page": "ask-key"}}, {}, {}, None, None) == {"ok": True, "page": "ask-key"}
+
+
 def test_both_addresses_are_pages_with_the_new_name():
     assert PAGES["methodology"] == "Methodology" and PAGES["how-it-works"] == "Methodology"
     table = GAME[GAME.index("RW.PATHS = {"):GAME.index("};", GAME.index("RW.PATHS = {"))]
