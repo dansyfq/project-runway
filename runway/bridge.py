@@ -21,7 +21,7 @@ from runway.agent import lease_price_needs, price_ask_needs
 from runway.auth import check_login
 from runway.chain import retrieve
 from runway.game_data import load_towns, recent_months, town_photo
-from runway.llm import AI_BUSY, INVENTED_FIGURE, LLM, language, screen_question, small_talk
+from runway.llm import AI_BUSY, INVENTED_FIGURE, LLM, language, question_language, screen_question, small_talk
 from runway.rag import Chunk, Retriever
 
 # Every screen's URL path and its name. app.py makes one page per entry; the interface (RW.PATHS) uses the same paths.
@@ -160,7 +160,7 @@ def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retri
 
     if kind == "ask":
         question = str(payload.get("q", ""))[:1000]
-        lang = language(payload.get("lang"))
+        lang = question_language(question, payload.get("lang"))  # a question written in 中文 or Tamil is answered in it
         facts = payload.get("facts")
         if facts:  # "Why?" for one flat: explain Runway's own numbers, never new ones
             if not isinstance(facts, dict) or not REQUIRED_FACTS <= facts.keys():

@@ -106,6 +106,18 @@ def language(code) -> str:
     return code if isinstance(code, str) and code in LANGUAGES else "en"
 
 
+def question_language(question: str, code) -> str:
+    """The answer language: the one chosen on the Ask page, unless the question itself is written in Chinese or Tamil
+    script. KEY has no language menu, so a question typed or spoken in 中文 would otherwise be answered in English."""
+    lang = language(code)
+    if lang == "en":
+        if re.search(r"[一-鿿]", question):
+            return "zh"
+        if re.search(r"[஀-௿]", question):
+            return "ta"
+    return lang
+
+
 def language_rule(lang: str) -> str:
     """Appended to a system prompt. Figures stay as Arabic numerals so the number guard can still check them."""
     if language(lang) == "en":

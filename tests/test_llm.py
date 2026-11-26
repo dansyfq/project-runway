@@ -259,6 +259,17 @@ def test_without_list_numbers_leaves_other_numbers_alone():
     assert "20" in without_list_numbers("A lease of 20 years or less")
 
 
+def test_a_question_in_chinese_or_tamil_script_is_answered_in_that_language():
+    """KEY has no language menu and sends the Ask page's choice (English by default): the script of the question decides."""
+    from runway.llm import question_language
+
+    assert question_language("公积金可以用多少？", "en") == "zh" and question_language("公积金可以用多少？", None) == "zh"
+    assert question_language("வீட்டுக் கடன் எவ்வளவு?", "en") == "ta"
+    assert question_language("How much CPF can I use?", "en") == "en"
+    assert question_language("How much CPF can I use?", "zh") == "zh"  # the Ask page's own choice still stands
+    assert question_language("Berapa CPF boleh guna?", "ms") == "ms" and question_language("公积金", "ms") == "ms"
+
+
 def test_small_talk_answers_greetings_thanks_and_who_are_you():
     from runway.llm import small_talk
 
