@@ -838,6 +838,7 @@ select.inp{appearance:none;-webkit-appearance:none;padding-right:44px;font-weigh
 .pinwrap svg{width:30px;height:30px;filter:drop-shadow(0 2px 2px rgba(17,17,17,.25))}
 .pinwrap b{font:700 11px/1 var(--font-ui);background:var(--snow);border:1px solid var(--line);border-radius:8px;padding:2px 5px;color:var(--ink);white-space:nowrap}
 .zoomed-out .pinwrap b{display:none}
+.pinwrap b.lbl-off{visibility:hidden}
 .zoomed-out .pinwrap svg{width:22px;height:22px}
 @keyframes drop{from{transform:translateY(-16px);opacity:0}to{transform:none;opacity:1}}
 .stn-label{background:var(--snow);border:1px solid var(--line);border-radius:6px;font:600 11px var(--font-ui);color:var(--ink);padding:1px 6px;box-shadow:none}
@@ -3036,10 +3037,26 @@ function initMap(){
   LY.bus=L.layerGroup(F.stops.map(([la,ln,n,rd])=>L.circleMarker([la,ln],{renderer:sr,radius:5,color:tok('--snow'),weight:2,fillColor:tok('--ink-2'),fillOpacity:1}).bindPopup(`<b>${esc(n)}</b><br>Bus stop · ${esc(rd)}`,{closeButton:false})));
   Object.entries(AMS).forEach(([k,v])=>{LY[k]=L.layerGroup(F.am[k].map(([la,ln,n])=>L.marker([la,ln],{icon:L.divIcon({className:'amicon',iconSize:[120,40],iconAnchor:[60,13],html:`<div class="am"><i style="background:${v.col}"><svg viewBox="0 0 24 24">${v.svg}</svg></i><b>${esc(n)}</b></div>`}),title:`${v.label.replace(/s$/,'')}: ${n}`,keyboard:false})));});
   LY.sales=L.layerGroup(); LY.labels=L.layerGroup().addTo(LM);
-  LM.on('zoomend',zoomStyle);
+  LM.on('zoomend',zoomStyle); LM.on('zoomend',declutterLabels);
   $('#zIn').onclick=()=>LM.zoomIn(); $('#zOut').onclick=()=>LM.zoomOut(); $('#zHome').onclick=()=>fitTown(true);
   $('#zSrc').onclick=()=>{tab('more');sub('sources');};
   applyLayers();
+}
+// Year labels: where several flats are close, a label that would sit on another label or on another diamond is hidden (the
+// blocks with matching flats, then those with more sales, keep theirs), so the ones that show can be read. Zooming in shows more.
+// The sizes are the pin's own (a 30px diamond, a label under it), worked out from the map position, not measured.
+let PINS = [];
+function declutterLabels(){
+  if(!LM || !window.L || LM.getZoom() < 16) return;  // below zoom 16 no label is shown at all
+  const items = PINS.filter(p => p.mk.getElement() && p.mk.getElement().querySelector('b')).map(p => {
+    const pt = LM.latLngToContainerPoint(p.mk.getLatLng()), b = p.mk.getElement().querySelector('b'), w = Math.max(30, b.textContent.length * 6.4 + 12);
+    return {p, b, dia: [pt.x - 15, pt.y - 17, pt.x + 15, pt.y + 13], lab: [pt.x - w / 2, pt.y + 14, pt.x + w / 2, pt.y + 31]};
+  });
+  const hit = (a, c) => a[0] < c[2] + 2 && c[0] < a[2] + 2 && a[1] < c[3] + 2 && c[1] < a[3] + 2, shown = [];
+  items.slice().sort((x, y) => (y.p.ok - x.p.ok) || (y.p.n - x.p.n)).forEach(it => {
+    const clash = shown.some(q => hit(it.lab, q)) || items.some(o => o !== it && hit(it.lab, o.dia));
+    it.b.classList.toggle('lbl-off', clash); if(!clash) shown.push(it.lab);
+  });
 }
 function applyLayers(){LAYERDEF.forEach(([k])=>{const on=S.layers[k];if(k==='bus')return;if(on&&!LM.hasLayer(LY[k]))LY[k].addTo(LM);if(!on&&LM.hasLayer(LY[k]))LM.removeLayer(LY[k]);});zoomStyle();}
 function zoomStyle(){
@@ -3086,7 +3103,7 @@ function drawMap(){
   if(!LM) initMap();
   LM.invalidateSize();
   if(needFit){fitTown();roadLabels();needFit=false;}
-  LY.sales.clearLayers();
+  LY.sales.clearLayers(); PINS=[];
   const groups=blocksInTown(); let nMatch=0;
   groups.forEach((g,i)=>{
     const s=g[0], r=calc(s.price,s.lease), ok=g.some(fits); if(ok&&S.match)nMatch+=g.filter(fits).length;
@@ -3094,8 +3111,9 @@ function drawMap(){
     const mk=L.marker([s.la,s.ln],{icon,keyboard:true,zIndexOffset:ok?1000:0,title:`Block ${s.blk} ${s.st}: ${g.length} sale${g.length>1?'s':''}, ${Math.floor(s.lease)} years left`,riseOnHover:true});
     const go=()=>g.length>1?openBlock(g):openEnc(s);
     mk.on('click',go).on('keydown',e=>{if(e.originalEvent.key==='Enter'||e.originalEvent.key===' '){e.originalEvent.preventDefault();go();}}); // Leaflet 1.9 pins are tabbable but ignore Enter
-    LY.sales.addLayer(mk);
+    LY.sales.addLayer(mk); PINS.push({mk, ok, n:g.length});
   });
+  declutterLabels();
   const n=(SALES[S.town]||[]).length;
   $('#mapHint').textContent = !n?`No sales here in ${SPAN}. Try another town.` : S.match&&!nMatch?`None of the ${n} sales here match your filters. Clear filters or try another town.` : S.match?`${nMatch} of ${n} sales here match your filters. Tap a bright diamond.`:`${n} sales here in ${SPAN}. Drag to look around, tap a diamond.`;
 }

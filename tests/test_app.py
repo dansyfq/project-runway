@@ -616,6 +616,18 @@ def test_key_suggestions_look_unlike_messages_and_sources_are_tucked_away():
     assert ".ksrc a{" not in GAME and ".ksrc summary{" not in GAME and ".ksrc ul{" not in GAME  # the link styles are gone too
 
 
+def test_crowded_map_labels_are_hidden_instead_of_overlapping():
+    # a year label that would sit on another label or another diamond is hidden; it is recomputed after every draw and zoom
+    i = GAME.index("function declutterLabels(){")
+    fn = GAME[i:GAME.index("function applyLayers(){", i)]
+    assert "LM.getZoom() < 16" in fn  # below zoom 16 the existing rule already hides every label
+    assert "(y.p.ok - x.p.ok) || (y.p.n - x.p.n)" in fn  # matching flats first, then blocks with more sales
+    assert "shown.some(q => hit(it.lab, q))" in fn and "items.some(o => o !== it && hit(it.lab, o.dia))" in fn  # clash with a label or a diamond
+    assert "it.b.classList.toggle('lbl-off', clash)" in fn and ".pinwrap b.lbl-off{visibility:hidden}" in GAME
+    assert "LM.on('zoomend',zoomStyle); LM.on('zoomend',declutterLabels);" in GAME
+    assert "LY.sales.clearLayers(); PINS=[];" in GAME and "PINS.push({mk, ok, n:g.length});\n  });\n  declutterLabels();" in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
