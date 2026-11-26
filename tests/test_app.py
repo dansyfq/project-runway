@@ -716,6 +716,13 @@ def test_calculator_why_questions_are_answered_from_the_calculator():
         assert phrase in GAME
 
 
+def test_the_map_and_the_towns_grid_use_their_plain_names():
+    # "Town Safari" and "Town stamps" sounded like a game: the Map is the Town map, and the Shortlist grid is Towns checked
+    assert "Town Safari" not in GAME and "Town stamp" not in GAME and "town stamp" not in GAME and "collect town stamps" not in GAME
+    assert '<h2 style="font-size:1.3rem">Towns checked</h2>' in GAME and "`New town checked: ${TBY[f.town].name}`" in GAME
+    assert "<li><b>Town map</b>:" in GAME and "town map'" in GAME and "towns checked file'" in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
