@@ -337,3 +337,16 @@ def test_the_source_line_is_not_said_twice():
     fixed = without_calculator_hedge(text, '{"share": 1.0}')
     assert fixed == "Yes, full CPF use. These figures come from Runway's calculator. The passages were retrieved on 2026-10-16."
     assert fixed.count("These figures come from Runway's calculator.") == 1
+
+
+def test_a_hedge_that_only_says_they_for_the_figures_is_dropped_too():
+    """Seen live: "All of these figures come from Runway's calculator. The passages I have for this question don't cover them."."""
+    from runway.llm import without_calculator_hedge
+
+    text = ("Yes, full CPF use. All of these figures come from Runway's calculator. The passages I have for this question "
+            "don't cover them. The passages were retrieved on 2026-10-16, so please confirm with HDB.")
+    fixed = without_calculator_hedge(text, '{"share": 1.0}')
+    assert fixed == ("Yes, full CPF use. All of these figures come from Runway's calculator. "
+                     "The passages were retrieved on 2026-10-16, so please confirm with HDB.")
+    other = "The PHG is $20,000. The passages don't give the amounts of the other grants, so check with HDB."
+    assert without_calculator_hedge(other, '{"share": 1.0}') == other  # no them/it: about something else

@@ -277,7 +277,8 @@ def small_talk(question: str, name: str = "KEY") -> str | None:
 _HEDGE_SENT_RE = re.compile(
     r"(?:\bpassages?\b.*\b(?:do not|don't|does not|doesn't|cannot|can't|not) (?:cover|cite|state|contain|give|include|mention)\b"
     r"|\b(?:can't|cannot|can not) cite\b)", re.I | re.S)
-_HEDGE_ABOUT_RE = re.compile(r"age[- ]95|loan limit|valuation limit|calculator|(?:these|those|the) figures", re.I)
+_HEDGE_ABOUT_RE = re.compile(r"age[- ]95|loan limit|valuation limit|calculator|(?:these|those|the) figures"
+                             r"|(?:cover|cite|state|contain|give|include|mention) (?:them|it|these|those)\b", re.I)
 _SOURCE_LINE_RE = re.compile(r"(?:these|those|the) figures (?:come|are) (?:only |all )?from runway's calculator", re.I)
 
 
