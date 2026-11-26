@@ -637,6 +637,13 @@ def test_voice_stays_female_and_answer_follows_the_question_language():
     assert "lang: questionLang(q) || S.lang});" in GAME and "lang: questionLang(q) || RW.lang || 'en', as: 'key'});" in GAME
 
 
+def test_reply_audio_player_is_remade_after_the_mic_lets_go():
+    # a Mac can change its audio rate while the mic is open; an idle player made before that is dropped when the mic ends
+    assert "function freshAudio(){ if(AUD||!AC) return; const old=AC; AC=null;" in GAME
+    end = GAME[GAME.index("function end(){\n    if(phase === 'done') return;"):]
+    assert "if(vad) vad.stop();\n    if(typeof freshAudio === 'function') freshAudio();" in end[:400]
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1

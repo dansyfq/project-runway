@@ -2460,6 +2460,7 @@ function dictate(o){
   function end(){
     if(phase === 'done') return;
     phase = 'done'; clearInterval(tick); clearTimeout(wait); if(vad) vad.stop();
+    if(typeof freshAudio === 'function') freshAudio();  // the mic has let go: the next reply gets a player made at the speakers' present rate
     if(rec){ const r = rec; rec = null; try{ r.abort(); }catch(e){} }
     if(MIC === me) MIC = null;
     pressed(false);
@@ -3771,6 +3772,9 @@ async function decodeClip(b64){  // the clip as an AudioBuffer, or null when it 
     return await AC.decodeAudioData(u.buffer);
   }catch(e){ return null; }
 }
+// While the mic is open the Mac can change its audio rate; a player made before that can then play the next reply fast.
+// When the mic lets go, a player that is idle is dropped, so the next reply makes a new one at the rate the speakers have now.
+function freshAudio(){ if(AUD||!AC) return; const old=AC; AC=null; try{ old.close().catch(()=>{}); }catch(e){} }
 let speakingBtn=null;
 function stopSpeak(){PACKRUN++;if(AUD){AUD.pause();AUD=null;}if(TTS)TTS.cancel();if(speakingBtn){speakingBtn.setAttribute('aria-pressed','false');speakingBtn.lastChild.textContent='Listen';}speakingBtn=null;}
 async function speakPack(text,btn,lang){
