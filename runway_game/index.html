@@ -2236,6 +2236,9 @@ function monthSpan(months){
 // The same three patterns as PERSONAL_PATTERNS in runway/llm.py (a test keeps them in step), matched after NFKC so
 // full-width digits and @ count. The email's length cap keeps a very long token from stalling the match.
 const PERSONAL = [/\b[stfgm][\s-]?\d{7}[\s-]?[a-z]\b/gi, /(^|\D)(?:\+?65[\s-]?)?[689]\d{3}[\s-]?\d{4}(?!\d)/g, /[\w.+-]{1,64}@[\w-]+\.[\w.]+/g];
+// The language a question is written in, when its letters say so (Chinese characters, Tamil script); null for anything else
+// (English and Malay share letters), and then the answer language chosen on the Ask page applies.
+const questionLang = q => /[\u3400-\u9fff]/.test(String(q)) ? 'zh' : /[\u0B80-\u0BFF]/.test(String(q)) ? 'ta' : null;
 const personal = q => { const t = String(q).normalize('NFKC'); return PERSONAL.some(re => (re.lastIndex = 0, re.test(t))); };
 function redact(txt){
   let n=0; txt=String(txt).normalize('NFKC');
@@ -2305,7 +2308,12 @@ const VPREF={en:[/^en[-_]SG/i,/^en[-_](GB|AU|IN)/i,/^en/i], zh:[/^(zh|cmn)[-_](H
   ms:[/^ms[-_]SG/i,/^ms[-_]MY/i,/^ms/i], ta:[/^ta[-_]SG/i,/^ta[-_]MY/i,/^ta/i]};
 const isSG=v=>/[-_]SG/i.test(v.lang)||/singapore/i.test(v.name);
 const vrank=(v,lang)=>{const i=VPREF[lang].findIndex(re=>re.test(v.lang)); return i>0&&isSG(v)?0:i;};
-const voicesFor=lang=>!TTS?[]:TTS.getVoices().map(v=>[v,vrank(v,lang)]).filter(x=>x[1]>=0).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);
+// The voice pack's voices are all female, so when a reply falls back to a voice on this device it should not turn male:
+// among the device voices for a language, any not known to be male comes first, then the best region, then a female-sounding one.
+const FEMALE_V = /\bfemale\b|samantha|karen|moira|tessa|fiona|victoria|allison|ava\b|susan|zoe|serena|kate\b|veena|lekha|ting-?ting|mei-?jia|sin-?ji|lili|amira|yasmin|siti|catherine|nicky|jenny|aria\b|libby|sonia|xiaoxiao|hanhan/i;
+const MALE_V = /(?<![a-z])male\b|daniel|alex\b|fred\b|oliver|rishi|aaron|arthur|gordon|ralph|reed\b|thomas|tom\b|lee\b|eddy|rocko|ryan\b|guy\b|james|george|david|mark\b|liam|yunyang|yunxi/i;
+const vgender = v => FEMALE_V.test(v.name) ? 0 : MALE_V.test(v.name) ? 2 : 1;
+const voicesFor=lang=>!TTS?[]:TTS.getVoices().map(v=>[v,vrank(v,lang)]).filter(x=>x[1]>=0).sort((a,b)=>(vgender(a[0])===2)-(vgender(b[0])===2)||a[1]-b[1]||vgender(a[0])-vgender(b[0])).map(x=>x[0]);
 function chosenVoice(lang){
   const vs=voicesFor(lang);
   return vs[0]||null;
@@ -2331,7 +2339,7 @@ function greet(lang){
       if(over) return; if(!TTS || (lang !== 'en' && !voice)) return end();
       const u = new SpeechSynthesisUtterance(VOICE[lang].hi); let began = false;
       if(voice){ u.voice = voice; u.lang = voice.lang; } else u.lang = 'en-SG';
-      u.rate = 1.1; u.onstart = () => { began = true; }; u.onend = u.onerror = end;
+      u.rate = 1; u.onstart = () => { began = true; }; u.onend = u.onerror = end;
       window._utter = u; HIOFF = () => { TTS.cancel(); end(); };
       if(TTS.speaking || TTS.pending){ TTS.cancel(); setTimeout(() => { if(!over) TTS.speak(u); }, 60); } else TTS.speak(u);
       setTimeout(() => { if(!began) end(); }, 1500);  // a device that never starts (Chrome can drop it) must not hold the mic
@@ -2654,7 +2662,7 @@ function faqFilter(faq, text){
     K.chat.push(typing); K.busy = true; ks.disabled = true; kRender();
     let b;
     try{
-      const d = RW.prof.get(), r = await RW.send('ask', {q, facts: null, history: prior, age: (d.onbDone || d.ageSet) && Number.isFinite(d.age) ? d.age : null, lang: RW.lang || 'en', as: 'key'});
+      const d = RW.prof.get(), r = await RW.send('ask', {q, facts: null, history: prior, age: (d.onbDone || d.ageSet) && Number.isFinite(d.age) ? d.age : null, lang: questionLang(q) || RW.lang || 'en', as: 'key'});
       if(typeof r.text !== 'string') throw new Error(r.error || 'no answer');
       b = {html: md(r.text) + (r.note ? `<p><small>${esc(r.note)}</small></p>` : ''), src: r.sources, warn: r.blocked === 'personal', skip: !!r.blocked};
       if(r.blocked) mine.skip = true; else if(!r.clarify && !r.offline) b.fb = {v: null, q};  // only a real AI answer can be voted on (not a greeting, a question back or the document links)
@@ -3567,7 +3575,7 @@ async function ask(q, ctx){
   S.chat.push(typing); renderChat();
   let b;
   try{
-    const r = await RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior, age: (S.onbDone||S.ageSet) ? S.age : null, lang: S.lang});
+    const r = await RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior, age: (S.onbDone||S.ageSet) ? S.age : null, lang: questionLang(q) || S.lang});
     if(typeof r.text !== 'string') throw new Error(r.error || 'no answer');  // the server failed: say so, never an empty answer
     b = {html: md(r.text) + (r.note ? `<p class="small">${esc(r.note)}</p>` : ''), src: r.sources, open: !!r.offline, warn: r.blocked === 'personal', skip: !!r.blocked}; if(r.blocked) mine.skip = true;
     b.lang = LANGS[r.lang] ? r.lang : 'en'; if(!r.blocked && !r.offline && !r.clarify) b.fb = {q, v:null};  // only AI answers get Helpful / Not helpful
@@ -3799,7 +3807,7 @@ async function speak(text,btn,lang='en'){
   if(lang!=='en' && !voice){ if(btn) btn.lastChild.textContent=`No ${LANGS[lang].name} voice on this device`; return; }
   const u=new SpeechSynthesisUtterance(packText(text,lang));
   if(voice){u.voice=voice;u.lang=voice.lang;} else u.lang='en-SG';
-  u.rate=1.1;
+  u.rate=1;
   if(btn){speakingBtn=btn;btn.setAttribute('aria-pressed','true');btn.lastChild.textContent='Stop';}
   u.onend=u.onerror=()=>{if(speakingBtn===btn)stopSpeak();};
   window._utter=u;  // Chrome drops utterances it garbage-collects mid-speech
