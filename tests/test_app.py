@@ -683,6 +683,12 @@ def test_town_ask_buttons_are_answered_from_the_town_data():
     assert "skip: true" in ask[ask.index("kTownAnswer(q)"):ask.index("RW.send('ask'")]  # no AI call, no vote, not sent back as history
 
 
+def test_home_calculator_shows_no_worked_formula():
+    # the Home result shows the share and the verdict, not the sum behind it ("(55 - 20) / (63 - 20) = 81%")
+    landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
+    assert "lFormula" not in GAME and "lformula" not in landing and "÷ (${needed} − 20)" not in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
