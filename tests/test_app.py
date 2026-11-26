@@ -650,6 +650,14 @@ def test_first_spoken_answer_keeps_the_server_voice():
     assert "window._packWarm=1;packFetch(VOICE[S.lang].hi,S.lang);" in GAME
 
 
+def test_town_comparison_says_it_in_plain_words():
+    # "9 points less" is gone: each card says the drop for a 10-year-shorter lease, then smaller / bigger / as big as the shown town's
+    assert "If the lease is 10 years shorter, the price per sqm is about ${d}% lower in ${esc(t.name)}.${gap}" in GAME
+    assert "That is a ${d < base ? 'smaller' : 'bigger'} drop than in ${esc(cur.name)} (${base}%)." in GAME
+    assert "That is as big a drop as in ${esc(cur.name)} (${base}%)." in GAME
+    assert "points less" not in GAME and "a lease 10 years shorter lowers the price per sqm by about ${base}%" in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
