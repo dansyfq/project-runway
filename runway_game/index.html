@@ -1389,6 +1389,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .ltc.dash{justify-content:center;background:var(--beige)}
 .lcmphead{flex:1 1 100%;margin:12px 0 -4px;font:400 .944rem/1.45 var(--font-ui);color:var(--ink-2)}
 .lcmphead b{font-weight:700;color:var(--ink)}
+.ltc.pick .lselw{max-width:340px}  /* the pick-a-town card: the same select as Your town */
 .lpill2{padding:5px 10px;border-radius:10px;background:var(--snow);font:700 11px var(--font-ui);color:var(--green)}
 .ldia{display:inline-flex;align-items:center;gap:3px;color:var(--brand-hi)}
 /* notice, footer */
@@ -1751,6 +1752,7 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
               <p class="lbody">10 fewer years of lease ≈ 11% lower price here.</p>
               <button type="button" class="llink" data-ask="Sembawang">Ask about Sembawang →</button>
             </article>
+            <article class="ltc pick sq" id="lCmpC" hidden></article>
             <article class="ltc dash sq">
               <h3 class="lh3">23 more towns</h3>
               <p class="lbody">Median price and price per square metre since 1990, by flat type.</p>
@@ -2816,6 +2818,29 @@ function faqFilter(faq, text){
     head.innerHTML = `Compared with <b>${esc(cur.name)}</b>${sel.value === cur.id ? ', the town you picked' : ', the town shown above'}${base === null ? '' : `: a lease 10 years shorter lowers the price per sqm by about <b class="lkey">${base}%</b>`}`;
     head.hidden = false;
     compareCard($('#lCmpA'), others[0], cur, base, 'least'); compareCard($('#lCmpB'), others[others.length - 1], cur, base, 'most');
+    pickCard(cur);
+  }
+  // A third card where you choose the town to compare with. The select is made when the town on show changes; picking only
+  // rewrites the answer under it, so the select keeps its focus. The pick stays across towns unless it is the one on show.
+  function pickCard(cur){
+    const c = $('#lCmpC'), opts = T.list.filter(t => t.id !== cur.id);
+    if(!opts.some(t => t.id === T.pick)) T.pick = '';
+    c.innerHTML = `<div class="lrowb"><h3 class="lh3">Compare with another town</h3><span class="lpill2 sq">vs ${esc(cur.name)}</span></div>
+      <div class="lselw"><select id="lCmpSel" class="lsel sq" aria-label="Town to compare with ${esc(cur.name)}"><option value="">Pick a town</option>${opts.map(t => `<option value="${esc(t.id)}"${t.id === T.pick ? ' selected' : ''}>${esc(t.name)}</option>`).join('')}</select>${sel.parentElement.querySelector('svg').outerHTML}</div>
+      <div id="lCmpOut" aria-live="polite"></div>`;
+    c.hidden = false;
+    $('#lCmpSel').onchange = e => { T.pick = e.target.value; pickOut(); };
+    pickOut();
+  }
+  function pickOut(){
+    const out = $('#lCmpOut'), cur = T.list[T.i], t = T.list.find(x => x.id === T.pick);
+    if(!t){ out.innerHTML = '<p class="lbody">Choose any town to see how much a shorter lease lowers its price.</p>'; return; }
+    const base = cur.low ? null : tenYears(cur.pct), ask = `<button type="button" class="llink" data-ask="${esc(t.name)}">Ask about ${esc(t.name)} →</button>`;
+    if(t.low){ out.innerHTML = `<p class="lbody">${esc(t.name)} has too few recent resales for Runway to measure what lease does to the price.</p>${ask}`; return; }
+    const d = tenYears(t.pct), gap = base === null ? '' : d === base ? ` That is <b class="lkey">as big</b> a drop as in ${esc(cur.name)} (${base}%).`
+      : ` That is a <b class="lkey">${d < base ? 'smaller' : 'bigger'}</b> drop than in ${esc(cur.name)} (${base}%).`;
+    out.innerHTML = `<p class="lmeta">${esc(t.n)} resales ${esc(T.span || 'recently')}</p>
+      <p class="lbody">If the lease is 10 years shorter, the price per sqm is about <b class="lkey">${d}%</b> lower in ${esc(t.name)}.${gap}</p>${ask}`;
   }
   window.RWYours = syncYours;
   $('#lPrev').onclick = () => stepTown(-1); $('#lNext').onclick = () => stepTown(1);
