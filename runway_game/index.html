@@ -3780,9 +3780,13 @@ function stopSpeak(){PACKRUN++;if(AUD){AUD.pause();AUD=null;}if(TTS)TTS.cancel()
 async function speakPack(text,btn,lang){
   const my=++PACKRUN, cs=packChunks(text);
   if(btn){speakingBtn=btn;btn.setAttribute('aria-pressed','true');btn.lastChild.textContent='Stop';}
-  let next=packFetch(cs[0],lang);
+  const t0=Date.now(); let next=packFetch(cs[0],lang);
   for(let i=0;i<cs.length;i++){
-    const b64=await next; if(PACKRUN!==my) return true;  // stopped or replaced while loading
+    let b64=await next; if(PACKRUN!==my) return true;  // stopped or replaced while loading
+    if(!b64&&i===0&&Date.now()-t0<4000){  // the first call of a session sometimes fails fast: once more before a device voice (another voice) speaks
+      await new Promise(r=>setTimeout(r,400)); if(PACKRUN!==my) return true;
+      b64=await packFetch(cs[0],lang); if(PACKRUN!==my) return true;
+    }
     if(!b64){stopSpeak(); return i>0;}  // nothing played yet: the caller falls back to device voices
     if(i+1<cs.length) next=packFetch(cs[i+1],lang);
     const buf=await decodeClip(b64); if(PACKRUN!==my) return true;  // stopped while decoding
@@ -3825,6 +3829,7 @@ $('#micBtn').onclick=()=>{
   if(MIC&&MIC.btn===mb){MIC.stop(true);return;}
   if(!SR){pushBot({warn:true,html:'<p>Voice input is not available in this browser. You can type your question instead.</p>'});return;}
   stopSpeak();
+  if(!window._packWarm&&typeof VOICE!=='undefined'&&VOICE[S.lang]){window._packWarm=1;packFetch(VOICE[S.lang].hi,S.lang);}  // wakes the voice service while you speak, so the first answer is not read by a device voice
   dictate({btn:mb, input:$('#askIn'), lang:S.lang, hint:'Type or tap the mic', done:v=>{$('#askIn').value='';ask(v);},
     fail:e=>e==='language-not-supported'?pushBot({warn:true,skip:true,html:`<p>Voice input in ${LANGS[S.lang].name} is not available in this browser. You can type your question instead.</p>`})
       :pushBot({warn:true,html:'<p>The microphone is blocked, so I could not hear you. Allow the microphone and tap the mic again, or type your question.</p>'})});
