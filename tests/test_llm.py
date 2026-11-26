@@ -326,3 +326,14 @@ def test_the_hedge_stays_when_no_calculator_ran_or_it_is_about_something_else():
     assert without_calculator_hedge(hedge, "") == hedge  # no tool result: the AI really had only the passages
     other = "The PHG is $20,000. The passages don't give the amounts of the other grants, so check with HDB."
     assert without_calculator_hedge(other, '{"share": 1.0}') == other
+
+
+def test_the_source_line_is_not_said_twice():
+    """Seen live: the AI wrote the hedge and also "These figures come from Runway's calculator.", so both ended up in the answer."""
+    from runway.llm import without_calculator_hedge
+
+    text = ("Yes, full CPF use. The passages I have don't cover the age-95 rule or the loan limit. "
+            "These figures come from Runway's calculator. The passages were retrieved on 2026-10-16.")
+    fixed = without_calculator_hedge(text, '{"share": 1.0}')
+    assert fixed == "Yes, full CPF use. These figures come from Runway's calculator. The passages were retrieved on 2026-10-16."
+    assert fixed.count("These figures come from Runway's calculator.") == 1

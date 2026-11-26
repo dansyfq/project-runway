@@ -278,6 +278,7 @@ _HEDGE_SENT_RE = re.compile(
     r"(?:\bpassages?\b.*\b(?:do not|don't|does not|doesn't|cannot|can't|not) (?:cover|cite|state|contain|give|include|mention)\b"
     r"|\b(?:can't|cannot|can not) cite\b)", re.I | re.S)
 _HEDGE_ABOUT_RE = re.compile(r"age[- ]95|loan limit|valuation limit|calculator|(?:these|those|the) figures", re.I)
+_SOURCE_LINE_RE = re.compile(r"(?:these|those|the) figures (?:come|are) (?:only |all )?from runway's calculator", re.I)
 
 
 def without_calculator_hedge(text: str, tools_used: str) -> str:
@@ -285,15 +286,20 @@ def without_calculator_hedge(text: str, tools_used: str) -> str:
     where they come from. Answers without a tool result, and other "the passages don't give ..." sentences, are untouched."""
     if not tools_used.strip():
         return text
-    parts, out, said = re.split(r"(?<=[.!?])(\s+)", text), [], False
+    parts, out = re.split(r"(?<=[.!?])(\s+)", text), []
+    is_hedge = lambda s: bool(_HEDGE_SENT_RE.search(s) and _HEDGE_ABOUT_RE.search(s))
+    # the AI may already say where the figures come from in another sentence: do not say it twice
+    said = any(_SOURCE_LINE_RE.search(p) and not is_hedge(p) for p in parts[::2])
+    changed = False
     for i in range(0, len(parts), 2):
         sentence, gap = parts[i], parts[i + 1] if i + 1 < len(parts) else ""
         if _HEDGE_SENT_RE.search(sentence) and _HEDGE_ABOUT_RE.search(sentence):
+            changed = True
             if said:
-                continue  # a second such sentence is dropped
+                continue  # dropped: a plain line saying where the figures come from is there already
             sentence, said = "These figures come from Runway's calculator.", True
         out.append(sentence + gap)
-    return "".join(out).rstrip() if said else text
+    return "".join(out).rstrip() if changed else text
 
 
 NUMBER_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
