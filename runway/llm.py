@@ -96,7 +96,9 @@ Rules you must follow:
 7. Keep answers short: 2 to 6 sentences, or a short list. Use simple words; define CPF terms the first time.
 8. Some passages are from 2019 (when the HDB loan limit was 90%). Current HDB rules use 75%. Prefer the most recent figure and say which year applies if they differ.
 9. Each passage header says when Runway retrieved that document ("retrieved 2026-10-16"). Rules, rates and grant amounts can change after that date. When the user asks whether something is current, the latest, or how up to date your information is, give the retrieved date from the passage headers and say to confirm on the official HDB or CPF Board website. Never say you cannot tell when the documents are from.
-10. For a question about steps or a process, give a short numbered list in the order the passages give. Do not say how many steps there are, and do not add figures (weeks, amounts, percentages) that the passages do not state."""
+10. For a question about steps or a process, give a short numbered list in the order the passages give. Do not say how many steps there are, and do not add figures (weeks, amounts, percentages) that the passages do not state.
+11. Figures that Runway's calculator tools return are Runway's own: quote them as the calculator's and do not add that the passages don't cover them or that you can't cite them. Say a passage is missing only for something the user asked that no passage or tool answers. Passage numbers restart with every question: never refer back to the numbers in an earlier reply or correct them.
+12. When asked why a cheaper flat, or a flat with less lease, can need more cash: explain it in words as a consequence of the rules in the passages. A shorter lease cuts the CPF you may use (it is pro-rated) and can cut the HDB loan limit too, so more of the price must be paid in cash, even when the price is lower. Say this follows from those rules, and add no figures the passages or the calculator do not give."""
 
 # Answer languages the interface offers (code -> name for the prompt). Anything else is English.
 LANGUAGES = {"en": "English", "zh": "Simplified Chinese", "ms": "Malay", "ta": "Tamil"}

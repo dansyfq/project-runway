@@ -406,3 +406,13 @@ def test_a_name_question_gets_a_fixed_reply_without_a_search_or_an_ai_call(bot, 
     reply = send("ask", {}, bot, index, q="what is your name", **{"as": "key"})
     assert "I'm KEY" in reply["text"] and reply["clarify"] is True and reply["sources"] == [] and reply["blocked"] is None
     assert "I'm KEY" in send("ask", {}, bot, index, q="who are you")["text"]
+
+
+def test_an_earlier_reply_goes_back_without_its_passage_numbers():
+    """[1]..[5] restart with every question: kept in the history, the AI "corrected" numbers that pointed at other passages."""
+    from runway.bridge import clean_history
+
+    history = [{"role": "user", "content": "Can I use CPF [1] for it?"},
+               {"role": "assistant", "content": "Only in part [4]. The lease is short [2][3]."}]
+    assert clean_history(history, 6) == [{"role": "user", "content": "Can I use CPF [1] for it?"},
+                                         {"role": "assistant", "content": "Only in part. The lease is short."}]

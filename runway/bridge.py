@@ -80,12 +80,18 @@ def source_view(chunks: list[Chunk]) -> list[dict]:
              "retrieved": c.retrieved, "text": c.text[:600]} for c in chunks]
 
 
+# Passage numbers [1]..[5] restart with every question, so an earlier reply's markers would point at the wrong passage and
+# the AI would "correct" them. Assistant turns go back without them.
+_CITATION_RE = re.compile(r"[ \t]*\[\d\]")
+
+
 def clean_history(raw, n: int) -> list[dict]:
     """Chat turns sent by the browser: keep the last n well-formed user/assistant turns, trimmed.
     Turns that were declined (NRIC/phone, injection) stay in the browser's chat, so drop them here."""
     turns = raw[-n:] if isinstance(raw, list) else []
     turns = [{"role": h["role"], "content": str(h.get("content", ""))[:2000]}
              for h in turns if isinstance(h, dict) and h.get("role") in {"user", "assistant"}]
+    turns = [{**h, "content": _CITATION_RE.sub("", h["content"])} if h["role"] == "assistant" else h for h in turns]
     return [h for h in turns if screen_question(h["content"]) not in {"personal", "injection"}]
 
 
