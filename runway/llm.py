@@ -127,7 +127,7 @@ def language_rule(lang: str) -> str:
             "the English source, in Arabic numerals 0-9, never in words or other numerals. Keep the [1] citations.")
 
 
-# Claude Opus 5.5 always thinks before answering, and the thinking counts towards max_tokens, so the cap is roomy and
+# Claude Sonnet 5.5 (like Opus 5.5) thinks before answering, and the thinking counts towards max_tokens, so the cap is roomy and
 # the prompts keep the answers short. Low effort: the answers are short and grounded in passages, and a person is waiting.
 MAX_TOKENS = 16000
 EFFORT = "low"

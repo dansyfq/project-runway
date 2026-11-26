@@ -48,7 +48,7 @@ streamlit run app.py
 Without an `ANTHROPIC_API_KEY` the app still works: calculations, charts and document search run as normal, and Ask
 Runway shows the matching official passages instead of an AI answer.
 
-Ask Runway uses Claude through the Anthropic API: `claude-opus-5-5` by default, or the model named in
+Ask Runway uses Claude through the Anthropic API: `claude-sonnet-5-5` by default, or the model named in
 `ANTHROPIC_MODEL` (for example `claude-haiku-5-5`, which costs far less per answer). The key comes from
 [console.anthropic.com](https://console.anthropic.com); a Claude subscription does not include one. Documents are found by
 hybrid search: BM25 keywords and a FAISS vector store (cosine similarity over `BAAI/bge-small-en-v1.5` embeddings, run
@@ -149,7 +149,7 @@ Each commit redeploys the app. Without a token, changes last until the app next 
 
 - **API.** Ask Runway calls Claude through the Anthropic API (the `anthropic` Python SDK) from `runway/llm.py`, on
   the server only; the browser never talks to Anthropic.
-- **Model.** `claude-opus-5-5` by default (`DEFAULT_CHAT_MODEL` in `runway/config.py`), or the model named in
+- **Model.** `claude-sonnet-5-5` by default (`DEFAULT_CHAT_MODEL` in `runway/config.py`), or the model named in
   `ANTHROPIC_MODEL`, for example `claude-haiku-5-5`.
 - **Secrets.** `ANTHROPIC_API_KEY` and, optionally, `ANTHROPIC_MODEL`, read from Streamlit secrets first, then from
   environment variables (`runway/config.py`).

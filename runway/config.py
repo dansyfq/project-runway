@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 
 RULES_LAST_CHECKED = "16 Oct 2026"
-DEFAULT_CHAT_MODEL = "claude-opus-5-5"  # set ANTHROPIC_MODEL (e.g. "claude-haiku-5-5") to change it
+DEFAULT_CHAT_MODEL = "claude-sonnet-5-5"  # faster than Opus; set ANTHROPIC_MODEL (e.g. "claude-opus-5-5") to change it
 
 
 def get_setting(name: str, default: str | None = None) -> str | None:
