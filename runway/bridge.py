@@ -172,8 +172,8 @@ def handle(msg: dict, state: MutableMapping, users: dict, bot: LLM, index: Retri
                     "note": NUMBERS_NOTE if used_llm else NUMBERS_NOTE + " Written from a fixed template."}
         talk = small_talk(question, "KEY")
         if talk:  # a greeting, thanks or "what is your name": a fixed reply, no search and no AI call
-            return {"text": talk, "sources": [], "blocked": None, "offline": False, "note": None, "lang": "en",
-                    "clarify": True}
+            return {"text": talk, "sources": [], "blocked": None, "offline": False, "note": None,
+                    "lang": question_language(talk, "en"), "clarify": True}  # a Chinese greeting gets a Chinese reply
         history = clean_history(payload.get("history"), 6)
         previous = next((h["content"] for h in reversed(history) if h["role"] == "user"), "")
         if lang == "en" and not screen_question(question):

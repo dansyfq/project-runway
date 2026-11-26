@@ -280,6 +280,16 @@ def test_small_talk_answers_greetings_thanks_and_who_are_you():
     assert "How long can my HDB loan be?" in small_talk("What can you do?")
 
 
+def test_small_talk_answers_in_chinese_to_a_chinese_greeting():
+    from runway.llm import question_language, small_talk
+
+    assert "我是KEY" in small_talk("你好，你叫什么名字？") and "我是KEY" in small_talk("你是谁")
+    assert small_talk("你好！").startswith("您好！我是KEY") and small_talk("谢谢").startswith("不客气")
+    assert "转售组屋" in small_talk("你能做什么？")
+    assert question_language(small_talk("你好"), "en") == "zh"
+    assert small_talk("公积金可以用多少？") is None and small_talk("你好，公积金可以用多少") is None  # real questions are not intercepted
+
+
 def test_small_talk_leaves_real_questions_and_unsafe_text_alone():
     from runway.llm import small_talk
 

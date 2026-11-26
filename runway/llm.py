@@ -229,12 +229,33 @@ _THANKS_RE = re.compile(r"^(?:thanks|thank you|thank u|thx|ty|cheers|ok thanks|g
 _CAN_DO_RE = re.compile(r"\b(?:what (?:can|do) you (?:do|help)|how can you help|what do you do|what can i ask|how do you work|help me)\b")
 
 
+_ZH_NAME_RE = re.compile(r"(?:你|您)(?:叫什么|叫啥|是谁|是什么|的名字)|你们是谁|介绍(?:一下)?(?:你|您)自己|自我介绍")
+_ZH_HELLO_RE = re.compile(r"^(?:你好|您好|嗨|哈喽|哈啰|早安|早上好|下午好|晚上好)(?:啊|呀|吗)?$")
+_ZH_THANKS_RE = re.compile(r"^(?:谢谢|多谢|感谢|谢啦)(?:你|您|了|啦)?$")
+_ZH_CAN_DO_RE = re.compile(r"(?:你|您)(?:能|可以|会)(?:做|帮|干)(?:什么|啥|我)|怎么帮(?:我|助)|你有什么(?:功能|用)")
+_ZH_ABOUT = "我根据官方文件回答购买转售组屋的问题：可以使用多少公积金、95岁租期规则、建屋局贷款、津贴和转售步骤。"
+
+
+def small_talk_zh(q: str, name: str) -> str | None:
+    if _ZH_NAME_RE.search(q):
+        return f"我是{name}，Runway 的助手。{_ZH_ABOUT}您想了解什么？"
+    if _ZH_HELLO_RE.match(q):
+        return f"您好！我是{name}。{_ZH_ABOUT}您想了解什么？"
+    if _ZH_THANKS_RE.match(q):
+        return "不客气！关于购买组屋，您还可以继续问我。"
+    if _ZH_CAN_DO_RE.search(q):
+        return f"{_ZH_ABOUT}例如，您可以问：“我的建屋局贷款最长可以借多久？”我不会就是否购买某个单位给出建议。"
+    return None
+
+
 def small_talk(question: str, name: str = "KEY") -> str | None:
     """A fixed reply to a greeting, thanks, or a question about the assistant, or None for anything else."""
     q = unicodedata.normalize("NFKC", question).lower().strip()
-    q = re.sub(r"[\s!.?,]+$", "", q)
+    q = re.sub(r"[\s!.?,。！？，、]+$", "", q)
     if not q or len(q) > 60 or screen_question(question) != "off_topic":
         return None  # only what would be declined for having no housing words: "How can you help with CPF?" is a real question
+    if re.search(r"[一-鿿]", q):
+        return small_talk_zh(q, name)  # in Chinese: the reply is in Chinese too
     about = ("I answer questions about buying an HDB resale flat from official documents: how much CPF you can use, the "
              "age-95 lease rule, HDB loans, grants and the resale steps.")
     if _NAME_RE.search(q):
