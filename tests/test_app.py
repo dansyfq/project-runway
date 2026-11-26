@@ -585,7 +585,7 @@ def test_key_popup_layout_placeholder_and_thumb_votes():
     assert ".keyhead .keyfull{flex:none;white-space:nowrap;" in GAME
     assert "keyActs" not in GAME and ".keyacts" not in GAME and "KEY_ACTIONS" not in GAME  # no shortcut buttons to other pages above the text box
     assert "height:min(600px,calc(100vh - 160px));" in GAME and "<small>CPF · HDB · MND documents</small>" in GAME  # room for the chat; the subtitle fits on one line
-    assert 'id="keyFull" aria-label="Open the full Ask page">Ask page</button>' in GAME  # a short label, so the subtitle is not cut off
+    assert 'id="keyFull" aria-label="Open the full Ask KEY page">Ask KEY</button>' in GAME  # a short label, so the subtitle is not cut off
     # the box says "Type your question": the header already says what KEY reads, and a long hint was cut off
     assert 'id="keyIn" type="text" autocomplete="off" maxlength="1000" placeholder="Type your question"' in GAME
     assert "const KEY_INTRO = 'Hello, I am KEY. How can I help?';" in GAME
