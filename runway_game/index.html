@@ -1260,6 +1260,9 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .lbody{font:400 .944rem/1.5 var(--font-ui);color:var(--ink-2)}
 .lkey{font-weight:700;color:var(--ink)}  /* the numbers and the verdict in a sentence: weight, not colour alone */
 .ltc.dark .lkey{color:var(--on-brand)}
+.lkey.ok{color:var(--ok)}  /* the CPF verdict: the app's own full / part / none colours (bold carries it too) */
+.lkey.part{color:var(--part)}
+.lkey.no{color:var(--no)}
 .lnote{font:400 .778rem/1.45 var(--font-ui);letter-spacing:var(--track-small);color:var(--ink-2)}
 .lstack{display:flex;flex-direction:column;gap:2px}
 .lsec{padding-block:72px 80px}
@@ -2765,8 +2768,8 @@ function faqFilter(faq, text){
   function syncYours(){
     const p = $('#lYours'), cur = T.list ? T.list[T.i] : {id: 'TOA PAYOH', name: 'Toa Payoh', pct: 1.5, low: false};
     const v = landingVerdict(L.age, L.lease), d = Math.round((1 - Math.pow(1 + cur.pct / 100, -10)) * 100);
-    const k = s => `<b class="lkey">${s}</b>`;
-    const cpf = {full: `CPF can be used ${k('in full')}`, part: `CPF use is cut to about ${k(v.pct + '%')} of the Valuation Limit`, none: `CPF ${k('cannot be used')}`}[v.status];
+    const k = (s, c) => `<b class="lkey${c ? ' ' + c : ''}">${s}</b>`;
+    const cpf = {full: `CPF can be used ${k('in full', 'ok')}`, part: `CPF use is cut to about ${k(v.pct + '%', 'part')} of the Valuation Limit`, none: `CPF ${k('cannot be used', 'no')}`}[v.status];
     p.innerHTML = `Your numbers from the calculator: ${k(yrs(L.lease))} of lease left and a youngest buyer aged ${k(L.age)}, so ${cpf}. `
       + (cur.low ? `${esc(cur.name)} has too few recent sales to measure what lease does to the price.`
                  : `In ${esc(cur.name)}, 10 fewer years of lease go with about ${k(d + '%')} lower price per sqm.`);
