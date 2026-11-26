@@ -4443,7 +4443,7 @@ window.RWAPP={
       S.landTown=!!(arg&&TBY[arg.town]);
       if(arg){ if(arg.age){ S.age=arg.age; S.ageSet=true; syncAvg(); S.dirty=true; } if(S.landTown) S.town=arg.town; S.match=arg.ft?{ft:arg.ft,max:Infinity}:null; needFit=true; }
     }
-    if(target!=='map'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=S.ageSet?2:1; show('scrOnb'); renderOnb(); },  // an age given on Home isn't asked again
+    if(target!=='map'||S.onbDone){ go(target,arg); return; } S.after={target,arg}; S.onb=1; show('scrOnb'); renderOnb(); },  // always the first page, "How old is the youngest buyer?", with the age from Home filled in, so the profile is set up from its start
   setAge(a){ S.age=a; S.ageSet=true; syncAvg(); S.dirty=true; sideProf(); },  // the Home age slider, once the app is loaded
   setUser(user,role){ S.user=user; S.role=role||'brief'; if(!$('#scrSub').hidden) renderSub(); else if(!$('#scrMore').hidden) renderMore(); else if(!$('#scrOnb').hidden) renderOnb(); }
 };
