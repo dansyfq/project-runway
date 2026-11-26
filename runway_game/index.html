@@ -2031,8 +2031,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
   /* Site search, in the browser only: the FAQ search first, then page names (with a few words each), FAQ questions and the 26 towns.
      The text never leaves the page: no message, no address (the FAQ gets it in RW.faqQuery). A town opens the Map there, like "See flats that pass". */
   const SEARCH = [
-    ['', 'Home', 'calculator age 95 rule lease cpf verdict check numbers'], ['map', 'Map', 'flats sold sales blocks mrt town safari'],
-    ['shortlist', 'Shortlist', 'saved kept flats town stamps file'], ['trends', 'Trends', 'price trends median per square metre history chart'],
+    ['', 'Home', 'calculator age 95 rule lease cpf verdict check numbers'], ['map', 'Map', 'flats sold sales blocks mrt town map'],
+    ['shortlist', 'Shortlist', 'saved kept flats towns checked file'], ['trends', 'Trends', 'price trends median per square metre history chart'],
     ['ask-key', 'Ask KEY', 'ask key question chat ai documents upload voice'], ['more', 'More', 'menu settings'],
     ['details', 'Your details', 'youngest buyer age average cpf ordinary account reset'], ['text-size', 'Text size', 'large font bigger'],
     ['about', 'About Us', 'team notice disclaimer'], ['methodology', 'Methodology', 'how it works rag pipeline retrieval search documents ai formula flowchart requirements tests'],
@@ -3483,7 +3483,7 @@ function keep(){
   const newStamp=!S.stamps.has(f.town); S.stamps.add(f.town);
   const c=$('#listCount'); c.hidden=false; c.textContent=S.list.length; c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
   $('#keepBtn').disabled=true; $('#keepBtn').innerHTML=ICON.keep+'In your shortlist';
-  toast(newStamp?`New town stamp: ${TBY[f.town].name}`:'Kept in your shortlist', newStamp);
+  toast(newStamp?`New town checked: ${TBY[f.town].name}`:'Kept in your shortlist', newStamp);
 }
 function toast(msg,stamp){
   $('#toastHost').innerHTML=`<div class="toast">${stamp?`<svg class="st" viewBox="0 0 42 42"><circle cx="21" cy="21" r="18" fill="var(--brand-hi)" stroke="var(--brand)" stroke-width="3"/><path d="M21 9 33 21 21 33 9 21Z" fill="var(--brand)"/></svg>`:''}<span>${esc(msg)}</span></div>`;
@@ -3523,7 +3523,7 @@ function renderList(){
       <section class="cmp" aria-labelledby="cmpH"><h2 id="cmpH" style="font-size:1.3rem">Compare flats</h2>${S.list.length<2?'<p class="small">Keep one more flat from the map to compare them side by side.</p>':`<fieldset class="cmppick"><legend class="small">Tick two or three flats.</legend>${S.list.map((f,i)=>`<label><input type="checkbox" data-ci="${i}"${CMP.has(f)?' checked':''}><span>Blk ${esc(f.blk)} ${esc(f.st)}, ${esc(TBY[f.town].name)}</span></label>`).join('')}</fieldset><p class="small" id="cmpMsg" role="status"></p><div id="cmpOut"></div>`}</section>`
       :`<div class="empty"><svg viewBox="0 0 52 52" width="52" height="52"><path d="M26 6 46 26 26 46 6 26Z" fill="none" stroke="var(--beige-deep)" stroke-width="3"/></svg><b class="ui">Nothing here yet</b><p class="small">Check a flat on the map, then tap Keep in shortlist.</p><button class="btn primary" type="button" data-gomap>Go to the map</button></div>`}
     <div style="display:flex;flex-direction:column;gap:10px">
-      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="font-size:1.3rem">Town stamps</h2><span class="label">${n} of ${TOWNS.length}</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2 style="font-size:1.3rem">Towns checked</h2><span class="label">${n} of ${TOWNS.length}</span></div>
       <div class="prog"><i style="width:${n/TOWNS.length*100}%"></i></div>
       <div class="stamps">${TOWNS.map(t=>{const p=PHOTOS[t.id];return `<div class="stampc ${S.stamps.has(t.id)?'got':''} ${p?'hasimg':''}" title="${esc(LANDMARK[t.id])}">${p?`<img loading="lazy" decoding="async" src="${esc(p.img)}" alt="">`:''}<span>${esc(t.name).replace('/','/&#8203;')}</span></div>`;}).join('')}</div>
     </div>`;
@@ -3938,7 +3938,7 @@ function renderSub(){
          ['dPar','par','Parents or child',[['no','Not living with or near them'],['with','Living with them in the flat'],['near','Living within 4 km of them']]]]
         .map(([id,k,lab,opts])=>`<label class="field"><span>${lab}</span><span class="lselw"><select class="inp" id="${id}" data-k="${k}">${opts.map(([v,t])=>`<option value="${v}" ${S[k]===v?'selected':''}>${t}</option>`).join('')}</select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></label>`).join('')}
       <button class="btn ghost sm" type="button" id="dReset">Reset my details</button>
-      <p class="small">Sets the youngest buyer back to 30, the average age back to following it, CPF back to Not sure, and clears the grant details. Your shortlist, town stamps, chat and map town stay as they are.</p>`;
+      <p class="small">Sets the youngest buyer back to 30, the average age back to following it, CPF back to Not sure, and clears the grant details. Your shortlist, towns checked, chat and map town stay as they are.</p>`;
     $('#dInc').oninput=e=>{const v=e.target.value.trim();S.inc=v===''||!(+v>=0)?null:+v;S.dirty=true;};
     $$('#dHh,#dFirst,#dCit,#dPar').forEach(x=>x.onchange=()=>{S[x.dataset.k]=x.value;S.dirty=true;});
     $('#dReset').onclick=()=>{S.age=30;S.avgSet=0;S.ageSet=false;syncAvg();S.oa=100000;S.oaSet=false;Object.assign(S,{inc:null,hh:'',first:'',cit:'sc',par:'no',spd:null});S.dirty=true;sideProf();renderSub();$('#dReset').focus();toast('Your details are back to the defaults');};
@@ -4140,14 +4140,14 @@ function aboutHtml(){
   <p>A runway is how far you can go before you run out of ground. For an HDB buyer, the lease is the runway.</p>
   <h2>Scope</h2><p>Buying an HDB flat in the resale market: how the lease left and the youngest buyer's age decide how much CPF and HDB loan you can use, and what a shorter lease costs in each town.</p>
   <h2>Objectives</h2><ul><li>Bring together the rules from CPF Board, HDB and the Ministry of National Development.</li><li>Personalise with generic details only: ages, a rough CPF figure and a town. No names or NRIC.</li><li>Explain, not just calculate, with the source shown.</li><li>Present it as a map, verdict cards, a shortlist, a file and a chat.</li></ul>
-  <h2>Features</h2><ul><li><b>Map (Town Safari)</b>: every HDB block, MRT lines and the flats sold in ${SPAN} at their real addresses. Check each one for your age, keep the ones you like and collect town stamps.</li><li><b>Ask KEY</b>: questions answered from 32 official documents with sources, "Why?" for any flat, a chat summary, chat download, read-aloud, and document upload that suggests towns. Questions with your own age, lease or price are worked out with Runway's calculator tools.</li><li><b>Lease explorer</b>: CPF use for every age and lease in one chart, with sliders for your own case.</li><li><b>Admin tools</b>: upload Ask documents, edit pages and the FAQ, and Insights on answer feedback, search quality and AI use.</li><li><b>Safeguards</b>: numbers come from Runway's calculator, never the AI. An AI explanation with a number the calculator didn't produce is replaced by a plain one. NRIC and phone numbers are blocked or removed.</li></ul>
+  <h2>Features</h2><ul><li><b>Town map</b>: every HDB block, MRT lines and the flats sold in ${SPAN} at their real addresses. Check each one for your age, keep the ones you like, and the Shortlist shows which towns you have checked.</li><li><b>Ask KEY</b>: questions answered from 32 official documents with sources, "Why?" for any flat, a chat summary, chat download, read-aloud, and document upload that suggests towns. Questions with your own age, lease or price are worked out with Runway's calculator tools.</li><li><b>Lease explorer</b>: CPF use for every age and lease in one chart, with sliders for your own case.</li><li><b>Admin tools</b>: upload Ask documents, edit pages and the FAQ, and Insights on answer feedback, search quality and AI use.</li><li><b>Safeguards</b>: numbers come from Runway's calculator, never the AI. An AI explanation with a number the calculator didn't produce is replaced by a plain one. NRIC and phone numbers are blocked or removed.</li></ul>
   <h2>Data sources</h2>
   <div class="scroll"><table class="tbl"><thead><tr><th>Source</th><th>Used for</th></tr></thead><tbody>
     <tr><td>HDB resale flat prices, 1990 – Sep 2026 (986,090 sales, data.gov.sg)</td><td>Flats on the map, town lease effect</td></tr>
     <tr><td>MND Annex A and CPF Board guidance on the age-95 rule</td><td>Rule engine, Ask KEY</td></tr>
     <tr><td>32 official CPF, HDB, MND/MOM, IRAS and CEA documents</td><td>Ask KEY</td></tr>
     <tr><td>OneMap (SLA) addresses, URA Master Plan 2014, LTA bus data, OpenStreetMap</td><td>Map</td></tr>
-    <tr><td>Wikimedia Commons (CC licences)</td><td>Town stamps</td></tr></tbody></table></div>
+    <tr><td>Wikimedia Commons (CC licences)</td><td>Town photos on the Shortlist</td></tr></tbody></table></div>
   ${NOTICE_BLOCK()}
   <h2>Team Runway</h2><p>Lynn Koh · Leong Soon Poh · Danish Syafiq · Max How</p>
 </div>`;
@@ -4164,7 +4164,7 @@ const FLOW_MAP = `<h2>Flowchart · Use case 1: Map</h2>
     <div class="ar jn"></div>
     <div class="fn">Verdict, CPF and cash numbers</div><div class="ar"></div>
     <div class="fn d">What next?</div><div class="sp"></div>
-    <div class="br"><div><div class="bl"><span>Keep</span></div><div class="fn t">Shortlist + town stamp</div></div><div><div class="bl"><span>Why?</span></div><div class="fn t">Ask KEY explains this flat</div></div></div>
+    <div class="br"><div><div class="bl"><span>Keep</span></div><div class="fn t">Shortlist + town checked</div></div><div><div class="bl"><span>Why?</span></div><div class="fn t">Ask KEY explains this flat</div></div></div>
   </div>`;
 const FLOW_ASK = `<h2>Flowchart · Use case 2: Ask KEY</h2>
   <div class="flow">
@@ -4253,7 +4253,7 @@ function methodHtml(){
     ['Personalised with non-identifying inputs','Ages, rough CPF, town; NRIC and phone blocked'],
     ['Explanations and follow-up questions','Ask KEY, Why?, chat summary'],
     ['Text, tables, charts and forms','Map, verdict card, shortlist, lease explorer chart, file and chat export'],
-    ['At least two use cases','Map (Town Safari), Ask KEY and Lease explorer'],
+    ['At least two use cases','Town map, Ask KEY and Lease explorer'],
     ['Agent with tools','Ask KEY calls 3 calculator tools (lease check, HDB loan length, Buyer\'s Stamp Duty) and a price lookup (the figures behind Trends) for questions with your own figures'],
     ['Evaluation and monitoring','Insights (admin only): answer feedback, eval by search mode, documents and AI use; eval/run_eval.py'],
     ['One flowchart per use case','Below'],
