@@ -304,3 +304,25 @@ def test_the_answer_rules_cover_calculator_figures_and_why_a_cheaper_flat_needs_
     assert "Figures that Runway's calculator tools return are Runway's own" in ANSWER_SYSTEM
     assert "Passage numbers restart with every question" in ANSWER_SYSTEM
     assert "why a cheaper flat" in ANSWER_SYSTEM and "so more of the price must be paid in cash" in ANSWER_SYSTEM
+
+
+def test_a_calculator_answer_does_not_say_the_passages_cannot_back_its_figures():
+    from runway.llm import without_calculator_hedge
+
+    hedge = ("Yes, full CPF use. The calculator says 66 years are needed. The passages I have for this question don't cover "
+             "the age-95 rule or the loan limit, so these figures come only from Runway's calculator. Please confirm them "
+             "with CPF Board or HDB. The passages are from 2026-10-16.")
+    fixed = without_calculator_hedge(hedge, '{"share": 1.0}')
+    assert "don't cover" not in fixed and "These figures come from Runway's calculator. Please confirm them" in fixed
+    assert fixed.startswith("Yes, full CPF use.") and fixed.endswith("The passages are from 2026-10-16.")
+    assert "I can't cite them" not in without_calculator_hedge(
+        "The passages don't cover the 75% loan limit, so I can't cite them. Check with HDB.", "{}")
+
+
+def test_the_hedge_stays_when_no_calculator_ran_or_it_is_about_something_else():
+    from runway.llm import without_calculator_hedge
+
+    hedge = "The passages don't cover the age-95 rule, so I can't cite it."
+    assert without_calculator_hedge(hedge, "") == hedge  # no tool result: the AI really had only the passages
+    other = "The PHG is $20,000. The passages don't give the amounts of the other grants, so check with HDB."
+    assert without_calculator_hedge(other, '{"share": 1.0}') == other

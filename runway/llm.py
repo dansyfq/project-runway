@@ -272,6 +272,30 @@ def small_talk(question: str, name: str = "KEY") -> str | None:
     return None
 
 
+# After a calculator answer the AI sometimes adds "the passages I have don't cover the age-95 rule or the loan limit, so I can't
+# cite them". The figures are Runway's own (the calculator ran), so that sentence only makes a correct answer sound shaky.
+_HEDGE_SENT_RE = re.compile(
+    r"(?:\bpassages?\b.*\b(?:do not|don't|does not|doesn't|cannot|can't|not) (?:cover|cite|state|contain|give|include|mention)\b"
+    r"|\b(?:can't|cannot|can not) cite\b)", re.I | re.S)
+_HEDGE_ABOUT_RE = re.compile(r"age[- ]95|loan limit|valuation limit|calculator|(?:these|those|the) figures", re.I)
+
+
+def without_calculator_hedge(text: str, tools_used: str) -> str:
+    """When a calculator tool ran, the sentence saying the passages don't cover its figures becomes one plain line saying
+    where they come from. Answers without a tool result, and other "the passages don't give ..." sentences, are untouched."""
+    if not tools_used.strip():
+        return text
+    parts, out, said = re.split(r"(?<=[.!?])(\s+)", text), [], False
+    for i in range(0, len(parts), 2):
+        sentence, gap = parts[i], parts[i + 1] if i + 1 < len(parts) else ""
+        if _HEDGE_SENT_RE.search(sentence) and _HEDGE_ABOUT_RE.search(sentence):
+            if said:
+                continue  # a second such sentence is dropped
+            sentence, said = "These figures come from Runway's calculator.", True
+        out.append(sentence + gap)
+    return "".join(out).rstrip() if said else text
+
+
 NUMBER_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
 
 
@@ -412,7 +436,7 @@ class LLM:
         if bad:
             print(f"[runway] answer replaced by passages: figure(s) not in the sources: {sorted(bad)}", flush=True)  # the log says which
             return Answer(text=offline_answer(sources), sources=sources, error=INVENTED_FIGURE)
-        return Answer(text=text, sources=sources)
+        return Answer(text=without_calculator_hedge(text, tools_used), sources=sources)
 
     def explain(self, facts: dict[str, str], sources: list[Chunk], lang: str = "en") -> tuple[str, bool]:
         """Returns (explanation, used_llm). Falls back to the template if the model invents a number."""
