@@ -212,6 +212,7 @@ def screen_question(question: str) -> str | None:
         return "off_topic"
     words = set(re.findall(r"[a-z0-9\-]+", q))
     words |= {part for w in words for part in w.split("-")}  # "20-year" also counts as "year"
+    words |= {w[:-1] for w in words if len(w) > 3 and w.endswith("s")}  # plurals count too: "grants", "buyers", "loans"
     if not (words & TOPIC_WORDS or any(w.startswith("eligib") for w in words) or any(t in q for t in TOPIC_TERMS)):
         return "off_topic"
     return None

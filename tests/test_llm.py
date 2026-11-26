@@ -356,3 +356,13 @@ def test_the_cheaper_flat_rule_keeps_the_2019_example_out():
     from runway.llm import ANSWER_SYSTEM
 
     assert "Leave out the 2019 example and the old 90% loan limit here" in ANSWER_SYSTEM
+
+
+def test_a_plural_topic_word_is_still_on_topic():
+    """Seen live: "What grants can first-time buyers get?" was refused as off topic: the list had grant and buyer, not the plurals."""
+    from runway.llm import screen_question
+
+    for q in ("What grants can first-time buyers get?", "Which loans does HDB offer?", "How do leases affect flats?"):
+        assert screen_question(q) is None, q
+    assert screen_question("What is the weather today?") == "off_topic"
+    assert screen_question("Tell me some jokes about cats") == "off_topic"
