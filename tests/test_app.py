@@ -702,6 +702,20 @@ def test_town_comparison_lets_you_pick_the_town():
     assert "That is a <b class=\"lkey\">${d < base ? 'smaller' : 'bigger'}</b> drop than in ${esc(cur.name)} (${base}%)." in pick
 
 
+def test_calculator_why_questions_are_answered_from_the_calculator():
+    # "Ask KEY why" asks about the user's own numbers; the AI added figures of its own (55 + 52 = 107) and the guard swapped in links.
+    # KEY answers the three phrasings from the calculator's verdict and the rule in words: no AI call, no vote, not sent as history.
+    assert "function kCalcAnswer(q){" in GAME and "why (?:can i use cpf in full|is my cpf use pro-rated|can't i use cpf) for a flat with" in GAME
+    calc = GAME[GAME.index("function kCalcAnswer(q){"):GAME.index("async function kAsk(q){")]
+    assert "landingVerdict(+m[2], +m[1])" in calc and "esc(v.sentence)" in calc and "LANDING_QA[0].publisher" in calc and "skip: true" in calc
+    assert "÷" not in calc and "pro-rated:" not in calc  # the sum stays off the page
+    ask = GAME[GAME.index("async function kAsk(q){"):GAME.index("function keyOpen(q){")]
+    assert "const calc = town ? null : kCalcAnswer(q);" in ask and ask.index("kCalcAnswer(q)") < ask.index("RW.send('ask'")
+    # the three phrasings the button sends are the ones the answer function matches
+    for phrase in ("Why can I use CPF in full", "Why is my CPF use pro-rated", "Why can't I use CPF"):
+        assert phrase in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1

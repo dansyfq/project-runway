@@ -2666,6 +2666,19 @@ function faqFilter(faq, text){
     return `<p>A shorter lease sells for less: the buyer gets fewer years in the flat, and a short lease also limits the CPF a buyer can use. In ${esc(t.name)}, each missing year of lease takes about ${k(t.pct.toFixed(1) + '%')} off the price per sqm, so 10 fewer years go with about ${k(tenYears(t.pct) + '%')} lower price.</p>`
       + `<p><small>Estimated from ${esc(t.n)} resales ${esc(T.span || 'recently')} in Runway's price data. These are past sales, not a promise of what a flat will sell for.</small></p>`;
   }
+  // The calculator's "Ask KEY why" questions ("Why can I use CPF in full for a flat with 55 years of lease left and a youngest buyer
+  // aged 52?") are about the user's own numbers. The AI added figures of its own (55 + 52 = 107) and the guard swapped its answer for
+  // links, so KEY answers from the calculator's verdict, the one shown on Home, and the rule in words.
+  function kCalcAnswer(q){
+    const m = /^why (?:can i use cpf in full|is my cpf use pro-rated|can't i use cpf) for a flat with (\d{1,3}) years? of lease left and a youngest buyer aged (\d{2})\?$/i.exec(q); if(!m) return null;
+    const v = landingVerdict(+m[2], +m[1]);
+    const rule = {full: 'CPF can be used up to the Valuation Limit when the remaining lease lasts until the youngest buyer is 95.',
+      part: 'when the remaining lease cannot last until the youngest buyer is 95, CPF use is cut in proportion to how far the lease covers that age.',
+      none: "with 20 years or less of lease left, CPF can't be used for the flat."}[v.status];
+    const lead = v.status === 'part' ? 'The rule: ' + rule.charAt(0).toUpperCase() + rule.slice(1) : 'The rule: ' + rule;
+    return {html: `<p>${esc(v.sentence)}</p><p>${esc(lead)}</p><p><small>Worked out by Runway's calculator from the numbers in your question.</small></p>`,
+      src: [{publisher: LANDING_QA[0].publisher}], skip: true};
+  }
   async function kAsk(q){
     q = String(q).trim().slice(0, 1000);
     if(!q || K.busy) return;
@@ -2680,7 +2693,8 @@ function faqFilter(faq, text){
     let b;
     try{
       const town = await kTownAnswer(q);
-      if(town) b = {html: town, skip: true};  // Runway's own numbers: no AI call, nothing to vote on, kept out of the history sent to the AI
+      const calc = town ? null : kCalcAnswer(q);
+      if(town || calc) b = calc || {html: town, skip: true};  // Runway's own numbers: no AI call, nothing to vote on, kept out of the history sent to the AI
       else{
       const d = RW.prof.get(), r = await RW.send('ask', {q, facts: null, history: prior, age: (d.onbDone || d.ageSet) && Number.isFinite(d.age) ? d.age : null, lang: questionLang(q) || RW.lang || 'en', as: 'key'});
       if(typeof r.text !== 'string') throw new Error(r.error || 'no answer');
