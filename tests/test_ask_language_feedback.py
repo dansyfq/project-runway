@@ -115,7 +115,7 @@ def test_interface_offers_the_four_languages_labelled_in_their_own_language():
     assert re.findall(r'<option value="(\w+)" lang="([\w-]+)">([^<]+)</option>', select) == [
         ("en", "en", "English"), ("zh", "zh-Hans", "中文"), ("ms", "ms", "Bahasa Melayu"), ("ta", "ta", "தமிழ்")]
     assert set(re.findall(r"(\w+):\{tag:", GAME)) == set(llm_mod.LANGUAGES)
-    assert "lang: S.lang" in GAME
+    assert "lang: questionLang(q) || S.lang" in GAME  # the question's own language wins when its letters say so
 
 
 # ---- feedback ----
