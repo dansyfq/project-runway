@@ -663,7 +663,10 @@ def test_key_numbers_in_the_town_section_are_bold():
     assert ".lkey{font-weight:700;color:var(--ink)}" in GAME and ".ltc.dark .lkey{color:var(--on-brand)}" in GAME
     yours = GAME[GAME.index("function syncYours()"):GAME.index("window.RWYours = syncYours;")]
     assert "p.innerHTML = " in yours and "p.textContent" not in yours
-    assert "${k(yrs(L.lease))} of lease left and a youngest buyer aged ${k(L.age)}" in yours and "k('in full')" in yours
+    assert "${k(yrs(L.lease))} of lease left and a youngest buyer aged ${k(L.age)}" in yours and "k('in full', 'ok')" in yours
+    # the verdict also takes the app's full / part / none colours
+    assert "k(v.pct + '%', 'part')" in yours and "k('cannot be used', 'no')" in yours
+    assert ".lkey.ok{color:var(--ok)}" in GAME and ".lkey.part{color:var(--part)}" in GAME and ".lkey.no{color:var(--no)}" in GAME
     assert yours.count("esc(cur.name)") >= 2
     assert '<b class="lkey">${d}%</b> lower in ${esc(t.name)}' in GAME and '<b class="lkey">${d < base ? \'smaller\' : \'bigger\'}</b> drop' in GAME
 
