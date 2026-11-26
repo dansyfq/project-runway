@@ -644,6 +644,12 @@ def test_reply_audio_player_is_remade_after_the_mic_lets_go():
     assert "if(vad) vad.stop();\n    if(typeof freshAudio === 'function') freshAudio();" in end[:400]
 
 
+def test_first_spoken_answer_keeps_the_server_voice():
+    # the first server-voice call of a session can fail fast: retried once, and woken while the question is being spoken
+    assert "if(!b64&&i===0&&Date.now()-t0<4000){" in GAME and "b64=await packFetch(cs[0],lang);" in GAME
+    assert "window._packWarm=1;packFetch(VOICE[S.lang].hi,S.lang);" in GAME
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
