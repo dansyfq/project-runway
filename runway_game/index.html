@@ -1361,7 +1361,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .ltile{display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:14px;background:var(--beige-2)}
 .ltile b{font:700 32px/1.1 var(--font-display);letter-spacing:var(--track-title);color:var(--green)}
 .ltile span{font:400 12px/1.3 var(--font-ui);color:var(--ink-2)}
-.lformula{padding:10px 12px;border-radius:12px;background:var(--beige);font:400 13px var(--mono);color:var(--green)}
 .lvacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto}
 /* your town */
 .lpager{display:flex;align-items:center;gap:10px}
@@ -1703,7 +1702,6 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
                 <div class="ltile sq"><b id="lLoan"></b><span>HDB loan limit</span></div>
               </div>
               <p class="lnote" id="lLtvNote">HDB lends up to 75% of the lower of the price or the flat's value for complete resale applications received from 20 August 2024. <a href="https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/housing-loan/housing-loan-from-hdb" target="_blank" rel="noopener">HDB: Housing Loan from HDB<span class="lsr"> (opens in a new tab)</span></a></p>
-              <p class="lformula sq" id="lFormula"></p>
               <div class="lvacts">
                 <button type="button" class="lb lb-g lb-50 sq" id="lSee">See flats that pass</button>
                 <button type="button" class="lb lb-out lb-50 sq" id="lWhy" style="flex-basis:150px">Ask KEY why</button>
@@ -2569,7 +2567,6 @@ function faqFilter(faq, text){
     $('#lBar').style.width = v.cover + '%';
     $('#lCovers').textContent = `Lease covers ${yrs(L.lease)}`; $('#lNeeds').textContent = `Needs ${needed} to reach 95`;
     $('#lPct').textContent = v.pct + '%'; $('#lLoan').textContent = v.loan + '%';
-    $('#lFormula').hidden = v.status !== 'part'; $('#lFormula').textContent = `(${L.lease} − 20) ÷ (${needed} − 20) = ${v.pct}%`;
     if(window.RWYours) RWYours();  // the Your town section repeats these numbers
   }
   function setRule(k, v){
