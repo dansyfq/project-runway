@@ -652,10 +652,20 @@ def test_first_spoken_answer_keeps_the_server_voice():
 
 def test_town_comparison_says_it_in_plain_words():
     # "9 points less" is gone: each card says the drop for a 10-year-shorter lease, then smaller / bigger / as big as the shown town's
-    assert "If the lease is 10 years shorter, the price per sqm is about ${d}% lower in ${esc(t.name)}.${gap}" in GAME
-    assert "That is a ${d < base ? 'smaller' : 'bigger'} drop than in ${esc(cur.name)} (${base}%)." in GAME
-    assert "That is as big a drop as in ${esc(cur.name)} (${base}%)." in GAME
-    assert "points less" not in GAME and "a lease 10 years shorter lowers the price per sqm by about ${base}%" in GAME
+    assert "If the lease is 10 years shorter, the price per sqm is about <b class=\"lkey\">${d}%</b> lower in ${esc(t.name)}.${gap}" in GAME
+    assert "That is a <b class=\"lkey\">${d < base ? 'smaller' : 'bigger'}</b> drop than in ${esc(cur.name)} (${base}%)." in GAME
+    assert "That is <b class=\"lkey\">as big</b> a drop as in ${esc(cur.name)} (${base}%)." in GAME
+    assert "points less" not in GAME and "a lease 10 years shorter lowers the price per sqm by about <b class=\"lkey\">${base}%</b>" in GAME
+
+
+def test_key_numbers_in_the_town_section_are_bold():
+    # the lease, the buyer's age, the verdict and the price drop stand out by weight (not colour alone); the town name stays escaped
+    assert ".lkey{font-weight:700;color:var(--ink)}" in GAME and ".ltc.dark .lkey{color:var(--on-brand)}" in GAME
+    yours = GAME[GAME.index("function syncYours()"):GAME.index("window.RWYours = syncYours;")]
+    assert "p.innerHTML = " in yours and "p.textContent" not in yours
+    assert "${k(yrs(L.lease))} of lease left and a youngest buyer aged ${k(L.age)}" in yours and "k('in full')" in yours
+    assert yours.count("esc(cur.name)") >= 2
+    assert '<b class="lkey">${d}%</b> lower in ${esc(t.name)}' in GAME and '<b class="lkey">${d < base ? \'smaller\' : \'bigger\'}</b> drop' in GAME
 
 
 def test_one_h1_on_the_home_page_and_described_ratings():

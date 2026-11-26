@@ -1258,6 +1258,8 @@ table.tbl{border-collapse:collapse;width:100%;font:400 .778rem/1.45 var(--font-u
 .llab{font:700 12px/1.4 var(--font-ui);letter-spacing:var(--track-small);color:var(--ink-2)}
 .lmeta{font:700 13px var(--font-ui);color:var(--ink-2)}
 .lbody{font:400 .944rem/1.5 var(--font-ui);color:var(--ink-2)}
+.lkey{font-weight:700;color:var(--ink)}  /* the numbers and the verdict in a sentence: weight, not colour alone */
+.ltc.dark .lkey{color:var(--on-brand)}
 .lnote{font:400 .778rem/1.45 var(--font-ui);letter-spacing:var(--track-small);color:var(--ink-2)}
 .lstack{display:flex;flex-direction:column;gap:2px}
 .lsec{padding-block:72px 80px}
@@ -2763,10 +2765,11 @@ function faqFilter(faq, text){
   function syncYours(){
     const p = $('#lYours'), cur = T.list ? T.list[T.i] : {id: 'TOA PAYOH', name: 'Toa Payoh', pct: 1.5, low: false};
     const v = landingVerdict(L.age, L.lease), d = Math.round((1 - Math.pow(1 + cur.pct / 100, -10)) * 100);
-    const cpf = {full: 'CPF can be used in full', part: `CPF use is cut to about ${v.pct}% of the Valuation Limit`, none: 'CPF cannot be used'}[v.status];
-    p.textContent = `Your numbers from the calculator: ${yrs(L.lease)} of lease left and a youngest buyer aged ${L.age}, so ${cpf}. `
-      + (cur.low ? `${cur.name} has too few recent sales to measure what lease does to the price.`
-                 : `In ${cur.name}, 10 fewer years of lease go with about ${d}% lower price per sqm.`);
+    const k = s => `<b class="lkey">${s}</b>`;
+    const cpf = {full: `CPF can be used ${k('in full')}`, part: `CPF use is cut to about ${k(v.pct + '%')} of the Valuation Limit`, none: `CPF ${k('cannot be used')}`}[v.status];
+    p.innerHTML = `Your numbers from the calculator: ${k(yrs(L.lease))} of lease left and a youngest buyer aged ${k(L.age)}, so ${cpf}. `
+      + (cur.low ? `${esc(cur.name)} has too few recent sales to measure what lease does to the price.`
+                 : `In ${esc(cur.name)}, 10 fewer years of lease go with about ${k(d + '%')} lower price per sqm.`);
     p.hidden = false;
     syncTrendLink();
   }
@@ -2783,11 +2786,11 @@ function faqFilter(faq, text){
     [1, 2, 3].map(i => i <= n ? '<svg width="13" height="13" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1 19 10 10 19 1 10Z" fill="currentColor"/></svg>'
       : '<svg width="13" height="13" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 18 10 10 18 2 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>').join('')}</span>`;
   function compareCard(el, t, cur, base, which){
-    const d = tenYears(t.pct), n = meter(t).n, gap = base === null ? '' : d === base ? ` That is as big a drop as in ${esc(cur.name)} (${base}%).`
-      : ` That is a ${d < base ? 'smaller' : 'bigger'} drop than in ${esc(cur.name)} (${base}%).`;
+    const d = tenYears(t.pct), n = meter(t).n, gap = base === null ? '' : d === base ? ` That is <b class="lkey">as big</b> a drop as in ${esc(cur.name)} (${base}%).`
+      : ` That is a <b class="lkey">${d < base ? 'smaller' : 'bigger'}</b> drop than in ${esc(cur.name)} (${base}%).`;
     el.innerHTML = `<div class="lrowb"><h3 class="lh3">${esc(t.name)}</h3><span style="display:flex;gap:8px;align-items:center"><span class="lpill2 sq">vs ${esc(cur.name)}</span>${diamonds(n, t.name, which === 'least' ? 'var(--green)' : 'var(--brand-hi)')}</span></div>
       <p class="lmeta">${which === 'least' ? 'Smallest' : 'Biggest'} lease effect of the other towns · ${esc(t.n)} resales ${esc(T.span || 'recently')}</p>
-      <p class="lbody">If the lease is 10 years shorter, the price per sqm is about ${d}% lower in ${esc(t.name)}.${gap}</p>
+      <p class="lbody">If the lease is 10 years shorter, the price per sqm is about <b class="lkey">${d}%</b> lower in ${esc(t.name)}.${gap}</p>
       <button type="button" class="llink" data-ask="${esc(t.name)}">Ask about ${esc(t.name)} →</button>`;
   }
   function syncCompare(){
@@ -2795,7 +2798,7 @@ function faqFilter(faq, text){
     const cur = T.list[T.i], others = T.list.filter(t => !t.low && t.id !== cur.id).sort((a, b) => a.pct - b.pct);
     if(others.length < 2) return;
     const base = cur.low ? null : tenYears(cur.pct), head = $('#lCmpHead');
-    head.innerHTML = `Compared with <b>${esc(cur.name)}</b>${sel.value === cur.id ? ', the town you picked' : ', the town shown above'}${base === null ? '' : `: a lease 10 years shorter lowers the price per sqm by about ${base}%`}`;
+    head.innerHTML = `Compared with <b>${esc(cur.name)}</b>${sel.value === cur.id ? ', the town you picked' : ', the town shown above'}${base === null ? '' : `: a lease 10 years shorter lowers the price per sqm by about <b class="lkey">${base}%</b>`}`;
     head.hidden = false;
     compareCard($('#lCmpA'), others[0], cur, base, 'least'); compareCard($('#lCmpB'), others[others.length - 1], cur, base, 'most');
   }
