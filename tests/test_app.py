@@ -671,6 +671,18 @@ def test_key_numbers_in_the_town_section_are_bold():
     assert '<b class="lkey">${d}%</b> lower in ${esc(t.name)}' in GAME and '<b class="lkey">${d < base ? \'smaller\' : \'bigger\'}</b> drop' in GAME
 
 
+def test_town_ask_buttons_are_answered_from_the_town_data():
+    # "Ask about <town>" asks "Why do short leases cost more in <town>?": the documents have no town prices, so the AI answered
+    # with a figure it could not source and the guard swapped in links. KEY now answers it from Runway's own town figures.
+    assert "async function kTownAnswer(q){" in GAME and "why do short leases cost more in (.+?)" in GAME
+    town = GAME[GAME.index("async function kTownAnswer(q){"):GAME.index("async function kAsk(q){")]
+    assert "await loadTowns()" in town and "esc(t.name)" in town and "t.pct.toFixed(1)" in town and "tenYears(t.pct)" in town
+    assert "too few recent resales" in town and "not a promise of what a flat will sell for" in town
+    ask = GAME[GAME.index("async function kAsk(q){"):GAME.index("function keyOpen(q){")]
+    assert "const town = await kTownAnswer(q);" in ask and ask.index("kTownAnswer(q)") < ask.index("RW.send('ask'")
+    assert "skip: true" in ask[ask.index("kTownAnswer(q)"):ask.index("RW.send('ask'")]  # no AI call, no vote, not sent back as history
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1

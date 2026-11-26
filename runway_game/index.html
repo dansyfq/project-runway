@@ -2656,6 +2656,17 @@ function faqFilter(faq, text){
     kl.scrollTop = kl.scrollHeight;
   }
   const kHistory = (n = 7) => K.chat.filter(m => !m.typing && !m.skip).slice(-n).map(m => ({role: m.me ? 'user' : 'assistant', content: kPlain(m.html)}));
+  // "Why do short leases cost more in <town>?" (the town cards' Ask button) is answered from Runway's own town figures. The
+  // documents have no town prices, so the AI could only invent a figure, and the guard would swap its answer for links.
+  async function kTownAnswer(q){
+    const m = /^why do short leases cost more in (.+?)\?*$/i.exec(q); if(!m) return null;
+    if(!await loadTowns()) return null;  // the towns would not load: the documents answer as before
+    const t = T.list.find(x => x.name.toLowerCase() === m[1].trim().toLowerCase()); if(!t) return null;
+    if(t.low) return `<p>${esc(t.name)} has too few recent resales for Runway to measure what lease does to the price.</p>`;
+    const k = s => `<b class="lkey">${s}</b>`;
+    return `<p>A shorter lease sells for less: the buyer gets fewer years in the flat, and a short lease also limits the CPF a buyer can use. In ${esc(t.name)}, each missing year of lease takes about ${k(t.pct.toFixed(1) + '%')} off the price per sqm, so 10 fewer years go with about ${k(tenYears(t.pct) + '%')} lower price.</p>`
+      + `<p><small>Estimated from ${esc(t.n)} resales ${esc(T.span || 'recently')} in Runway's price data. These are past sales, not a promise of what a flat will sell for.</small></p>`;
+  }
   async function kAsk(q){
     q = String(q).trim().slice(0, 1000);
     if(!q || K.busy) return;
@@ -2669,10 +2680,14 @@ function faqFilter(faq, text){
     K.chat.push(typing); K.busy = true; ks.disabled = true; kRender();
     let b;
     try{
+      const town = await kTownAnswer(q);
+      if(town) b = {html: town, skip: true};  // Runway's own numbers: no AI call, nothing to vote on, kept out of the history sent to the AI
+      else{
       const d = RW.prof.get(), r = await RW.send('ask', {q, facts: null, history: prior, age: (d.onbDone || d.ageSet) && Number.isFinite(d.age) ? d.age : null, lang: questionLang(q) || RW.lang || 'en', as: 'key'});
       if(typeof r.text !== 'string') throw new Error(r.error || 'no answer');
       b = {html: md(r.text) + (r.note ? `<p><small>${esc(r.note)}</small></p>` : ''), src: r.sources, warn: r.blocked === 'personal', skip: !!r.blocked};
       if(r.blocked) mine.skip = true; else if(!r.clarify && !r.offline) b.fb = {v: null, q};  // only a real AI answer can be voted on (not a greeting, a question back or the document links)
+      }
     }catch(e){ b = {warn: true, skip: true, html: '<p>KEY could not reach the documents just now. Try again in a moment.</p>'}; }
     K.chat.splice(K.chat.indexOf(typing), 1); K.chat.push(b); K.busy = false; ks.disabled = false; kRender();
   }
