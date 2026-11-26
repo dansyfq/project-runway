@@ -500,7 +500,7 @@ def test_ask_suggests_a_question_built_from_the_customers_details():
     assert "What does ${Math.floor(p.lease)} years of lease left do to the price of a ${p.pickType} flat in ${t.name}?" in GAME
     assert "(mine&&fresh(mine)?[mine]:[])" in GAME  # first in the list, unless the customer already asked it
     # the question carries the figures itself: nothing extra about the customer is sent to the server
-    assert "RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior, age: (S.onbDone||S.ageSet) ? S.age : null, lang: S.lang})" in GAME
+    assert "RW.send('ask', {q, facts: ctx ? flatFacts(ctx) : null, history: prior, age: (S.onbDone||S.ageSet) ? S.age : null, lang: questionLang(q) || S.lang})" in GAME
     assert "and a price lookup (the figures behind Trends)" in GAME
 
 
@@ -553,7 +553,7 @@ def test_when_you_sell_shows_a_lease_bar_with_the_rule_behind_why():
 def test_the_voice_is_not_slowed_down():
     # the server voice and every device voice (the mic greeting, read aloud, the voice test) run a little faster than
     # normal: they were set slower than normal (-8%, 0.92) and sounded too slow
-    assert re.findall(r"u\.rate ?= ?([\d.]+)", GAME) == ["1.1", "1.1"]
+    assert re.findall(r"u\.rate ?= ?([\d.]+)", GAME) == ["1", "1"]  # a voice on the device speaks at its own normal speed (1.1 was quick on a Mac)
     pack = (ROOT / "runway" / "voicepack.py").read_text(encoding="utf-8")
     assert 'rate="+10%"' in pack and 'rate="-' not in pack
 
@@ -626,6 +626,15 @@ def test_crowded_map_labels_are_hidden_instead_of_overlapping():
     assert "it.b.classList.toggle('lbl-off', clash)" in fn and ".pinwrap b.lbl-off{visibility:hidden}" in GAME
     assert "LM.on('zoomend',zoomStyle); LM.on('zoomend',declutterLabels);" in GAME
     assert "LY.sales.clearLayers(); PINS=[];" in GAME and "PINS.push({mk, ok, n:g.length});\n  });\n  declutterLabels();" in GAME
+
+
+def test_voice_stays_female_and_answer_follows_the_question_language():
+    # a device voice that is not male comes first (the voice pack is female), so a fallback does not turn the reply male
+    assert "const vgender = v => FEMALE_V.test(v.name) ? 0 : MALE_V.test(v.name) ? 2 : 1;" in GAME
+    assert "(vgender(a[0])===2)-(vgender(b[0])===2)||a[1]-b[1]||vgender(a[0])-vgender(b[0])" in GAME
+    # a question in Chinese or Tamil letters is answered in that language, by KEY and on the Ask page, whatever the dropdown says
+    assert "const questionLang = q => /[\\u3400-\\u9fff]/.test(String(q)) ? 'zh' : /[\\u0B80-\\u0BFF]/.test(String(q)) ? 'ta' : null;" in GAME
+    assert "lang: questionLang(q) || S.lang});" in GAME and "lang: questionLang(q) || RW.lang || 'en', as: 'key'});" in GAME
 
 
 def test_one_h1_on_the_home_page_and_described_ratings():
