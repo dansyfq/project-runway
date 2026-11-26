@@ -689,6 +689,19 @@ def test_home_calculator_shows_no_worked_formula():
     assert "lFormula" not in GAME and "lformula" not in landing and "÷ (${needed} − 20)" not in GAME
 
 
+def test_town_comparison_lets_you_pick_the_town():
+    # a third card under the two automatic ones: a select of every other town and, once picked, the same plain wording
+    landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
+    assert '<article class="ltc pick sq" id="lCmpC" hidden></article>' in landing
+    assert "function pickCard(cur){" in GAME and "function pickOut(){" in GAME and "pickCard(cur);" in GAME
+    pick = GAME[GAME.index("function pickCard(cur){"):GAME.index("window.RWYours = syncYours;")]
+    assert "T.list.filter(t => t.id !== cur.id)" in pick and "if(!opts.some(t => t.id === T.pick)) T.pick = '';" in pick
+    assert "$('#lCmpSel').onchange = e => { T.pick = e.target.value; pickOut(); };" in pick  # picking rewrites only the answer
+    assert 'aria-live="polite"' in pick and 'aria-label="Town to compare with ${esc(cur.name)}"' in pick
+    assert "has too few recent resales for Runway to measure" in pick and "esc(t.name)" in pick
+    assert "That is a <b class=\"lkey\">${d < base ? 'smaller' : 'bigger'}</b> drop than in ${esc(cur.name)} (${base}%)." in pick
+
+
 def test_one_h1_on_the_home_page_and_described_ratings():
     landing = GAME[GAME.index('<section class="screen" id="scrLanding">'):GAME.index("<!-- ONBOARDING -->")]
     assert len(re.findall(r"<h1\b", landing)) == 1
